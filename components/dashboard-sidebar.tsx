@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { UserButton } from "@clerk/nextjs"
 import { Home, FileText, Settings } from "lucide-react"
@@ -20,7 +21,13 @@ export function DashboardSidebar() {
       {/* Logo */}
       <div className="flex h-16 items-center border-b px-6">
         <Link href="/dashboard" className="flex items-center space-x-2">
-          <div className="h-8 w-8 rounded-lg bg-neutral-900 dark:bg-neutral-50" />
+          <Image
+            src="/logo.svg"
+            alt="Fennec Logo"
+            width={32}
+            height={32}
+            className="h-8 w-8"
+          />
           <span className="text-lg font-semibold">Fennec</span>
         </Link>
       </div>
