@@ -43,10 +43,10 @@ export function Navbar() {
         {/* CTA Buttons */}
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/login">Login</Link>
+            <Link href="/sign-in">Login</Link>
           </Button>
           <Button size="sm" asChild>
-            <Link href="/signup">Sign Up</Link>
+            <Link href="/sign-up">Sign Up</Link>
           </Button>
         </div>
       </div>
