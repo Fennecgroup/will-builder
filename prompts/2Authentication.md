@@ -1,0 +1,2 @@
+Create the skeleton of the app with a dashboard. It will have a consistent side bare on the ledt hand side for navigation.
+Use context7 to setup authentication using Clerk Auth and wrap this new section that will be the skeleton a logged in user
