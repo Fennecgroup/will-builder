@@ -1,15 +1,16 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import AnimatedBackground from "@/components/animated-background";
 
 export function Hero() {
   return (
     <section className="relative flex min-h-[100vh] w-full items-start justify-center overflow-hidden">
-      {/* Interactive Background - Placeholder for future interactive elements */}
+      {/* Interactive Animated Background */}
       <div
         className="interactive-background absolute inset-0 -z-10 bg-gradient-to-br from-background via-background to-primary/5"
         aria-hidden="true"
       >
-        {/* Future interactive background elements will go here */}
+        <AnimatedBackground />
       </div>
 
       {/* Hero Content */}
