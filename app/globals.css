@@ -172,3 +172,25 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Circuit animation styles for SVG */
+@keyframes pulseLine {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.circuit-line-animated {
+  animation: pulseLine 3s ease-in-out infinite;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .circuit-line-animated {
+    animation: none !important;
+    opacity: 0.5;
+  }
+}
