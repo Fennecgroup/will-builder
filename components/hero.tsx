@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import AnimatedBackground from "@/components/animated-background";
 
@@ -11,6 +12,34 @@ export function Hero() {
         aria-hidden="true"
       >
         <AnimatedBackground />
+      </div>
+
+      {/* Left Decorative Logo */}
+      <div
+        className="absolute left-8 top-1/2 -translate-y-1/2 hidden lg:block xl:left-16"
+        aria-hidden="true"
+      >
+        <Image
+          src="/logo.svg"
+          alt=""
+          width={256}
+          height={256}
+          className="h-48 w-48 opacity-50 xl:h-64 xl:w-64"
+        />
+      </div>
+
+      {/* Right Decorative Logo - Flipped */}
+      <div
+        className="absolute right-8 top-1/2 -translate-y-1/2 hidden lg:block xl:right-16"
+        aria-hidden="true"
+      >
+        <Image
+          src="/logo.svg"
+          alt=""
+          width={256}
+          height={256}
+          className="h-48 w-48 scale-x-[-1] opacity-50 xl:h-64 xl:w-64"
+        />
       </div>
 
       {/* Hero Content */}
