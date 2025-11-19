@@ -173,24 +173,22 @@
   }
 }
 
-/* Circuit animation styles for SVG */
-@keyframes pulseLine {
+/* Grid cell pulse animation */
+@keyframes pulseCell {
   0%, 100% {
-    opacity: 0;
+    background-color: transparent;
   }
   50% {
-    opacity: 1;
+    background-color: oklch(0.6231 0.1880 259.8145 / 0.15);
   }
 }
 
-.circuit-line-animated {
-  animation: pulseLine 3s ease-in-out infinite;
-  opacity: 0;
+.pulse-cell {
+  animation: pulseCell 5s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .circuit-line-animated {
+  .pulse-cell {
     animation: none !important;
-    opacity: 0.5;
   }
 }
