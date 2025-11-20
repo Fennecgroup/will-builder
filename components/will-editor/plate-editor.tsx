@@ -53,6 +53,7 @@ import { AIChat } from '@/components/plate-ui/ai-chat';
 import { AILeaf } from '@/components/plate-ui/ai-leaf';
 import { SlashInputElement } from '@/components/plate-ui/slash-input-element';
 import { AISuggestionMenu } from '@/components/plate-ui/ai-suggestion-menu';
+import { AICommandCombobox } from '@/components/plate-ui/ai-command-combobox';
 
 interface PlateEditorProps {
   initialValue?: Value;
@@ -380,6 +381,7 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [lastAIAction, setLastAIAction] = useState<{ action: string; text: string } | null>(null);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
 
   const editor = useMemo(
     () =>
@@ -500,6 +502,7 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
       summarize: `Summarize the following text concisely:\n\n${selectedText}`,
       continue: `Continue writing from the following text, maintaining the same style and tone:\n\n${selectedText}`,
       explain: `Explain the following text in simpler terms:\n\n${selectedText}`,
+      custom: selectedText, // For custom prompts, selectedText is actually the custom prompt
     };
 
     const prompt = prompts[action] || selectedText;
@@ -567,6 +570,44 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
     };
   }, [handleAIAction]);
 
+  // Ctrl+K keyboard shortcut for command palette
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Handle commands from command palette
+  const handleCommandPaletteAction = useCallback(
+    (action: string, customPrompt?: string) => {
+      const selectedText = editor.selection
+        ? editor.api.string(editor.selection)
+        : '';
+
+      // Handle formatting commands
+      if (['h1', 'h2', 'h3', 'p', 'blockquote', 'ul', 'ol'].includes(action)) {
+        editor.tf.setNodes({ type: action });
+        return;
+      }
+
+      // Handle custom prompts - pass the custom prompt as the "selectedText"
+      if (action === 'custom' && customPrompt) {
+        handleAIAction('custom', customPrompt);
+        return;
+      }
+
+      // Handle predefined AI commands with actual selected text
+      handleAIAction(action, selectedText);
+    },
+    [editor, handleAIAction]
+  );
+
   return (
     <div className={cn('flex flex-col rounded-lg border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950', className)}>
       <Plate
@@ -631,6 +672,18 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
         onInsert={handleInsertFromChat}
         isOpen={isChatOpen}
         onOpenChange={setIsChatOpen}
+      />
+
+      {/* AI Command Palette (Ctrl+K) */}
+      <AICommandCombobox
+        open={isCommandPaletteOpen}
+        onOpenChange={setIsCommandPaletteOpen}
+        onCommand={handleCommandPaletteAction}
+        hasSelection={
+          editor.selection
+            ? (editor.api.string(editor.selection)?.length > 0)
+            : false
+        }
       />
     </div>
   );
