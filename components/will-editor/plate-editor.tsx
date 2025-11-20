@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 import {
   Plate,
   PlateContent,
@@ -27,6 +27,10 @@ import {
 } from '@udecode/plate-ai/react';
 import { BlockSelectionPlugin } from '@udecode/plate-selection/react';
 import {
+  SlashPlugin,
+  SlashInputPlugin,
+} from '@udecode/plate-slash-command/react';
+import {
   Bold,
   Italic,
   Underline,
@@ -46,6 +50,9 @@ import { Separator } from '@/components/ui/separator';
 import { AIMenu } from '@/components/plate-ui/ai-menu';
 import { AIToolbarButton } from '@/components/plate-ui/ai-toolbar-button';
 import { AIChat } from '@/components/plate-ui/ai-chat';
+import { AILeaf } from '@/components/plate-ui/ai-leaf';
+import { SlashInputElement } from '@/components/plate-ui/slash-input-element';
+import { AISuggestionMenu } from '@/components/plate-ui/ai-suggestion-menu';
 
 interface PlateEditorProps {
   initialValue?: Value;
@@ -372,6 +379,7 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
 
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [lastAIAction, setLastAIAction] = useState<{ action: string; text: string } | null>(null);
 
   const editor = useMemo(
     () =>
@@ -457,6 +465,15 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
               },
             },
           }),
+
+          // Slash Commands
+          SlashPlugin.configure({
+            options: {
+              trigger: '/',
+              triggerPreviousCharPattern: /^\s?$/,
+            },
+          }),
+          SlashInputPlugin.withComponent(SlashInputElement),
         ],
         value: initialValue && Array.isArray(initialValue) && initialValue.length > 0
           ? initialValue
@@ -469,6 +486,7 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
 
   const handleAIAction = useCallback(async (action: string, selectedText: string) => {
     setIsLoading(true);
+    setLastAIAction({ action, text: selectedText });
 
     const prompts: Record<string, string> = {
       generate: `Generate appropriate content for a legal will document. Be formal and clear.`,
@@ -507,13 +525,16 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
         }
       }
 
-      // Insert or replace text based on action
+      // Insert or replace text based on action with AI marks
       if (result && editor.selection) {
         if (selectedText && action !== 'generate' && action !== 'explain') {
           // Replace selection
           editor.tf.delete();
         }
-        editor.tf.insertText(result);
+
+        // Insert text with AI marks for visual distinction
+        const aiMark = { [AIPlugin.key]: true };
+        editor.tf.insertText(result, { marks: aiMark });
       }
     } catch (error) {
       console.error('AI action error:', error);
@@ -525,6 +546,26 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
   const handleInsertFromChat = useCallback((text: string) => {
     editor.tf.insertText(text);
   }, [editor]);
+
+  const handleTryAgain = useCallback(() => {
+    if (lastAIAction) {
+      handleAIAction(lastAIAction.action, lastAIAction.text);
+    }
+  }, [lastAIAction, handleAIAction]);
+
+  // Listen for slash AI commands
+  useEffect(() => {
+    const handleSlashAICommand = (event: Event) => {
+      const customEvent = event as CustomEvent<{ action: string; selectedText: string }>;
+      const { action, selectedText } = customEvent.detail;
+      handleAIAction(action, selectedText);
+    };
+
+    window.addEventListener('slash-ai-command', handleSlashAICommand);
+    return () => {
+      window.removeEventListener('slash-ai-command', handleSlashAICommand);
+    };
+  }, [handleAIAction]);
 
   return (
     <div className={cn('flex flex-col rounded-lg border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950', className)}>
@@ -562,6 +603,12 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
           }}
           renderLeaf={({ attributes, children, leaf }) => {
             let result = children;
+
+            // Apply AI mark styling first for visual distinction
+            if ((leaf as any)[AIPlugin.key]) {
+              result = <AILeaf attributes={attributes} leaf={leaf}>{result}</AILeaf>;
+            }
+
             if (leaf.bold) {
               result = <BoldLeaf attributes={attributes} leaf={leaf}>{result}</BoldLeaf>;
             }
@@ -574,6 +621,9 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
             return <span {...attributes}>{result}</span>;
           }}
         />
+
+        {/* AI Suggestion Menu - Must be inside Plate for hooks */}
+        <AISuggestionMenu onTryAgain={handleTryAgain} />
       </Plate>
 
       {/* AI Chat Panel */}

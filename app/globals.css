@@ -187,8 +187,25 @@
   animation: pulseCell 5s ease-in-out infinite;
 }
 
+/* AI shimmer animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pulse-cell {
+    animation: none !important;
+  }
+  .animate-shimmer {
     animation: none !important;
   }
 }
