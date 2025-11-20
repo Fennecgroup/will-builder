@@ -43,8 +43,13 @@ export function AIMenu({ onAIAction, isLoading = false }: AIMenuProps) {
   const selection = useEditorSelection();
 
   const getSelectedText = React.useCallback(() => {
-    if (!selection) return '';
-    return editor.api.string(selection);
+    if (!selection || !editor?.api) return '';
+    try {
+      return editor.api.string(selection);
+    } catch (error) {
+      console.error('Error getting selected text:', error);
+      return '';
+    }
   }, [editor, selection]);
 
   const handleAction = (action: string) => {

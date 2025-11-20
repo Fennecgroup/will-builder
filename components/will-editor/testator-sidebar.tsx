@@ -73,8 +73,8 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
     digitalAssets,
   } = willContent;
 
-  const totalAssetValue = assets.reduce((sum, asset) => sum + (asset.estimatedValue || 0), 0);
-  const totalLiabilities = liabilities.reduce((sum, liability) => sum + liability.amount, 0);
+  const totalAssetValue = assets?.reduce((sum, asset) => sum + (asset.estimatedValue || 0), 0) || 0;
+  const totalLiabilities = liabilities?.reduce((sum, liability) => sum + liability.amount, 0) || 0;
 
   return (
     <ScrollArea className="h-full">
@@ -85,65 +85,71 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
 
         <Accordion type="multiple" defaultValue={['personal', 'marriage', 'assets', 'beneficiaries']} className="w-full">
           {/* Personal Information */}
-          <AccordionItem value="personal">
-            <AccordionTrigger className="text-sm font-medium">
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                Personal Information
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-2 pl-6">
-                <InfoRow icon={User} label="Name" value={testator.fullName} />
-                <InfoRow icon={Calendar} label="DOB" value={formatDate(testator.dateOfBirth)} />
-                <InfoRow icon={Hash} label="ID" value={testator.idNumber} />
-                <InfoRow
-                  icon={MapPin}
-                  label="Address"
-                  value={`${testator.address.street}, ${testator.address.city}, ${testator.address.state} ${testator.address.postalCode}`}
-                />
-                <InfoRow icon={Phone} label="Phone" value={testator.phone} />
-                <InfoRow icon={Mail} label="Email" value={testator.email} />
-                {testator.occupation && (
-                  <InfoRow icon={Building2} label="Occupation" value={testator.occupation} />
-                )}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+          {testator && (
+            <AccordionItem value="personal">
+              <AccordionTrigger className="text-sm font-medium">
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Personal Information
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-2 pl-6">
+                  <InfoRow icon={User} label="Name" value={testator.fullName} />
+                  <InfoRow icon={Calendar} label="DOB" value={formatDate(testator.dateOfBirth)} />
+                  <InfoRow icon={Hash} label="ID" value={testator.idNumber} />
+                  {testator.address && (
+                    <InfoRow
+                      icon={MapPin}
+                      label="Address"
+                      value={`${testator.address.street}, ${testator.address.city}, ${testator.address.state} ${testator.address.postalCode}`}
+                    />
+                  )}
+                  <InfoRow icon={Phone} label="Phone" value={testator.phone} />
+                  <InfoRow icon={Mail} label="Email" value={testator.email} />
+                  {testator.occupation && (
+                    <InfoRow icon={Building2} label="Occupation" value={testator.occupation} />
+                  )}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
 
           {/* Marriage Status */}
-          <AccordionItem value="marriage">
-            <AccordionTrigger className="text-sm font-medium">
-              <div className="flex items-center gap-2">
-                <Heart className="h-4 w-4" />
-                Marriage Status
-                <Badge variant="secondary" className="ml-2 text-xs capitalize">
-                  {marriage.status}
-                </Badge>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-2 pl-6">
-                {marriage.spouse && (
-                  <>
-                    <InfoRow icon={User} label="Spouse" value={marriage.spouse.fullName} />
-                    {marriage.spouse.dateOfMarriage && (
-                      <InfoRow
-                        icon={Calendar}
-                        label="Married"
-                        value={formatDate(marriage.spouse.dateOfMarriage)}
-                      />
-                    )}
-                  </>
-                )}
-                <InfoRow
-                  icon={Users}
-                  label="Children"
-                  value={marriage.hasChildren ? `Yes (${marriage.numberOfChildren || 0})` : 'No'}
-                />
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+          {marriage && (
+            <AccordionItem value="marriage">
+              <AccordionTrigger className="text-sm font-medium">
+                <div className="flex items-center gap-2">
+                  <Heart className="h-4 w-4" />
+                  Marriage Status
+                  <Badge variant="secondary" className="ml-2 text-xs capitalize">
+                    {marriage.status}
+                  </Badge>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-2 pl-6">
+                  {marriage.spouse && (
+                    <>
+                      <InfoRow icon={User} label="Spouse" value={marriage.spouse.fullName} />
+                      {marriage.spouse.dateOfMarriage && (
+                        <InfoRow
+                          icon={Calendar}
+                          label="Married"
+                          value={formatDate(marriage.spouse.dateOfMarriage)}
+                        />
+                      )}
+                    </>
+                  )}
+                  <InfoRow
+                    icon={Users}
+                    label="Children"
+                    value={marriage.hasChildren ? `Yes (${marriage.numberOfChildren || 0})` : 'No'}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
 
           {/* Assets */}
           <AccordionItem value="assets">
@@ -152,7 +158,7 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
                 <Building2 className="h-4 w-4" />
                 Assets
                 <Badge variant="secondary" className="ml-2 text-xs">
-                  {assets.length} items
+                  {assets?.length || 0} items
                 </Badge>
               </div>
             </AccordionTrigger>
@@ -161,7 +167,7 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
                 <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                   Total Value: {formatCurrency(totalAssetValue)}
                 </div>
-                {assets.map((asset) => (
+                {assets?.map((asset) => (
                   <div key={asset.id} className="border-l-2 border-neutral-200 pl-3 dark:border-neutral-700">
                     <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {asset.description}
@@ -188,13 +194,13 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
                 <Users className="h-4 w-4" />
                 Beneficiaries
                 <Badge variant="secondary" className="ml-2 text-xs">
-                  {beneficiaries.length}
+                  {beneficiaries?.length || 0}
                 </Badge>
               </div>
             </AccordionTrigger>
             <AccordionContent>
               <div className="space-y-3 pl-6">
-                {beneficiaries.map((beneficiary) => (
+                {beneficiaries?.map((beneficiary) => (
                   <div key={beneficiary.id} className="border-l-2 border-neutral-200 pl-3 dark:border-neutral-700">
                     <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {beneficiary.fullName}
@@ -223,13 +229,13 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
                 <UserCheck className="h-4 w-4" />
                 Executor
                 <Badge variant="secondary" className="ml-2 text-xs">
-                  {executors.length}
+                  {executors?.length || 0}
                 </Badge>
               </div>
             </AccordionTrigger>
             <AccordionContent>
               <div className="space-y-3 pl-6">
-                {executors.map((executor) => (
+                {executors?.map((executor) => (
                   <div key={executor.id} className="border-l-2 border-neutral-200 pl-3 dark:border-neutral-700">
                     <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {executor.fullName}
@@ -254,13 +260,13 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
                 <Eye className="h-4 w-4" />
                 Witnesses
                 <Badge variant="secondary" className="ml-2 text-xs">
-                  {witnesses.length}
+                  {witnesses?.length || 0}
                 </Badge>
               </div>
             </AccordionTrigger>
             <AccordionContent>
               <div className="space-y-3 pl-6">
-                {witnesses.map((witness) => (
+                {witnesses?.map((witness) => (
                   <div key={witness.id} className="border-l-2 border-neutral-200 pl-3 dark:border-neutral-700">
                     <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {witness.fullName}
@@ -278,20 +284,20 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
           </AccordionItem>
 
           {/* Guardians */}
-          {guardians.length > 0 && (
+          {(guardians?.length || 0) > 0 && (
             <AccordionItem value="guardians">
               <AccordionTrigger className="text-sm font-medium">
                 <div className="flex items-center gap-2">
                   <Shield className="h-4 w-4" />
                   Guardians
                   <Badge variant="secondary" className="ml-2 text-xs">
-                    {guardians.length}
+                    {guardians?.length || 0}
                   </Badge>
                 </div>
               </AccordionTrigger>
               <AccordionContent>
                 <div className="space-y-3 pl-6">
-                  {guardians.map((guardian) => (
+                  {guardians?.map((guardian) => (
                     <div key={guardian.id} className="border-l-2 border-neutral-200 pl-3 dark:border-neutral-700">
                       <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                         {guardian.fullName}
@@ -319,7 +325,7 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
                 <CreditCard className="h-4 w-4" />
                 Debts & Liabilities
                 <Badge variant="secondary" className="ml-2 text-xs">
-                  {liabilities.length}
+                  {liabilities?.length || 0}
                 </Badge>
               </div>
             </AccordionTrigger>
@@ -328,7 +334,7 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
                 <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                   Total: {formatCurrency(totalLiabilities)}
                 </div>
-                {liabilities.map((liability) => (
+                {liabilities?.map((liability) => (
                   <div key={liability.id} className="border-l-2 border-neutral-200 pl-3 dark:border-neutral-700">
                     <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {liability.creditor}
@@ -401,13 +407,13 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
                 <Globe className="h-4 w-4" />
                 Digital Assets
                 <Badge variant="secondary" className="ml-2 text-xs">
-                  {digitalAssets.length}
+                  {digitalAssets?.length || 0}
                 </Badge>
               </div>
             </AccordionTrigger>
             <AccordionContent>
               <div className="space-y-3 pl-6">
-                {digitalAssets.map((asset) => (
+                {digitalAssets?.map((asset) => (
                   <div key={asset.id} className="border-l-2 border-neutral-200 pl-3 dark:border-neutral-700">
                     <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {asset.platform}

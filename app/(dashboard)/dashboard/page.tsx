@@ -1,12 +1,24 @@
 import { auth, currentUser } from "@clerk/nextjs/server"
 import { Card } from "@/components/ui/card"
-import { FileText, Plus } from "lucide-react"
+import { FileText, Plus, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
+import { getWillStats, getWills } from "@/lib/actions/wills"
+import { formatDistanceToNow } from "date-fns"
 
 export default async function DashboardPage() {
   const { userId } = await auth()
   const user = await currentUser()
+
+  if (!userId) {
+    return null
+  }
+
+  const [stats, allWills] = await Promise.all([getWillStats(), getWills()])
+
+  // Get recent wills (last 5 updated)
+  const recentWills = allWills.slice(0, 5)
 
   return (
     <div className="container mx-auto p-8">
@@ -29,7 +41,7 @@ export default async function DashboardPage() {
                 Total Wills
               </p>
               <p className="text-3xl font-bold text-neutral-900 dark:text-neutral-50 mt-2">
-                0
+                {stats.total}
               </p>
             </div>
             <FileText className="h-12 w-12 text-neutral-400" />
@@ -43,7 +55,7 @@ export default async function DashboardPage() {
                 Draft Wills
               </p>
               <p className="text-3xl font-bold text-neutral-900 dark:text-neutral-50 mt-2">
-                0
+                {stats.draft}
               </p>
             </div>
             <FileText className="h-12 w-12 text-neutral-400" />
@@ -57,7 +69,7 @@ export default async function DashboardPage() {
                 Completed Wills
               </p>
               <p className="text-3xl font-bold text-neutral-900 dark:text-neutral-50 mt-2">
-                0
+                {stats.completed}
               </p>
             </div>
             <FileText className="h-12 w-12 text-neutral-400" />
@@ -112,11 +124,48 @@ export default async function DashboardPage() {
         <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-50 mb-4">
           Recent Activity
         </h2>
-        <Card className="p-6">
-          <p className="text-center text-neutral-600 dark:text-neutral-400 py-8">
-            No recent activity yet. Create your first will to get started!
-          </p>
-        </Card>
+        {recentWills.length === 0 ? (
+          <Card className="p-6">
+            <p className="text-center text-neutral-600 dark:text-neutral-400 py-8">
+              No recent activity yet. Create your first will to get started!
+            </p>
+          </Card>
+        ) : (
+          <Card className="divide-y divide-neutral-200 dark:divide-neutral-800">
+            {recentWills.map((will) => (
+              <Link
+                key={will.id}
+                href={`/dashboard/wills/${will.id}`}
+                className="flex items-center justify-between p-4 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <FileText className="h-5 w-5 text-neutral-400" />
+                  <div>
+                    <p className="font-medium text-neutral-900 dark:text-neutral-50">
+                      {will.title}
+                    </p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400 flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      Updated {formatDistanceToNow(new Date(will.updatedAt), { addSuffix: true })}
+                    </p>
+                  </div>
+                </div>
+                <Badge
+                  variant="secondary"
+                  className={
+                    will.status === 'draft'
+                      ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                      : will.status === 'completed'
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                      : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                  }
+                >
+                  {will.status.charAt(0).toUpperCase() + will.status.slice(1)}
+                </Badge>
+              </Link>
+            ))}
+          </Card>
+        )}
       </div>
     </div>
   )

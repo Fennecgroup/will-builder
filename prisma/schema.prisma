@@ -25,14 +25,15 @@ model User {
 }
 
 model Will {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  content   Json?
-  status    String   @default("draft") // draft, completed, finalized
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title         String
+  content       Json?
+  editorContent Json?
+  status        String   @default("draft") // draft, completed, finalized
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([userId])
 }

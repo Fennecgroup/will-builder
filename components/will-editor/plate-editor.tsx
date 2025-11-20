@@ -458,8 +458,12 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
             },
           }),
         ],
-        value: initialValue || defaultValue,
+        value: initialValue && Array.isArray(initialValue) && initialValue.length > 0
+          ? initialValue
+          : defaultValue,
       }),
+    // Empty dependency array is intentional - editor should only be created once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
