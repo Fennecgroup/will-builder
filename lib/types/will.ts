@@ -2,6 +2,18 @@
 
 export type MaritalStatus = 'single' | 'married' | 'divorced' | 'widowed' | 'separated';
 
+// South African Provinces
+export type SAProvince =
+  | 'Gauteng'
+  | 'Western Cape'
+  | 'KwaZulu-Natal'
+  | 'Eastern Cape'
+  | 'Free State'
+  | 'Limpopo'
+  | 'Mpumalanga'
+  | 'Northern Cape'
+  | 'North West';
+
 export type AssetType =
   | 'real-estate'
   | 'vehicle'
@@ -16,26 +28,35 @@ export type AssetType =
 export interface Address {
   street: string;
   city: string;
-  state: string;
-  postalCode: string;
-  country: string;
+  state: string; // For SA: Province (Gauteng, Western Cape, KwaZulu-Natal, etc.)
+  postalCode: string; // For SA: 4-digit postal code
+  country: string; // Default: "South Africa"
 }
 
 export interface TestatorInfo {
   id: string;
   fullName: string;
   dateOfBirth: string;
-  idNumber: string; // National ID, SSN, etc.
+  idNumber: string; // For SA: 13-digit ID number (YYMMDD SSSS C A Z)
   address: Address;
-  phone: string;
+  phone: string; // For SA: +27 format
   email: string;
   occupation?: string;
 }
 
 export interface SpouseInfo {
   fullName: string;
+  idNumber?: string; // For SA: 13-digit ID number
   dateOfBirth?: string;
   dateOfMarriage?: string;
+}
+
+export interface Child {
+  id: string;
+  fullName: string;
+  idNumber?: string; // For SA: 13-digit ID number (if 16+)
+  dateOfBirth: string;
+  isMinor: boolean; // Under 18 in SA
 }
 
 export interface MarriageInfo {
@@ -43,6 +64,7 @@ export interface MarriageInfo {
   spouse?: SpouseInfo;
   hasChildren: boolean;
   numberOfChildren?: number;
+  children?: Child[]; // SA: Required for guardianship and minor provisions
 }
 
 export interface Asset {
@@ -59,6 +81,7 @@ export interface Asset {
 export interface Beneficiary {
   id: string;
   fullName: string;
+  idNumber?: string; // For SA: 13-digit ID number (required for adults)
   relationship: string;
   dateOfBirth?: string;
   address?: Address;
@@ -68,11 +91,13 @@ export interface Beneficiary {
   specificBequests?: string[]; // Specific items bequeathed to this person
   isMinor?: boolean;
   guardianId?: string; // Reference to guardian if minor
+  substituteBeneficiaryId?: string; // SA: Who inherits if this beneficiary predeceases testator
 }
 
 export interface Executor {
   id: string;
   fullName: string;
+  idNumber: string; // For SA: 13-digit ID number (required)
   relationship: string;
   address: Address;
   phone: string;
@@ -83,14 +108,18 @@ export interface Executor {
 export interface Witness {
   id: string;
   fullName: string;
+  idNumber?: string; // For SA: 13-digit ID number (recommended)
   address: Address;
   phone?: string;
   occupation?: string;
+  dateWitnessed?: string; // SA: Date when will was witnessed
+  // CRITICAL: SA law - witness CANNOT be a beneficiary, executor, or guardian (or their spouse)
 }
 
 export interface Guardian {
   id: string;
   fullName: string;
+  idNumber: string; // For SA: 13-digit ID number (required)
   relationship: string;
   address: Address;
   phone: string;
@@ -127,20 +156,39 @@ export interface DigitalAsset {
   beneficiaryId?: string;
 }
 
+export interface SpecificBequest {
+  id: string;
+  description: string; // e.g., "My 2022 BMW X5, registration ABC123GP"
+  beneficiaryId: string; // Who receives this item
+  substituteBeneficiaryId?: string; // If primary beneficiary predeceases testator
+}
+
+export interface MinorBeneficiaryProvisions {
+  method: 'guardian-fund' | 'testamentary-trust' | 'other'; // SA: How to handle minor's inheritance
+  ageOfInheritance?: number; // Default 18, can specify higher
+  trusteeId?: string; // If using testamentary trust
+  instructions?: string; // Additional instructions
+}
+
 export interface WillContent {
   testator: TestatorInfo;
   marriage: MarriageInfo;
   assets: Asset[];
   beneficiaries: Beneficiary[];
   executors: Executor[];
-  witnesses: Witness[];
+  witnesses: Witness[]; // SA: Minimum 2 required
   guardians: Guardian[];
   liabilities: Liability[];
   funeralWishes?: FuneralWishes;
   digitalAssets: DigitalAsset[];
   specialInstructions?: string;
-  revocationClause?: string;
-  residuaryClause?: string; // What happens to unspecified assets
+  revocationClause: string; // SA: Required - "I hereby revoke all previous Wills..."
+  residuaryClause: string; // SA: Required - what happens to remaining assets
+  specificBequests?: SpecificBequest[]; // SA: Specific items/legacies
+  minorBeneficiaryProvisions?: MinorBeneficiaryProvisions; // SA: Guardian's Fund or Trust for minors
+  attestationClause?: string; // SA: Recommended attestation clause
+  dateExecuted?: string; // SA: Date will was signed (highly recommended)
+  placeExecuted?: string; // SA: City/town where will was signed
 }
 
 export interface WillDocument {
