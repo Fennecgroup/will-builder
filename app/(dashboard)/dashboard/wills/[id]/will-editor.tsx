@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Save, FileDown, Clock, Trash2, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, Save, FileDown, Clock, Trash2, CheckCircle2, Pencil } from 'lucide-react'
 import type { Value } from '@udecode/plate'
 import { Will } from '@prisma/client'
 import { Button } from '@/components/ui/button'
@@ -40,6 +40,10 @@ export function WillEditor({ will }: WillEditorProps) {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [status, setStatus] = useState(will.status)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [isEditingTitle, setIsEditingTitle] = useState(false)
+  const [title, setTitle] = useState(will.title)
+  const [isSavingTitle, setIsSavingTitle] = useState(false)
+  const titleInputRef = useRef<HTMLInputElement>(null)
 
   // Auto-save function
   const saveWill = useCallback(async () => {
@@ -95,6 +99,53 @@ export function WillEditor({ will }: WillEditorProps) {
     }
   }
 
+  // Handle title save
+  const saveTitle = async (newTitle: string) => {
+    const trimmedTitle = newTitle.trim()
+
+    // Don't save if title is empty or unchanged
+    if (!trimmedTitle || trimmedTitle === will.title) {
+      setTitle(will.title)
+      setIsEditingTitle(false)
+      return
+    }
+
+    setIsSavingTitle(true)
+    try {
+      await updateWill(will.id, { title: trimmedTitle })
+      setTitle(trimmedTitle)
+      toast.success('Will title updated')
+      router.refresh()
+    } catch (error) {
+      toast.error('Failed to update title')
+      console.error('Error updating title:', error)
+      setTitle(will.title)
+    } finally {
+      setIsSavingTitle(false)
+      setIsEditingTitle(false)
+    }
+  }
+
+  // Handle title edit start
+  const handleTitleEdit = () => {
+    setIsEditingTitle(true)
+    setTimeout(() => {
+      titleInputRef.current?.focus()
+      titleInputRef.current?.select()
+    }, 0)
+  }
+
+  // Handle title input key down
+  const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      saveTitle(title)
+    } else if (e.key === 'Escape') {
+      setTitle(will.title)
+      setIsEditingTitle(false)
+    }
+  }
+
   // Handle delete
   const handleDelete = async () => {
     try {
@@ -121,7 +172,7 @@ export function WillEditor({ will }: WillEditorProps) {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `${will.title.replace(/[^a-z0-9]/gi, '_')}.pdf`
+      a.download = `${title.replace(/[^a-z0-9]/gi, '_')}.pdf`
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
@@ -160,9 +211,33 @@ export function WillEditor({ will }: WillEditorProps) {
             </Button>
           </Link>
           <div>
-            <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
-              {will.title}
-            </h1>
+            {/* Editable Title */}
+            <div className="group relative flex items-center gap-2">
+              {isEditingTitle ? (
+                <input
+                  ref={titleInputRef}
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  onBlur={() => saveTitle(title)}
+                  onKeyDown={handleTitleKeyDown}
+                  disabled={isSavingTitle}
+                  className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 bg-transparent border-b-2 border-neutral-300 dark:border-neutral-700 focus:border-neutral-900 dark:focus:border-neutral-100 outline-none px-1 py-0.5 w-full max-w-md"
+                  placeholder="Enter will title"
+                />
+              ) : (
+                <>
+                  <h1
+                    onClick={handleTitleEdit}
+                    className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 cursor-pointer hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors px-1 py-0.5 rounded border-2 border-transparent hover:border-neutral-200 dark:hover:border-neutral-800"
+                    title="Click to edit title"
+                  >
+                    {title}
+                  </h1>
+                  <Pencil className="h-3.5 w-3.5 text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </>
+              )}
+            </div>
             <div className="flex items-center gap-2 text-sm text-neutral-500">
               <Select value={status} onValueChange={handleStatusChange}>
                 <SelectTrigger className="h-6 w-auto border-0 p-0 focus:ring-0">
@@ -241,7 +316,7 @@ export function WillEditor({ will }: WillEditorProps) {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDelete}
-        willTitle={will.title}
+        willTitle={title}
       />
     </div>
   )
