@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import {
   Plate,
   PlateContent,
@@ -8,6 +8,7 @@ import {
   PlateLeaf,
   ParagraphPlugin,
   createPlateEditor,
+  useEditorRef,
 } from '@udecode/plate/react';
 import type { Value } from '@udecode/plate';
 import {
@@ -29,10 +30,15 @@ import {
   ListOrdered,
   Quote,
   Pilcrow,
+  MessageSquare,
+  Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { AIMenu } from '@/components/plate-ui/ai-menu';
+import { AIToolbarButton } from '@/components/plate-ui/ai-toolbar-button';
+import { AIChat } from '@/components/plate-ui/ai-chat';
 
 interface PlateEditorProps {
   initialValue?: Value;
@@ -195,8 +201,14 @@ function ToolbarButton({ onClick, isActive, children, title }: ToolbarButtonProp
   );
 }
 
-// Static toolbar component (visual only for now)
-function EditorToolbar() {
+// Toolbar with AI features
+interface EditorToolbarProps {
+  onAIAction: (action: string, text: string) => void;
+  onOpenChat: () => void;
+  isLoading: boolean;
+}
+
+function EditorToolbar({ onAIAction, onOpenChat, isLoading }: EditorToolbarProps) {
   return (
     <div className="flex items-center gap-1 border-b border-neutral-200 bg-neutral-50 px-3 py-2 dark:border-neutral-800 dark:bg-neutral-900">
       <ToolbarButton onClick={() => {}} title="Heading 1">
@@ -236,8 +248,22 @@ function EditorToolbar() {
         <Quote className="h-4 w-4" />
       </ToolbarButton>
 
-      <div className="ml-auto text-xs text-neutral-500">
-        Use Ctrl+B, Ctrl+I, Ctrl+U for formatting
+      <Separator orientation="vertical" className="mx-1 h-6" />
+
+      {/* AI Features */}
+      <AIMenu onAIAction={onAIAction} isLoading={isLoading} />
+      <AIToolbarButton onClick={onOpenChat} isLoading={isLoading} tooltip="AI Chat" />
+
+      <div className="ml-auto flex items-center gap-2">
+        {isLoading && (
+          <span className="flex items-center gap-1 text-xs text-purple-600 dark:text-purple-400">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            Processing...
+          </span>
+        )}
+        <span className="text-xs text-neutral-500">
+          Ctrl+J for AI
+        </span>
       </div>
     </div>
   );
@@ -250,6 +276,9 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
       children: [{ text: 'Start writing your will...' }],
     },
   ];
+
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const editor = useMemo(
     () =>
@@ -271,13 +300,74 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
     []
   );
 
+  const handleAIAction = useCallback(async (action: string, selectedText: string) => {
+    setIsLoading(true);
+
+    const prompts: Record<string, string> = {
+      generate: `Generate appropriate content for a legal will document. Be formal and clear.`,
+      improve: `Improve the following text to be more clear and professional while maintaining its legal accuracy:\n\n${selectedText}`,
+      fix: `Fix any grammar, spelling, or punctuation errors in the following text:\n\n${selectedText}`,
+      simplify: `Simplify the following text while maintaining its legal meaning:\n\n${selectedText}`,
+      formal: `Make the following text more formal and appropriate for a legal document:\n\n${selectedText}`,
+      expand: `Expand on the following text with more detail while maintaining a legal tone:\n\n${selectedText}`,
+      summarize: `Summarize the following text concisely:\n\n${selectedText}`,
+      continue: `Continue writing from the following text, maintaining the same style and tone:\n\n${selectedText}`,
+      explain: `Explain the following text in simpler terms:\n\n${selectedText}`,
+    };
+
+    const prompt = prompts[action] || selectedText;
+
+    try {
+      const response = await fetch('/api/ai/command', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+      });
+
+      if (!response.ok) throw new Error('Failed to get AI response');
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let result = '';
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          result += decoder.decode(value);
+        }
+      }
+
+      // Insert or replace text based on action
+      if (result && editor.selection) {
+        if (selectedText && action !== 'generate' && action !== 'explain') {
+          // Replace selection
+          editor.tf.delete();
+        }
+        editor.tf.insertText(result);
+      }
+    } catch (error) {
+      console.error('AI action error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [editor]);
+
+  const handleInsertFromChat = useCallback((text: string) => {
+    editor.tf.insertText(text);
+  }, [editor]);
+
   return (
     <div className={cn('flex flex-col rounded-lg border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950', className)}>
       <Plate
         editor={editor}
         onChange={({ value }) => onChange?.(value)}
       >
-        <EditorToolbar />
+        <EditorToolbar
+          onAIAction={handleAIAction}
+          onOpenChat={() => setIsChatOpen(true)}
+          isLoading={isLoading}
+        />
         <PlateContent
           className="min-h-[500px] p-6 focus:outline-none"
           placeholder="Start typing your will..."
@@ -316,6 +406,13 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
           }}
         />
       </Plate>
+
+      {/* AI Chat Panel */}
+      <AIChat
+        onInsert={handleInsertFromChat}
+        isOpen={isChatOpen}
+        onOpenChange={setIsChatOpen}
+      />
     </div>
   );
 }
