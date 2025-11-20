@@ -9,6 +9,7 @@ import {
   ParagraphPlugin,
   createPlateEditor,
   useEditorRef,
+  useEditorState,
 } from '@udecode/plate/react';
 import type { Value } from '@udecode/plate';
 import {
@@ -19,6 +20,12 @@ import {
 import { HeadingPlugin } from '@udecode/plate-heading/react';
 import { ListPlugin, BulletedListPlugin, NumberedListPlugin, ListItemPlugin } from '@udecode/plate-list/react';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
+import {
+  AIPlugin,
+  AIChatPlugin,
+  CopilotPlugin,
+} from '@udecode/plate-ai/react';
+import { BlockSelectionPlugin } from '@udecode/plate-selection/react';
 import {
   Bold,
   Italic,
@@ -209,42 +216,128 @@ interface EditorToolbarProps {
 }
 
 function EditorToolbar({ onAIAction, onOpenChat, isLoading }: EditorToolbarProps) {
+  const editor = useEditorRef();
+  const editorState = useEditorState();
+
+  // Check active marks by reading editor.marks
+  const marks = editor.marks || {};
+  const isBoldActive = !!marks[BoldPlugin.key];
+  const isItalicActive = !!marks[ItalicPlugin.key];
+  const isUnderlineActive = !!marks[UnderlinePlugin.key];
+
+  // Check active block types - get current node from selection
+  let currentType = 'p';
+  if (editor.selection) {
+    try {
+      const nodeEntry = editor.api.node({ at: editor.selection });
+      if (nodeEntry) {
+        const [node] = nodeEntry as [any, any];
+        if (node && typeof node === 'object' && 'type' in node) {
+          currentType = node.type || 'p';
+        }
+      }
+    } catch (e) {
+      // Fallback to 'p' if error
+      currentType = 'p';
+    }
+  }
+
+  const isH1Active = currentType === 'h1';
+  const isH2Active = currentType === 'h2';
+  const isH3Active = currentType === 'h3';
+  const isParagraphActive = currentType === 'p';
+  const isBlockquoteActive = currentType === 'blockquote';
+  const isUlActive = currentType === 'ul';
+  const isOlActive = currentType === 'ol';
+
+  // Toggle functions
+  const toggleBold = () => {
+    const isActive = !!editor.marks?.[BoldPlugin.key];
+    if (isActive) {
+      editor.tf.removeMark(BoldPlugin.key);
+    } else {
+      editor.tf.addMark(BoldPlugin.key, true);
+    }
+  };
+
+  const toggleItalic = () => {
+    const isActive = !!editor.marks?.[ItalicPlugin.key];
+    if (isActive) {
+      editor.tf.removeMark(ItalicPlugin.key);
+    } else {
+      editor.tf.addMark(ItalicPlugin.key, true);
+    }
+  };
+
+  const toggleUnderline = () => {
+    const isActive = !!editor.marks?.[UnderlinePlugin.key];
+    if (isActive) {
+      editor.tf.removeMark(UnderlinePlugin.key);
+    } else {
+      editor.tf.addMark(UnderlinePlugin.key, true);
+    }
+  };
+
+  const setBlockType = (type: string) => {
+    editor.tf.setNodes({ type });
+  };
+
+  const toggleList = (type: 'ul' | 'ol') => {
+    const isActive = currentType === type;
+    if (isActive) {
+      // Convert list back to paragraph
+      editor.tf.setNodes({ type: 'p' });
+    } else {
+      // Convert to list
+      editor.tf.setNodes({ type });
+    }
+  };
+
+  const toggleBlockquote = () => {
+    const isActive = currentType === 'blockquote';
+    if (isActive) {
+      editor.tf.setNodes({ type: 'p' });
+    } else {
+      editor.tf.setNodes({ type: 'blockquote' });
+    }
+  };
+
   return (
     <div className="flex items-center gap-1 border-b border-neutral-200 bg-neutral-50 px-3 py-2 dark:border-neutral-800 dark:bg-neutral-900">
-      <ToolbarButton onClick={() => {}} title="Heading 1">
+      <ToolbarButton onClick={() => setBlockType('h1')} isActive={isH1Active} title="Heading 1">
         <Heading1 className="h-4 w-4" />
       </ToolbarButton>
-      <ToolbarButton onClick={() => {}} title="Heading 2">
+      <ToolbarButton onClick={() => setBlockType('h2')} isActive={isH2Active} title="Heading 2">
         <Heading2 className="h-4 w-4" />
       </ToolbarButton>
-      <ToolbarButton onClick={() => {}} title="Heading 3">
+      <ToolbarButton onClick={() => setBlockType('h3')} isActive={isH3Active} title="Heading 3">
         <Heading3 className="h-4 w-4" />
       </ToolbarButton>
-      <ToolbarButton onClick={() => {}} title="Paragraph">
+      <ToolbarButton onClick={() => setBlockType('p')} isActive={isParagraphActive} title="Paragraph">
         <Pilcrow className="h-4 w-4" />
       </ToolbarButton>
 
       <Separator orientation="vertical" className="mx-1 h-6" />
 
-      <ToolbarButton onClick={() => {}} title="Bold (Ctrl+B)">
+      <ToolbarButton onClick={toggleBold} isActive={isBoldActive} title="Bold (Ctrl+B)">
         <Bold className="h-4 w-4" />
       </ToolbarButton>
-      <ToolbarButton onClick={() => {}} title="Italic (Ctrl+I)">
+      <ToolbarButton onClick={toggleItalic} isActive={isItalicActive} title="Italic (Ctrl+I)">
         <Italic className="h-4 w-4" />
       </ToolbarButton>
-      <ToolbarButton onClick={() => {}} title="Underline (Ctrl+U)">
+      <ToolbarButton onClick={toggleUnderline} isActive={isUnderlineActive} title="Underline (Ctrl+U)">
         <Underline className="h-4 w-4" />
       </ToolbarButton>
 
       <Separator orientation="vertical" className="mx-1 h-6" />
 
-      <ToolbarButton onClick={() => {}} title="Bulleted List">
+      <ToolbarButton onClick={() => toggleList('ul')} isActive={isUlActive} title="Bulleted List">
         <List className="h-4 w-4" />
       </ToolbarButton>
-      <ToolbarButton onClick={() => {}} title="Numbered List">
+      <ToolbarButton onClick={() => toggleList('ol')} isActive={isOlActive} title="Numbered List">
         <ListOrdered className="h-4 w-4" />
       </ToolbarButton>
-      <ToolbarButton onClick={() => {}} title="Quote">
+      <ToolbarButton onClick={toggleBlockquote} isActive={isBlockquoteActive} title="Quote">
         <Quote className="h-4 w-4" />
       </ToolbarButton>
 
@@ -262,7 +355,7 @@ function EditorToolbar({ onAIAction, onOpenChat, isLoading }: EditorToolbarProps
           </span>
         )}
         <span className="text-xs text-neutral-500">
-          Ctrl+J for AI
+          Cmd+J for AI
         </span>
       </div>
     </div>
@@ -284,16 +377,86 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
     () =>
       createPlateEditor({
         plugins: [
+          // Block selection must come before other plugins
+          BlockSelectionPlugin,
+
+          // Basic formatting
           ParagraphPlugin,
           HeadingPlugin,
-          BoldPlugin,
-          ItalicPlugin,
-          UnderlinePlugin,
+          BoldPlugin.configure({
+            handlers: {
+              onKeyDown: ({ editor, event }) => {
+                if (event.key === 'b' && (event.ctrlKey || event.metaKey)) {
+                  event.preventDefault();
+                  const isActive = !!editor.marks?.[BoldPlugin.key];
+                  if (isActive) {
+                    editor.tf.removeMark(BoldPlugin.key);
+                  } else {
+                    editor.tf.addMark(BoldPlugin.key, true);
+                  }
+                  return true;
+                }
+                return false;
+              },
+            },
+          }),
+          ItalicPlugin.configure({
+            handlers: {
+              onKeyDown: ({ editor, event }) => {
+                if (event.key === 'i' && (event.ctrlKey || event.metaKey)) {
+                  event.preventDefault();
+                  const isActive = !!editor.marks?.[ItalicPlugin.key];
+                  if (isActive) {
+                    editor.tf.removeMark(ItalicPlugin.key);
+                  } else {
+                    editor.tf.addMark(ItalicPlugin.key, true);
+                  }
+                  return true;
+                }
+                return false;
+              },
+            },
+          }),
+          UnderlinePlugin.configure({
+            handlers: {
+              onKeyDown: ({ editor, event }) => {
+                if (event.key === 'u' && (event.ctrlKey || event.metaKey)) {
+                  event.preventDefault();
+                  const isActive = !!editor.marks?.[UnderlinePlugin.key];
+                  if (isActive) {
+                    editor.tf.removeMark(UnderlinePlugin.key);
+                  } else {
+                    editor.tf.addMark(UnderlinePlugin.key, true);
+                  }
+                  return true;
+                }
+                return false;
+              },
+            },
+          }),
           BlockquotePlugin,
           ListPlugin,
           BulletedListPlugin,
           NumberedListPlugin,
           ListItemPlugin,
+
+          // AI Plugins
+          AIPlugin,
+          AIChatPlugin.configure({
+            options: {
+              trigger: ' ',
+              triggerPreviousCharPattern: /^\s?$/,
+            },
+          }),
+          CopilotPlugin.configure({
+            options: {
+              debounceDelay: 500,
+              completeOptions: {
+                api: '/api/ai/copilot',
+                body: {},
+              },
+            },
+          }),
         ],
         value: initialValue || defaultValue,
       }),
@@ -309,7 +472,9 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
       fix: `Fix any grammar, spelling, or punctuation errors in the following text:\n\n${selectedText}`,
       simplify: `Simplify the following text while maintaining its legal meaning:\n\n${selectedText}`,
       formal: `Make the following text more formal and appropriate for a legal document:\n\n${selectedText}`,
-      expand: `Expand on the following text with more detail while maintaining a legal tone:\n\n${selectedText}`,
+      emojify: `Add appropriate emojis to the following text while maintaining its meaning:\n\n${selectedText}`,
+      expand: `Make the following text longer and more detailed while maintaining a professional tone:\n\n${selectedText}`,
+      shorten: `Make the following text more concise and brief:\n\n${selectedText}`,
       summarize: `Summarize the following text concisely:\n\n${selectedText}`,
       continue: `Continue writing from the following text, maintaining the same style and tone:\n\n${selectedText}`,
       explain: `Explain the following text in simpler terms:\n\n${selectedText}`,

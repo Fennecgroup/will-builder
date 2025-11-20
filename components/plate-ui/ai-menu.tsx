@@ -26,6 +26,11 @@ import {
   Maximize2,
   Languages,
   MessageSquare,
+  RefreshCw,
+  Smile,
+  X,
+  ArrowDown,
+  Replace,
 } from 'lucide-react';
 
 interface AIMenuProps {
@@ -108,6 +113,13 @@ export function AIMenu({ onAIAction, isLoading = false }: AIMenuProps) {
                   <FileText className="mr-2 h-4 w-4" />
                   Make more formal
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleAction('emojify')}
+                  disabled={isLoading}
+                >
+                  <Smile className="mr-2 h-4 w-4" />
+                  Add emojis
+                </DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuSub>
 
@@ -122,7 +134,14 @@ export function AIMenu({ onAIAction, isLoading = false }: AIMenuProps) {
                   disabled={isLoading}
                 >
                   <Maximize2 className="mr-2 h-4 w-4" />
-                  Expand
+                  Make longer
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleAction('shorten')}
+                  disabled={isLoading}
+                >
+                  <Minimize2 className="mr-2 h-4 w-4" />
+                  Make shorter
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleAction('summarize')}
