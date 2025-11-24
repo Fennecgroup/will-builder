@@ -27,10 +27,6 @@ import {
 } from '@udecode/plate-ai/react';
 import { BlockSelectionPlugin } from '@udecode/plate-selection/react';
 import {
-  SlashPlugin,
-  SlashInputPlugin,
-} from '@udecode/plate-slash-command/react';
-import {
   Bold,
   Italic,
   Underline,
@@ -51,9 +47,8 @@ import { AIMenu } from '@/components/plate-ui/ai-menu';
 import { AIToolbarButton } from '@/components/plate-ui/ai-toolbar-button';
 import { AIChat } from '@/components/plate-ui/ai-chat';
 import { AILeaf } from '@/components/plate-ui/ai-leaf';
-import { SlashInputElement } from '@/components/plate-ui/slash-input-element';
 import { AISuggestionMenu } from '@/components/plate-ui/ai-suggestion-menu';
-import { AICommandCombobox } from '@/components/plate-ui/ai-command-combobox';
+import { FloatingSelectionToolbar } from '@/components/plate-ui/floating-selection-toolbar';
 
 interface PlateEditorProps {
   initialValue?: Value;
@@ -381,7 +376,6 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [lastAIAction, setLastAIAction] = useState<{ action: string; text: string } | null>(null);
-  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
 
   const editor = useMemo(
     () =>
@@ -467,15 +461,6 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
               },
             },
           }),
-
-          // Slash Commands
-          SlashPlugin.configure({
-            options: {
-              trigger: '/',
-              triggerPreviousCharPattern: /^\s?$/,
-            },
-          }),
-          SlashInputPlugin.withComponent(SlashInputElement),
         ],
         value: initialValue && Array.isArray(initialValue) && initialValue.length > 0
           ? initialValue
@@ -556,58 +541,6 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
     }
   }, [lastAIAction, handleAIAction]);
 
-  // Listen for slash AI commands
-  useEffect(() => {
-    const handleSlashAICommand = (event: Event) => {
-      const customEvent = event as CustomEvent<{ action: string; selectedText: string }>;
-      const { action, selectedText } = customEvent.detail;
-      handleAIAction(action, selectedText);
-    };
-
-    window.addEventListener('slash-ai-command', handleSlashAICommand);
-    return () => {
-      window.removeEventListener('slash-ai-command', handleSlashAICommand);
-    };
-  }, [handleAIAction]);
-
-  // Ctrl+K keyboard shortcut for command palette
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        setIsCommandPaletteOpen(true);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  // Handle commands from command palette
-  const handleCommandPaletteAction = useCallback(
-    (action: string, customPrompt?: string) => {
-      const selectedText = editor.selection
-        ? editor.api.string(editor.selection)
-        : '';
-
-      // Handle formatting commands
-      if (['h1', 'h2', 'h3', 'p', 'blockquote', 'ul', 'ol'].includes(action)) {
-        editor.tf.setNodes({ type: action });
-        return;
-      }
-
-      // Handle custom prompts - pass the custom prompt as the "selectedText"
-      if (action === 'custom' && customPrompt) {
-        handleAIAction('custom', customPrompt);
-        return;
-      }
-
-      // Handle predefined AI commands with actual selected text
-      handleAIAction(action, selectedText);
-    },
-    [editor, handleAIAction]
-  );
-
   return (
     <div className={cn('flex flex-col rounded-lg border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950', className)}>
       <Plate
@@ -663,6 +596,9 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
           }}
         />
 
+        {/* Floating Selection Toolbar - Appears on text selection */}
+        <FloatingSelectionToolbar onAIAction={handleAIAction} />
+
         {/* AI Suggestion Menu - Must be inside Plate for hooks */}
         <AISuggestionMenu onTryAgain={handleTryAgain} />
       </Plate>
@@ -672,18 +608,6 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
         onInsert={handleInsertFromChat}
         isOpen={isChatOpen}
         onOpenChange={setIsChatOpen}
-      />
-
-      {/* AI Command Palette (Ctrl+K) */}
-      <AICommandCombobox
-        open={isCommandPaletteOpen}
-        onOpenChange={setIsCommandPaletteOpen}
-        onCommand={handleCommandPaletteAction}
-        hasSelection={
-          editor.selection
-            ? (editor.api.string(editor.selection)?.length > 0)
-            : false
-        }
       />
     </div>
   );
