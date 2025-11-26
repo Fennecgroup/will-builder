@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select'
 import { PlateEditor } from '@/components/will-editor/plate-editor'
 import { TestatorSidebar } from '@/components/will-editor/testator-sidebar'
-import { initialEditorContent } from '@/lib/data/sample-will'
+import { initialEditorContent, sampleWillContent } from '@/lib/data/sample-will'
 import { updateWill, deleteWill } from '@/lib/actions/wills'
 import { DeleteDialog } from '@/components/wills/delete-dialog'
 import { WillContent } from '@/lib/types/will'
@@ -32,9 +32,14 @@ export function WillEditor({ will }: WillEditorProps) {
   const [editorValue, setEditorValue] = useState<Value>(
     (will.editorContent as unknown as Value) || (initialEditorContent as Value)
   )
-  const [willContent, setWillContent] = useState<WillContent>(
-    (will.content as unknown as WillContent) || ({} as WillContent)
-  )
+  const [willContent, setWillContent] = useState<WillContent>(() => {
+    const content = will.content as unknown as WillContent
+    // Use sample if content is falsy or an empty object
+    if (!content || Object.keys(content).length === 0) {
+      return sampleWillContent
+    }
+    return content
+  })
   const [lastSaved, setLastSaved] = useState<Date>(new Date(will.updatedAt))
   const [isSaving, setIsSaving] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
