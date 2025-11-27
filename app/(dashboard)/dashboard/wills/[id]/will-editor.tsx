@@ -302,7 +302,7 @@ export function WillEditor({ will }: WillEditorProps) {
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
         {/* Editor Section */}
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 p-6">
           <PlateEditor
             initialValue={editorValue}
             onChange={handleEditorChange}

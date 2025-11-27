@@ -306,7 +306,7 @@ function EditorToolbar({ onAIAction, onOpenChat, isLoading }: EditorToolbarProps
   };
 
   return (
-    <div className="flex items-center gap-1 border-b border-neutral-200 bg-neutral-50 px-3 py-2 dark:border-neutral-800 dark:bg-neutral-900">
+    <div className="sticky top-0 z-10 flex items-center gap-1 border-b border-neutral-200 bg-neutral-50 px-3 py-2 dark:border-neutral-800 dark:bg-neutral-900">
       <ToolbarButton onClick={() => setBlockType('h1')} isActive={isH1Active} title="Heading 1">
         <Heading1 className="h-4 w-4" />
       </ToolbarButton>
@@ -542,7 +542,7 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
   }, [lastAIAction, handleAIAction]);
 
   return (
-    <div className={cn('flex flex-col rounded-lg border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950', className)}>
+    <div className={cn('flex flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950', className)}>
       <Plate
         editor={editor}
         onChange={({ value }) => onChange?.(value)}
@@ -552,55 +552,57 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
           onOpenChat={() => setIsChatOpen(true)}
           isLoading={isLoading}
         />
-        <PlateContent
-          className="min-h-[500px] p-6 focus:outline-none"
-          placeholder="Start typing your will..."
-          renderElement={({ attributes, children, element }) => {
-            switch (element.type) {
-              case 'h1':
-                return <H1Element attributes={attributes} element={element}>{children}</H1Element>;
-              case 'h2':
-                return <H2Element attributes={attributes} element={element}>{children}</H2Element>;
-              case 'h3':
-                return <H3Element attributes={attributes} element={element}>{children}</H3Element>;
-              case 'blockquote':
-                return <BlockquoteElement attributes={attributes} element={element}>{children}</BlockquoteElement>;
-              case 'ul':
-                return <BulletedListElement attributes={attributes} element={element}>{children}</BulletedListElement>;
-              case 'ol':
-                return <NumberedListElement attributes={attributes} element={element}>{children}</NumberedListElement>;
-              case 'li':
-                return <ListItemElement attributes={attributes} element={element}>{children}</ListItemElement>;
-              default:
-                return <ParagraphElement attributes={attributes} element={element}>{children}</ParagraphElement>;
-            }
-          }}
-          renderLeaf={({ attributes, children, leaf }) => {
-            let result = children;
+        <div className="flex-1 overflow-auto">
+          <PlateContent
+            className="min-h-[500px] p-6 focus:outline-none"
+            placeholder="Start typing your will..."
+            renderElement={({ attributes, children, element }) => {
+              switch (element.type) {
+                case 'h1':
+                  return <H1Element attributes={attributes} element={element}>{children}</H1Element>;
+                case 'h2':
+                  return <H2Element attributes={attributes} element={element}>{children}</H2Element>;
+                case 'h3':
+                  return <H3Element attributes={attributes} element={element}>{children}</H3Element>;
+                case 'blockquote':
+                  return <BlockquoteElement attributes={attributes} element={element}>{children}</BlockquoteElement>;
+                case 'ul':
+                  return <BulletedListElement attributes={attributes} element={element}>{children}</BulletedListElement>;
+                case 'ol':
+                  return <NumberedListElement attributes={attributes} element={element}>{children}</NumberedListElement>;
+                case 'li':
+                  return <ListItemElement attributes={attributes} element={element}>{children}</ListItemElement>;
+                default:
+                  return <ParagraphElement attributes={attributes} element={element}>{children}</ParagraphElement>;
+              }
+            }}
+            renderLeaf={({ attributes, children, leaf }) => {
+              let result = children;
 
-            // Apply AI mark styling first for visual distinction
-            if ((leaf as any)[AIPlugin.key]) {
-              result = <AILeaf attributes={attributes} leaf={leaf}>{result}</AILeaf>;
-            }
+              // Apply AI mark styling first for visual distinction
+              if ((leaf as any)[AIPlugin.key]) {
+                result = <AILeaf attributes={attributes} leaf={leaf}>{result}</AILeaf>;
+              }
 
-            if (leaf.bold) {
-              result = <BoldLeaf attributes={attributes} leaf={leaf}>{result}</BoldLeaf>;
-            }
-            if (leaf.italic) {
-              result = <ItalicLeaf attributes={attributes} leaf={leaf}>{result}</ItalicLeaf>;
-            }
-            if (leaf.underline) {
-              result = <UnderlineLeaf attributes={attributes} leaf={leaf}>{result}</UnderlineLeaf>;
-            }
-            return <span {...attributes}>{result}</span>;
-          }}
-        />
+              if (leaf.bold) {
+                result = <BoldLeaf attributes={attributes} leaf={leaf}>{result}</BoldLeaf>;
+              }
+              if (leaf.italic) {
+                result = <ItalicLeaf attributes={attributes} leaf={leaf}>{result}</ItalicLeaf>;
+              }
+              if (leaf.underline) {
+                result = <UnderlineLeaf attributes={attributes} leaf={leaf}>{result}</UnderlineLeaf>;
+              }
+              return <span {...attributes}>{result}</span>;
+            }}
+          />
 
-        {/* Floating Selection Toolbar - Appears on text selection */}
-        <FloatingSelectionToolbar onAIAction={handleAIAction} />
+          {/* Floating Selection Toolbar - Appears on text selection */}
+          <FloatingSelectionToolbar onAIAction={handleAIAction} />
 
-        {/* AI Suggestion Menu - Must be inside Plate for hooks */}
-        <AISuggestionMenu onTryAgain={handleTryAgain} />
+          {/* AI Suggestion Menu - Must be inside Plate for hooks */}
+          <AISuggestionMenu onTryAgain={handleTryAgain} />
+        </div>
       </Plate>
 
       {/* AI Chat Panel */}
