@@ -336,7 +336,7 @@ export function WillEditor({ will }: WillEditorProps) {
         </div>
 
         {/* AI Chat Panel - Right Column */}
-        <aside className="w-[400px]">
+        <aside className="w-[400px] h-full overflow-hidden">
           <AIChat
             onInsert={handleInsertFromChat}
             willContent={willContent}

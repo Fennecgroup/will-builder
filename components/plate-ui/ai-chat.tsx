@@ -156,7 +156,7 @@ Format your responses in a clear, readable way.`,
       </div>
 
       {/* Messages - Scrollable */}
-      <ScrollArea className="flex-1 px-4" ref={scrollRef}>
+      <ScrollArea className="flex-1 min-h-0 px-4" ref={scrollRef}>
         <div className="space-y-4 py-4">
           {messages.map((message) => (
             <div
