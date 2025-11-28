@@ -306,6 +306,7 @@ export function WillEditor({ will }: WillEditorProps) {
           <PlateEditor
             initialValue={editorValue}
             onChange={handleEditorChange}
+            willContent={willContent}
             className="h-full"
           />
         </div>

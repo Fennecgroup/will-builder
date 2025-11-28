@@ -2,10 +2,13 @@
 
 import * as React from 'react';
 import { useEditorRef } from '@udecode/plate/react';
+import type { WillContent } from '@/lib/types/will';
+import { buildTestatorContext, buildMinimalContext } from '@/lib/ai/context-builder';
 
 interface UseAIOptions {
   onComplete?: (text: string) => void;
   onError?: (error: Error) => void;
+  willContent?: WillContent;
 }
 
 export function useAI(options: UseAIOptions = {}) {
@@ -33,11 +36,25 @@ export function useAI(options: UseAIOptions = {}) {
 
       const prompt = prompts[action] || selectedText;
 
+      // Build testator context if willContent is available
+      const context = options.willContent
+        ? buildTestatorContext({
+            action,
+            selectedText,
+            willContent: options.willContent,
+            interactionType: 'command',
+          })
+        : null;
+
       try {
         const response = await fetch('/api/ai/command', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt }),
+          body: JSON.stringify({
+            prompt,
+            testatorContext: context?.contextData,
+            tokenMap: context ? Object.fromEntries(context.tokenMap) : undefined,
+          }),
           signal: abortControllerRef.current.signal,
         });
 
@@ -80,11 +97,19 @@ export function useAI(options: UseAIOptions = {}) {
 
     abortControllerRef.current = new AbortController();
 
+    // Build minimal context for copilot (non-sensitive basic info only)
+    const minimalContext = options.willContent
+      ? buildMinimalContext(options.willContent)
+      : undefined;
+
     try {
       const response = await fetch('/api/ai/copilot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: text }),
+        body: JSON.stringify({
+          prompt: text,
+          minimalContext,
+        }),
         signal: abortControllerRef.current.signal,
       });
 
@@ -112,7 +137,7 @@ export function useAI(options: UseAIOptions = {}) {
     } finally {
       abortControllerRef.current = null;
     }
-  }, []);
+  }, [options.willContent]);
 
   const abort = React.useCallback(() => {
     abortControllerRef.current?.abort();
@@ -127,9 +152,9 @@ export function useAI(options: UseAIOptions = {}) {
   };
 }
 
-export function useAIEditor() {
+export function useAIEditor(willContent?: WillContent) {
   const editor = useEditorRef();
-  const { isLoading, streamingText, executeCommand, getCopilotSuggestion, abort } = useAI();
+  const { isLoading, streamingText, executeCommand, getCopilotSuggestion, abort } = useAI({ willContent });
 
   const replaceSelection = React.useCallback(
     async (action: string, selectedText: string) => {

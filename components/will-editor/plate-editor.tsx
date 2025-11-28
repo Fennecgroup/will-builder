@@ -50,10 +50,13 @@ import { AILeaf } from '@/components/plate-ui/ai-leaf';
 import { AISuggestionMenu } from '@/components/plate-ui/ai-suggestion-menu';
 import { FloatingSelectionToolbar } from '@/components/plate-ui/floating-selection-toolbar';
 
+import type { WillContent } from '@/lib/types/will';
+
 interface PlateEditorProps {
   initialValue?: Value;
   onChange?: (value: Value) => void;
   className?: string;
+  willContent?: WillContent;
 }
 
 // Custom element components
@@ -365,7 +368,7 @@ function EditorToolbar({ onAIAction, onOpenChat, isLoading }: EditorToolbarProps
   );
 }
 
-export function PlateEditor({ initialValue, onChange, className }: PlateEditorProps) {
+export function PlateEditor({ initialValue, onChange, className, willContent }: PlateEditorProps) {
   const defaultValue: Value = [
     {
       type: 'p',
@@ -492,11 +495,27 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
 
     const prompt = prompts[action] || selectedText;
 
+    // Build testator context if willContent is available
+    const context = willContent
+      ? await import('@/lib/ai/context-builder').then(mod =>
+          mod.buildTestatorContext({
+            action,
+            selectedText,
+            willContent,
+            interactionType: 'command',
+          })
+        )
+      : null;
+
     try {
       const response = await fetch('/api/ai/command', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({
+          prompt,
+          testatorContext: context?.contextData,
+          tokenMap: context ? Object.fromEntries(context.tokenMap) : undefined,
+        }),
       });
 
       if (!response.ok) throw new Error('Failed to get AI response');
@@ -521,15 +540,14 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
         }
 
         // Insert text with AI marks for visual distinction
-        const aiMark = { [AIPlugin.key]: true };
-        editor.tf.insertText(result, { marks: aiMark });
+        editor.tf.insertText(result, { [AIPlugin.key]: true });
       }
     } catch (error) {
       console.error('AI action error:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [editor]);
+  }, [editor, willContent]);
 
   const handleInsertFromChat = useCallback((text: string) => {
     editor.tf.insertText(text);
@@ -610,6 +628,7 @@ export function PlateEditor({ initialValue, onChange, className }: PlateEditorPr
         onInsert={handleInsertFromChat}
         isOpen={isChatOpen}
         onOpenChange={setIsChatOpen}
+        willContent={willContent}
       />
     </div>
   );

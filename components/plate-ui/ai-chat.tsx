@@ -13,6 +13,8 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Send, Sparkles, Loader2, User, Bot, X } from 'lucide-react';
+import type { WillContent } from '@/lib/types/will';
+import { buildTestatorContext } from '@/lib/ai/context-builder';
 
 interface Message {
   id: string;
@@ -24,9 +26,10 @@ interface AIChatProps {
   onInsert: (text: string) => void;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  willContent?: WillContent;
 }
 
-export function AIChat({ onInsert, isOpen, onOpenChange }: AIChatProps) {
+export function AIChat({ onInsert, isOpen, onOpenChange, willContent }: AIChatProps) {
   const [messages, setMessages] = React.useState<Message[]>([
     {
       id: '1',
@@ -56,15 +59,30 @@ export function AIChat({ onInsert, isOpen, onOpenChange }: AIChatProps) {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const userInput = input.trim();
     setInput('');
     setIsLoading(true);
+
+    // Build testator context for chat
+    const context = willContent
+      ? buildTestatorContext({
+          action: 'chat',
+          selectedText: userInput,
+          willContent,
+          interactionType: 'chat',
+          conversationHistory: messages.map(msg => ({
+            role: msg.role,
+            content: msg.content,
+          })),
+        })
+      : null;
 
     try {
       const response = await fetch('/api/ai/command', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          prompt: input.trim(),
+          prompt: userInput,
           system: `You are an AI assistant helping with legal document writing, specifically wills.
 You should:
 - Provide helpful suggestions for will content
@@ -73,6 +91,8 @@ You should:
 - Help draft specific clauses or sections
 - Always be clear that you're providing assistance, not legal advice
 Format your responses in a clear, readable way.`,
+          testatorContext: context?.contextData,
+          tokenMap: context ? Object.fromEntries(context.tokenMap) : undefined,
         }),
       });
 

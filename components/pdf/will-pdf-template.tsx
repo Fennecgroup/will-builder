@@ -143,8 +143,8 @@ export function WillPDFTemplate({ title, content, createdAt }: WillPDFTemplatePr
                 {content.marriage.spouse.idNumber && (
                   <Text> (ID: {content.marriage.spouse.idNumber})</Text>
                 )}
-                {content.marriage.dateOfMarriage && (
-                  <Text>. We were married on {content.marriage.dateOfMarriage}</Text>
+                {content.marriage.spouse.dateOfMarriage && (
+                  <Text>. We were married on {content.marriage.spouse.dateOfMarriage}</Text>
                 )}.
               </Text>
             )}

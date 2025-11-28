@@ -49,7 +49,7 @@ export function validateWitnesses(willContent: WillContent): WitnessConflict[] {
   willContent.witnesses.forEach((witness) => {
     // Check if witness is a beneficiary
     const isBeneficiary = willContent.beneficiaries.some(
-      (b) => issamePerson(witness, b)
+      (b) => isSamePerson(witness, b)
     )
     if (isBeneficiary) {
       const beneficiary = willContent.beneficiaries.find((b) => isSamePerson(witness, b))
