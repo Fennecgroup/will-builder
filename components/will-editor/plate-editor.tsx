@@ -45,7 +45,6 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { AIMenu } from '@/components/plate-ui/ai-menu';
 import { AIToolbarButton } from '@/components/plate-ui/ai-toolbar-button';
-import { AIChat } from '@/components/plate-ui/ai-chat';
 import { AILeaf } from '@/components/plate-ui/ai-leaf';
 import { AISuggestionMenu } from '@/components/plate-ui/ai-suggestion-menu';
 import { FloatingSelectionToolbar } from '@/components/plate-ui/floating-selection-toolbar';
@@ -217,11 +216,10 @@ function ToolbarButton({ onClick, isActive, children, title }: ToolbarButtonProp
 // Toolbar with AI features
 interface EditorToolbarProps {
   onAIAction: (action: string, text: string) => void;
-  onOpenChat: () => void;
   isLoading: boolean;
 }
 
-function EditorToolbar({ onAIAction, onOpenChat, isLoading }: EditorToolbarProps) {
+function EditorToolbar({ onAIAction, isLoading }: EditorToolbarProps) {
   const editor = useEditorRef();
   const editorState = useEditorState();
 
@@ -351,7 +349,6 @@ function EditorToolbar({ onAIAction, onOpenChat, isLoading }: EditorToolbarProps
 
       {/* AI Features */}
       <AIMenu onAIAction={onAIAction} isLoading={isLoading} />
-      <AIToolbarButton onClick={onOpenChat} isLoading={isLoading} tooltip="AI Chat" />
 
       <div className="ml-auto flex items-center gap-2">
         {isLoading && (
@@ -376,7 +373,6 @@ export function PlateEditor({ initialValue, onChange, className, willContent }: 
     },
   ];
 
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [lastAIAction, setLastAIAction] = useState<{ action: string; text: string } | null>(null);
 
@@ -549,10 +545,6 @@ export function PlateEditor({ initialValue, onChange, className, willContent }: 
     }
   }, [editor, willContent]);
 
-  const handleInsertFromChat = useCallback((text: string) => {
-    editor.tf.insertText(text);
-  }, [editor]);
-
   const handleTryAgain = useCallback(() => {
     if (lastAIAction) {
       handleAIAction(lastAIAction.action, lastAIAction.text);
@@ -567,7 +559,6 @@ export function PlateEditor({ initialValue, onChange, className, willContent }: 
       >
         <EditorToolbar
           onAIAction={handleAIAction}
-          onOpenChat={() => setIsChatOpen(true)}
           isLoading={isLoading}
         />
         <div className="flex-1 overflow-auto">
@@ -622,14 +613,6 @@ export function PlateEditor({ initialValue, onChange, className, willContent }: 
           <AISuggestionMenu onTryAgain={handleTryAgain} />
         </div>
       </Plate>
-
-      {/* AI Chat Panel */}
-      <AIChat
-        onInsert={handleInsertFromChat}
-        isOpen={isChatOpen}
-        onOpenChange={setIsChatOpen}
-        willContent={willContent}
-      />
     </div>
   );
 }

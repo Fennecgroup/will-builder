@@ -5,13 +5,6 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
 import { Send, Sparkles, Loader2, User, Bot, X } from 'lucide-react';
 import type { WillContent } from '@/lib/types/will';
 import { buildTestatorContext } from '@/lib/ai/context-builder';
@@ -24,12 +17,11 @@ interface Message {
 
 interface AIChatProps {
   onInsert: (text: string) => void;
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
   willContent?: WillContent;
+  className?: string;
 }
 
-export function AIChat({ onInsert, isOpen, onOpenChange, willContent }: AIChatProps) {
+export function AIChat({ onInsert, willContent, className }: AIChatProps) {
   const [messages, setMessages] = React.useState<Message[]>([
     {
       id: '1',
@@ -144,75 +136,84 @@ Format your responses in a clear, readable way.`,
 
   const handleInsertMessage = (content: string) => {
     onInsert(content);
-    onOpenChange(false);
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[400px] sm:w-[540px] flex flex-col">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-purple-500" />
-            AI Writing Assistant
-          </SheetTitle>
-        </SheetHeader>
+    <div
+      className={cn(
+        "flex flex-col h-full",
+        "border-l border-neutral-200 dark:border-neutral-800",
+        "bg-white dark:bg-neutral-950",
+        className
+      )}
+    >
+      {/* Header - Fixed */}
+      <div className="flex items-center gap-2 border-b border-neutral-200 dark:border-neutral-800 px-4 py-3 flex-shrink-0">
+        <Sparkles className="h-5 w-5 text-purple-500" />
+        <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+          AI Writing Assistant
+        </h2>
+      </div>
 
-        <ScrollArea className="flex-1 pr-4 mt-4" ref={scrollRef}>
-          <div className="space-y-4">
-            {messages.map((message) => (
+      {/* Messages - Scrollable */}
+      <ScrollArea className="flex-1 px-4" ref={scrollRef}>
+        <div className="space-y-4 py-4">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={cn(
+                'flex gap-3 text-sm',
+                message.role === 'user' ? 'justify-end' : 'justify-start'
+              )}
+            >
+              {message.role === 'assistant' && (
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                  <Bot className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                </div>
+              )}
               <div
-                key={message.id}
                 className={cn(
-                  'flex gap-3 text-sm',
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
+                  'rounded-lg px-4 py-2 max-w-[80%]',
+                  message.role === 'user'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted'
                 )}
               >
-                {message.role === 'assistant' && (
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                    <Bot className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                  </div>
-                )}
-                <div
-                  className={cn(
-                    'rounded-lg px-4 py-2 max-w-[80%]',
-                    message.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
-                  )}
-                >
-                  <p className="whitespace-pre-wrap">{message.content}</p>
-                  {message.role === 'assistant' && message.content && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="mt-2 h-7 text-xs"
-                      onClick={() => handleInsertMessage(message.content)}
-                    >
-                      Insert into editor
-                    </Button>
-                  )}
-                </div>
-                {message.role === 'user' && (
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                    <User className="h-4 w-4 text-primary-foreground" />
-                  </div>
+                <p className="whitespace-pre-wrap">{message.content}</p>
+                {message.role === 'assistant' && message.content && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mt-2 h-7 text-xs"
+                    onClick={() => handleInsertMessage(message.content)}
+                  >
+                    Insert into editor
+                  </Button>
                 )}
               </div>
-            ))}
-            {isLoading && (
-              <div className="flex gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                  <Loader2 className="h-4 w-4 text-purple-600 dark:text-purple-400 animate-spin" />
+              {message.role === 'user' && (
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                  <User className="h-4 w-4 text-primary-foreground" />
                 </div>
-                <div className="rounded-lg px-4 py-2 bg-muted">
-                  <p className="text-sm text-muted-foreground">Thinking...</p>
-                </div>
+              )}
+            </div>
+          ))}
+          {isLoading && (
+            <div className="flex gap-3">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                <Loader2 className="h-4 w-4 text-purple-600 dark:text-purple-400 animate-spin" />
               </div>
-            )}
-          </div>
-        </ScrollArea>
+              <div className="rounded-lg px-4 py-2 bg-muted">
+                <p className="text-sm text-muted-foreground">Thinking...</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
 
-        <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
+      {/* Input Form - Fixed at Bottom */}
+      <div className="border-t border-neutral-200 dark:border-neutral-800 px-4 py-3 flex-shrink-0">
+        <form onSubmit={handleSubmit} className="flex gap-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -228,7 +229,7 @@ Format your responses in a clear, readable way.`,
             )}
           </Button>
         </form>
-      </SheetContent>
-    </Sheet>
+      </div>
+    </div>
   );
 }

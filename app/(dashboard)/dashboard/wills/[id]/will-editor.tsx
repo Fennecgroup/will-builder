@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/select'
 import { PlateEditor } from '@/components/will-editor/plate-editor'
 import { TestatorSidebar } from '@/components/will-editor/testator-sidebar'
+import { AIChat } from '@/components/plate-ui/ai-chat'
 import { initialEditorContent, sampleWillContent } from '@/lib/data/sample-will'
 import { updateWill, deleteWill } from '@/lib/actions/wills'
 import { DeleteDialog } from '@/components/wills/delete-dialog'
@@ -130,6 +131,22 @@ export function WillEditor({ will }: WillEditorProps) {
       setIsEditingTitle(false)
     }
   }
+
+  // Handle AI chat text insertion
+  const handleInsertFromChat = useCallback((text: string) => {
+    // Append text as new paragraph to editor
+    setEditorValue(prev => {
+      return [
+        ...prev,
+        {
+          type: 'p',
+          children: [{ text }],
+        }
+      ] as Value;
+    });
+    setHasUnsavedChanges(true);
+    toast.success('Text inserted into editor');
+  }, []);
 
   // Handle title edit start
   const handleTitleEdit = () => {
@@ -299,21 +316,31 @@ export function WillEditor({ will }: WillEditorProps) {
         </div>
       </header>
 
-      {/* Main Content */}
+      {/* Main Content - 3 Column Layout */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Editor Section */}
-        <div className="flex-1 p-6">
-          <PlateEditor
-            initialValue={editorValue}
-            onChange={handleEditorChange}
-            willContent={willContent}
-            className="h-full"
-          />
+        {/* Editor Section - Left/Center Column */}
+        <div className="flex-1 overflow-auto">
+          <div className="p-6 h-full">
+            <PlateEditor
+              initialValue={editorValue}
+              onChange={handleEditorChange}
+              willContent={willContent}
+              className="h-full"
+            />
+          </div>
         </div>
 
-        {/* Sidebar */}
+        {/* Testator Sidebar - Middle Column */}
         <aside className="w-96 border-l border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950">
           <TestatorSidebar willContent={willContent} />
+        </aside>
+
+        {/* AI Chat Panel - Right Column */}
+        <aside className="w-[400px]">
+          <AIChat
+            onInsert={handleInsertFromChat}
+            willContent={willContent}
+          />
         </aside>
       </div>
 
