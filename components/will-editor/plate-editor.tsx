@@ -510,7 +510,7 @@ export function PlateEditor({ initialValue, onChange, className, willContent }: 
         body: JSON.stringify({
           prompt,
           testatorContext: context?.contextData,
-          tokenMap: context ? Object.fromEntries(context.tokenMap) : undefined,
+          // No tokenMap needed in API call
         }),
       });
 
@@ -518,6 +518,7 @@ export function PlateEditor({ initialValue, onChange, className, willContent }: 
 
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
+      const { deAnonymizeText } = await import('@/lib/ai/context-builder');
       let result = '';
 
       if (reader) {
@@ -528,15 +529,20 @@ export function PlateEditor({ initialValue, onChange, className, willContent }: 
         }
       }
 
+      // De-anonymize the final result before inserting
+      const finalText = context
+        ? deAnonymizeText(result, Object.fromEntries(context.tokenMap))
+        : result;
+
       // Insert or replace text based on action with AI marks
-      if (result && editor.selection) {
+      if (finalText && editor.selection) {
         if (selectedText && action !== 'generate' && action !== 'explain') {
           // Replace selection
           editor.tf.delete();
         }
 
-        // Insert text with AI marks for visual distinction
-        editor.tf.insertText(result, { [AIPlugin.key]: true });
+        // Insert de-anonymized text with AI marks for visual distinction
+        editor.tf.insertText(finalText, { [AIPlugin.key]: true });
       }
     } catch (error) {
       console.error('AI action error:', error);

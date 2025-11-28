@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useEditorRef } from '@udecode/plate/react';
 import type { WillContent } from '@/lib/types/will';
-import { buildTestatorContext, buildMinimalContext } from '@/lib/ai/context-builder';
+import { buildTestatorContext, buildMinimalContext, deAnonymizeText } from '@/lib/ai/context-builder';
 
 interface UseAIOptions {
   onComplete?: (text: string) => void;
@@ -53,7 +53,7 @@ export function useAI(options: UseAIOptions = {}) {
           body: JSON.stringify({
             prompt,
             testatorContext: context?.contextData,
-            tokenMap: context ? Object.fromEntries(context.tokenMap) : undefined,
+            // Don't send tokenMap to API - we'll use it client-side
           }),
           signal: abortControllerRef.current.signal,
         });
@@ -71,12 +71,23 @@ export function useAI(options: UseAIOptions = {}) {
 
             const chunk = decoder.decode(value);
             result += chunk;
-            setStreamingText(result);
+
+            // De-anonymize the accumulated result before displaying
+            const displayText = context
+              ? deAnonymizeText(result, Object.fromEntries(context.tokenMap))
+              : result;
+
+            setStreamingText(displayText);
           }
         }
 
-        options.onComplete?.(result);
-        return result;
+        // Final de-anonymized result
+        const finalResult = context
+          ? deAnonymizeText(result, Object.fromEntries(context.tokenMap))
+          : result;
+
+        options.onComplete?.(finalResult);
+        return finalResult;
       } catch (error) {
         if ((error as Error).name === 'AbortError') {
           return '';

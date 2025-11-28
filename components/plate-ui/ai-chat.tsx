@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Send, Sparkles, Loader2, User, Bot, X } from 'lucide-react';
 import type { WillContent } from '@/lib/types/will';
-import { buildTestatorContext } from '@/lib/ai/context-builder';
+import { buildTestatorContext, deAnonymizeText } from '@/lib/ai/context-builder';
 
 interface Message {
   id: string;
@@ -84,7 +84,7 @@ You should:
 - Always be clear that you're providing assistance, not legal advice
 Format your responses in a clear, readable way.`,
           testatorContext: context?.contextData,
-          tokenMap: context ? Object.fromEntries(context.tokenMap) : undefined,
+          // No tokenMap in API call
         }),
       });
 
@@ -110,10 +110,15 @@ Format your responses in a clear, readable way.`,
           const chunk = decoder.decode(value);
           assistantContent += chunk;
 
+          // De-anonymize before displaying
+          const displayContent = context
+            ? deAnonymizeText(assistantContent, Object.fromEntries(context.tokenMap))
+            : assistantContent;
+
           setMessages((prev) =>
             prev.map((msg) =>
               msg.id === assistantMessage.id
-                ? { ...msg, content: assistantContent }
+                ? { ...msg, content: displayContent }
                 : msg
             )
           );
