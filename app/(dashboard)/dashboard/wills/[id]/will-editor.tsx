@@ -318,7 +318,12 @@ export function WillEditor({ will }: WillEditorProps) {
 
       {/* Main Content - 3 Column Layout */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Editor Section - Left/Center Column */}
+        {/* Testator Sidebar - Left Column */}
+        <aside className="w-96 border-r border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950">
+          <TestatorSidebar willContent={willContent} />
+        </aside>
+
+        {/* Editor Section - Center Column */}
         <div className="flex-1 overflow-auto">
           <div className="p-6 h-full">
             <PlateEditor
@@ -329,11 +334,6 @@ export function WillEditor({ will }: WillEditorProps) {
             />
           </div>
         </div>
-
-        {/* Testator Sidebar - Middle Column */}
-        <aside className="w-96 border-l border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950">
-          <TestatorSidebar willContent={willContent} />
-        </aside>
 
         {/* AI Chat Panel - Right Column */}
         <aside className="w-[400px]">
