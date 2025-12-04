@@ -1,0 +1,892 @@
+5.1 Introduction
+It has been said that the other bank of the River Styx is lined with the shades of
+dissatisfied testators waiting to receive the judicial personages who have misconstrued
+their wills. But more often than not, the blame should fall upon the draftsman whose
+unskilful efforts created the necessity for construing the will. The drafting of documents
+at all times is an art; in the case of wills, skill in the use of words is not enough—it must
+be combined with a thorough knowledge of testamentary law.1 While the draftsman may
+adequately provide for the devolution desired by the testator, the form in which the
+bequest is made may involve consequences flowing from the law of wills which may have
+been neither contemplated nor desired by the testator. For instance, a testator may wish to
+appoint his wife as his heir and after her death his children. The draftsman may say
+exactly this, with the result that a fideicommissum is created which prevents the wife from
+alienating any of the assets or disposing of the capital, whereas all the testator may have
+had in mind was that while his wife was to enjoy his estate with complete and unfettered
+discretion to do with it as she pleased, his children should take on her death what was left.
+This chapter is intended, therefore, to afford some guide as to how wills should be drafted
+and to explain the effect of some of the more common forms of bequest, so that the
+draftsman can avoid the pitfalls that yawn before him in the drafting of wills.
+
+5.2 General rules
+(1) A well-drafted will should be clear to any person who is able to understand a will. It
+is essential that not only should the will be understood, but it should also not be
+misunderstood.
+(2) The will should not be ambiguous. Perhaps the most frequent source of ambiguity is
+the fact that the draftsman thinks he is saying one thing when he is really saying more
+than one thing or that he is dealing with a simple matter in relation to a particular
+situation, whereas in reality it may be subject to unsuspected qualifications or may have
+to be applied in unforeseen circumstances or contingencies.
+(3) It is, therefore, essential that the draftsman should begin by knowing exactly what
+he means to say, what he does not mean to say, and what he does not need to say. Many a
+will otherwise well drawn has caused trouble because, although the draftsman has dealt
+with a point he had in mind, he has not sufficiently considered the possibilities.
+(4) It should go without saying that the draftsman’s language should be in accordance
+with the rules of grammar. Long sentences replete with qualifying and relative clauses
+should be avoided. Sentences should be as short as is compatible with clarity. While
+unnecessary verbiage should be excluded, repetition and tautology are not problematic if
+they help to achieve clarity.
+(5) The draftsman must be sure that he understands the words he is using, and words
+should always be used in the same sense throughout the will. If the draftsman wishes to
+change the meaning, the word should be changed or the change of meaning clearly stated.
+The draftsman should consider the meaning of the words in their context in case the
+intended meaning is modified in that context.
+(6) Words which are vague and depend upon their context for their meaning or which
+are capable of more than one meaning, for example, money, effects, movables should
+either be avoided or precisely defined in the will.
+(7) The order of the will should be logical; in this way, the risk of omission or
+repetition is minimised. The draftsman should deal with one thing at a time and each point
+by itself, for example, he should deal with legacies before residue; when he deals with
+income he should exhaust all the points in connection with it before he comes to deal with
+the capital.
+(8) When provisos or conditions are attached to a bequest, the draftsman should use
+paragraphing or clear reference to clarify to which bequest a proviso or condition relates.
+(9) The draftsman should use his imagination to visualise all the possible contingencies
+and circumstances in which the will may operate, so that his draft will provides for them.
+The longer the period of time in which the will is intended to operate, the more
+contingencies and possibilities have to be provided for.
+(10) The draftsman should have a good knowledge of the practical aspects of winding
+up an estate. For example, if the will creates a trust and the income of the trust is
+bequeathed to A, A will not be entitled to any income that may be earned on the assets
+prior to their award to the trustee after the account has lain for inspection. If it is intended
+that he should receive income earned from the date of death of the testator, this should be
+specifically provided for in the will.
+(11) The draftsman should acquaint himself with the nature and composition of the
+estator’s estate in order to ensure that the testator’s intentions are given proper
+expression. For example, a testator may instruct the draftsman to bequeath his shares in a
+company to his beneficiary, when what he intends is to leave his total interest in the
+company, such as shares and loan account.
+(12) It is also important for a draftsman to acquaint himself with the international
+composition of a testator’s estate. Where, for example a testator might have assets in
+numerous jurisdictions, the draftsman must inform the testator that a will can have an
+influence on his assets internationally; alternatively, he must clearly state in the will that
+this will deals only with the South African-based assets, and that a separate will will be
+created in the other jurisdiction to deal with those assets.
+(13) Lastly and perhaps most important, the draftsman, when he has completed his
+draft, should reconsider it and read it with the eye and mind of a stranger. He should
+satisfy himself, before it is too late, that the will means, firstly, what he intends; secondly,
+that it does not say anything more or less than what is intended; and thirdly, that it takes
+into account all the circumstances that ought to be contemplated. He should as far as
+possible adopt the approach of a person who does not wish the document to mean what
+the draftsman intends and if such a person could reasonably argue that it does not bear the
+intended meaning or that it could bear some other meaning, then the will requires
+redrafting.
+
+5.3 The testator’s instructions
+Some testators are clear about what they want; others are vague or undecided.
+In the first case, the draftsman should explain the legal effect of the testator’s proposed
+dispositions so that he is made fully aware of the position and not be under a
+misapprehension as to where his dispositions may lead. This is of particular importance
+where the testator wishes to tie up his estate for a long period or impose prohibitions upon
+the alienation of his assets for one or two or more generations. Too many testators, either
+wishing to control their families’ lives from the grave or out of too great an anxiety for the
+well-being of the following generations, impose conditions which, in a rapidly changing
+world of uncertain economies, may be onerous for those whom they wish to benefit and
+who may suffer for the sake of the ultimate generation who inherit outright. It may not be
+the duty of the draftsman to dissuade the testator from what he has in mind, but the least
+he can do is draw the testator’s attention to the possibilities. This may often lead to some
+saving provision in the will that will mitigate any harshness that future events may
+otherwise bring about through uncompromising conditions in the will.
+In the second case, the draftsman should explain to, and discuss with, the testator the
+advantages of each mode of disposition so that the testator can make his choice.
+It is not always necessary to know the value of the testator’s estate or what it
+comprises, but this information may often prove helpful in advising the testator as to the
+best mode of disposition, particularly when large legacies are left and it is borne in mind
+that estate duty is payable out of the residue. After the payment of the legacies and estate
+duties, there may be little or no residue left for those whom the testator appoints as his
+heirs.
+If the testator is married, his marital status, whether married in or out of community of
+property, should be known, because if he is married in community of property the will
+should be precise, when dealing with the particular assets, as to whether he is bequeathing
+the whole asset or only his half-share in it.
+
+5.4 Directions and wishes
+The draftsman should clearly bear in mind the distinction between a direction by the
+testator binding on the beneficiary and a wish or desire. It often happens that a testator
+would like his beneficiary to do something without, however, making it a binding
+condition. When this is the position, the draftsman should use appropriate language to
+indicate this wish or desire. On the other hand, where it is the intention of the testator to
+make a bequest or condition, the words ‘wish’ and ‘desire’ should be avoided.
+Example
+I appoint my sons John and James to be the heirs of my estate.
+It is my earnest wish and desire, without however binding my sons in any way, that
+they continue the business carried on by me or, if they desire not to do so at any time,
+that they pay to each of the employees of the said business a month’s salary as a gift
+for the faithful service they have rendered me in their lifetime.
+
+5.5 The beneficiaries
+The beneficiaries should be clearly identifiable from the will. A point should be made
+to see that their correct names are used and, if there is a possibility of confusion, for
+example, a bequest to a relative who bears the same name as another, the beneficiary’s
+relationship to the testator or other distinguishing feature, for example, the son of X, a
+birthdate, or identity number, should be set out. Addresses may also help, particularly if
+the beneficiaries are not known to the executor, whose duty it will be to trace them.
+Where bequests are left to institutions, the exact names and descriptions of the
+institutions should be ascertained. It is surprising how often the testator gives the wrong
+name of an institution or insufficient identification, and in some cases the testator has
+benefited an institution that has never existed.
+
+5.6 The bequests
+The actual thing bequeathed should be sufficiently and accurately described so as to
+leave no ambiguity, for example, a motor car should be described by the make or kind,
+licence number, etc.
+Land
+Land should be described by its title deed number or by its title deed description or
+otherwise by its exact situation, for example, street, number or name. Where the
+testator wishes to leave a defined portion of land, that portion should be defined in the
+will with as much detail as possible so as to avoid a dispute as to what exactly was
+bequeathed.
+Where the testator wishes to divide up his land, it should be borne in mind that the
+Deeds Registry Act and other legislation dealing with land, for example, the
+Townships Ordinance, may create insuperable difficulties and, therefore, such bequests
+should always be made to conform with them; otherwise, the bequests may be
+stultified.
+The Subdivision of Agricultural Land Act stipulates that no agricultural land can be
+subdivided nor that an undivided share shall vest in any person unless the Minister of
+Agriculture, Forestry and Fisheries consents thereto. The effect hereof is that, inter
+alia farm property, cannot easily be bequeathed to more than one heir. This can be
+pre-empted in a will and the agricultural land can be bequeathed to only one heir
+subject to a bequest price in favour of the others, or to a testamentary trust with the
+intended heirs being the beneficiaries, or a company with the intended heirs being the
+shareholders in such relation as the testator wishes.
+
+5.7 Joint wills and massing
+One of the most frequent forms of will is the joint will, particularly for spouses married
+in community of property. The law reports are studded with cases where such wills have
+had to be construed, the main cause of ambiguity being whether the will effected a
+massing or not.
+In spite of its form, a joint will is simply a document containing the wills of two or
+more persons. It may, according to its form, operate as the will of the first-dying of the
+testators only. It may also operate as the will of the surviving testator on his death. If it
+does, the survivor is free to revoke it at any time before his death. If, however, the joint
+will effects a massing of the estates of both testators then, after the death of the first-dying
+testator, the survivor, if he accepts the benefits conferred upon him by the will, that is,
+adiates, cannot dispose by later will of his share of the massed estate, although he is free
+to make a will in respect of any of his assets that he acquires after the death of the
+first-dying and which do not form part of the massed estate.
+In order for a will to effect a massing it must be a joint will by the testators jointly
+disposing of the property of both, the disposition taking effect after the death of the
+survivor, who obtains benefits during his lifetime. It is not essential that the whole of their
+estates should be massed; testators can mass a portion only of their estates.
+The difficulty in deciding whether a joint will effects a massing or merely disposes of
+the share of the first-dying arises very often out of the use of the words ‘our’ and ‘our
+estate’. The presumption is against massing and, in the absence of other indications in the
+will pointing to massing, ‘our’ will be interpreted as ‘my’, that is, as referring to the share
+of the first-dying. The draftsman should make it perfectly clear, therefore, whether it is
+intended to mass the joint estate or only to dispose of the first-dying’s share. If the former
+is intended, he should say specifically that the spouses mass their estate; if the latter is
+intended, he should avoid using the word ‘our’. The draftsman must further consider the
+possibility of the donations tax consequences of massing.
+
+5.7.1 Examples of massing
+Usufruct to survivor
+We hereby mass our joint community estate and bequeath the whole of our massed
+joint estate to our children subject to the usufruct of the survivor of us until his or her
+death.
+Survivor heir subject to fideicommissum
+We hereby mass our joint community estate and appoint the survivor of us to be the
+heir thereof, subject to the condition that upon the death of the survivor our massed
+estate shall devolve upon the children of our marriage then alive and the issue per
+stirpes of such children who may have predeceased the survivor leaving issue.
+Partial massing
+(i) We hereby mass our shares of our farm ‘Doornkloof’ and all the livestock thereon
+and bequeath the said farm and livestock to our son John, subject to the usufruct of
+the survivor of us during his or her lifetime.
+(ii) We appoint the survivor of us as the heir or heiress of the residue of the estate of
+the first-dying of us.
+Massing combined with a division upon remarriage
+We hereby mass our joint community estate and appoint the survivor of us to be the
+heir thereof, subject to the following conditions, namely:
+(i) Upon the death of the survivor the massed estate shall devolve upon the children of
+our marriage then alive and the issue per stirpes of any children who may have
+predeceased the survivor leaving issue.
+(ii) Should, however, the survivor remarry or enter into a permanent relationship of
+care and cohabitation with another, then in that event the massed estate shall be
+divided and one-half thereof shall be and remain the sole property of the survivor
+and the other half shall devolve upon the children of our marriage then alive and
+the lawful issue per stirpes of any children who may have predeceased the date
+of the survivor’s remarriage leaving issue.
+Massing with fideicommissum residui
+We hereby mass our joint community estate and appoint the survivor of us to be the
+heir thereof with full powers to alienate and dispose of all or any portion of the said
+massed estate during his or her lifetime; subject to the condition that upon the death
+of the survivor whatever shall then remain or be left of the said massed estate shall
+devolve upon the children of our marriage then alive and the lawful issue per stirpes
+of any children who may have predeceased the survivor leaving issue alive at his or
+her death.
+Massing taking into account donations tax consequence, in community of property
+We hereby further determine that, should the bequest of our massed estates have the
+effect that more than half of the net value of the survivor’s estate is bequeathed to our
+heirs, an interest-free loan is to be made for the difference in value between the
+bequests and the value of half of the estate, owing by the heirs to the surviving
+spouse.
+
+5.7.2 Examples where no massing
+Usufruct to survivor
+We appoint the children of our marriage as the heirs of the estate of the first-dying
+of us subject to the usufruct of the survivor of us until his or her death or remarriage.
+Survivor heir subject to fideicommissum
+We appoint the survivor of us to be the heir of the first-dying of us subject to the
+condition that upon the death of the survivor the said estate of the first-dying of us
+shall devolve upon his or her (alternatively, our) children, and if any child shall have
+predeceased the survivor of us his or her share shall devolve upon his or her lawful
+issue per stirpes alive at the death of the survivor, or failing such issue, upon the
+remaining children and the lawful issue per stirpes alive at the death of the survivor
+of any predeceased children.
+Survivor and children co-heirs with usufruct to survivor
+We appoint the survivor of us together with the children of our marriage to be the
+heirs of the first-dying of us, subject to the usufruct of the survivor until his or her
+death or remarriage over the portions of the children.
+
+5.7.3 Examples where no massing and joint will also operative upon the death of the
+survivor
+(i) We appoint the survivor of us to be the sole and universal heir of the estate of the
+first-dying.
+(ii) The survivor of us appoints the children of our marriage, and in the event of any
+of them predeceasing the survivor, their issue per stirpes to be the heirs of the
+estate of the survivor.
+Alternatively:
+(i) We appoint the children of our marriage and, in the event of any child predeceasing
+the first-dying, in his place his or her issue per stirpes to be the sole and universal
+heirs of the estate of the first-dying, subject to the usufruct of the survivor until his or
+her death or remarriage.
+(ii) The survivor of us appoints the children of our marriage and in the event of any
+child predeceasing the survivor, in his place his or her issue per stirpes to be the
+heirs of the estate of the survivor.
+Note: The survivor may at any time before or after the death of the first-dying, even
+where he has adiated under the will of the first-dying, revoke the will in so far as his
+own dispositions are concerned.
+
+5.8 Simultaneous death
+It is not unusual for spouses in mutual wills to provide for the eventuality of their dying
+simultaneously, having in mind the possibility of an accident in the course of travel. There
+is no presumption in our law arising from age or sex as to survivorship, nor is there any
+presumption of simultaneous death; the question is one of fact depending upon the
+evidence. To overcome this inquiry, the draftsman should provide not only for the
+testators’ dying simultaneously but for their dying within a short time of each other.
+Moreover, the provision should avoid being construed as creating a fideicommissum with
+the survivor as fiduciary should the one testator survive the other but die within the time
+limit. The following clause would cover the situation:
+‘In the event of our dying simultaneously or in the event of the survivor dying within
+(period) after the first-dying then instead of the aforegoing appointment (of heir,
+legatees, etc.) we direct etc.’
+
+5.9 Appointment of executors
+The testator may appoint as many executors as he pleases. If he appoints more than
+one, then unless the will requires a quorum the executors remaining from time to time are
+entitled to act. Should the testator desire a quorum, the will should expressly say so. It is
+important to note that the nomination of an executor in a will is in essence only a wish of
+the testator as empowered by ss 13 and 14 of the Act, and is still subject to the
+appointment of the executor by the Master after the testator’s death.
+In mutual wills or in the wills of married persons, it is often the case that the survivor is
+appointed executor and also given a life interest. This may entail acts of administration
+after the death of the survivor, for example, passing transfer of landed property. The
+estate will, however, be unrepresented and an executor dative will have to be appointed,
+unless the will provides for an executor testamentary upon the death of the first executor.
+Whenever, therefore, the estate has to be wound up upon the death of the holder of a life
+interest who is also the executor, the will should provide for a further appointment of an
+executor. This applies particularly to mutual wills.
+Assumption of executors
+Executors are frequently given the power to assume another person or persons as
+co-executors. Where more than one executor has been appointed and it is desired that
+the remaining one or ones should have the power to assume, the will should make it
+clear that the power is given not only to the appointed executors jointly but also to the
+remaining executors or executor (see 9.5.1).
+
+5.10 Security by executors
+Where the executor is not one of the persons exempted by the Act from furnishing
+security because of his relationship to the deceased he will have to furnish security for his
+administration unless the will exempts him.2
+Example
+As executor of my will I appoint Tom Jones with all the powers allowed in law and
+particularly the power of assumption. I direct that my said executor shall not be required
+to furnish security to the Master of the Supreme Court for the due administration of my
+estate under any law existing or which may in the future exist.
+
+5.11 Powers of executors
+The powers of the executor are circumscribed by law and the will.3 If it is desired to
+give the executor specific powers, for example, to enter into leases, carry on business or a
+partnership in the course of liquidation, these must be set out in the will.
+If the testator wishes to leave to the discretion of his executor which assets should be
+sold and how they should be sold, he should set this out in his will; if he does not, the
+executor’s powers are not unlimited.4
+Example
+My executor shall have full power in his discretion to sell all or any of the assets of my
+estate and in such manner as he may decide upon, whether by public auction or by private
+treaty or otherwise.
+
+5.12 Vesting and substitution
+An inheritance or bequest vests in the heir or legatee if he becomes entitled thereto in
+the sense that he can transmit his rights to others either during his lifetime or upon his
+death. Where there is no vesting in the beneficiary, he acquires no right until the
+happening of the event upon which the vesting depends (see 18.12 for a discussion on
+vesting of rights and adiation and repudiation).
+In the case of an outright unconditional bequest, the beneficiary acquires an
+immediately vested right on the death of the testator. Where the enjoyment of the right,
+for example, because of an intervening usufructuary interest, is postponed until a future
+date, it is often a difficult question—if the draftsman has not expressed himself
+clearly—to determine whether the vesting of the right (dies cedit) has also been
+postponed or not. Where the intervening life interest is usufructuary, the presumption is
+that the vesting is immediate upon the death of the testator and not when the usufruct
+comes to an end. However, the will should not leave the matter in doubt and precise
+wording should be used either to show that vesting is intended immediately upon death or
+is postponed until some future date.
+In the case of substitution of other beneficiaries for those who die, it is also a matter of
+difficulty sometimes to determine whether the substitution is direct or fideicommissary.
+In the former case, if the beneficiary survives, he takes outright and the substitution is
+only effective if he predeceases the event; in the latter case, the substituted beneficiary
+takes after the death of the original beneficiary who is merely a fiduciary. Here again,
+although the presumption is in favour of direct rather than fideicommissary substitution,
+the draftsman should clearly express himself. It must be kept in mind that a
+fideicommissum—transfer of the property from the fiduciary to the fideicommissary—is
+only a spes for the fideicommissary.
+It is a simple matter to do so if it is borne in mind that phrases such as ‘after the death’,
+‘upon death’, ‘in the event of death of’, ‘if A should die’, ’predecease’, etc are ambiguous
+in themselves and that the event to which they relate should always be specified.
+Examples
+Immediate vesting
+Subject to the usufruct of my wife Mary Jones, I appoint my son John as heir of
+my estate and in the event of my said son predeceasing me, then his issue per stirpes.
+Postponed vesting
+Subject to the usufruct of my wife Mary Jones, I appoint as heirs of my estate such
+of my children who survive my wife and the lawful issue per stirpes of any child who
+may have predeceased my wife leaving issue alive at the death of my wife.
+Fideicommissum
+I appoint my son John as heir of my estate and upon his death before or after me,
+his lawful issue per stirpes.
+Predeceasing us
+Another fruitful source of ambiguity arises in joint wills where the survivor is given
+a life interest and the testators provide for a substitution should a beneficiary
+‘predecease us’. It may mean predecease the testator or predecease either testator, with
+consequently different results. The draftsman should always say to which one of the
+testators the predeceasing refers. If he means the first-dying then he should say so;
+equally, if he means that the beneficiary must survive both testators he should make
+this clear.
+For example, in the first case, ‘in the event of our son John dying before the
+first-dying of us’; or in the second case, ‘in the event of our son John dying before the
+survivor of us’.
+
+5.13 Bequest to a class of persons
+Where a testator bequeaths a legacy to, or appoints as heirs, a class of persons,
+problems may arise if the will is not sufficiently explicit as to the time when the members
+of that class are to be finally determined. For example, a bequest to the children of a son
+immediately raises the issue whether, if the son is alive at the death of the testator, or at
+some future date (eg on the death of a usufructuary), the son’s children born after the
+death of the testator (or the termination of the usufruct) also share in the bequest. If
+after-born children do share, questions arise relating to the distribution of income and the
+care and management of the corpus until the full number of children has been determined.
+These matters should not be left unexpressed in the will. A bequest to a class should
+clearly specify the point at which the class becomes determined and, if that time is after
+the death of the testator, the will should deal with the management of the capital and the
+distribution or accumulation of the income in the interim.
+Examples
+(a) I bequeath the sum of R20 000 to be divided among such of the children of my son A
+who shall be alive at my death.
+(b) I bequeath the sum of R50 000 in trust, the income thereof as and when it
+accrues to be distributed among, or used for the benefit of, the children of A
+alive at the date of accrual (the issue of a deceased child taking by
+representation), and the capital to be distributed at A’s death among the children
+of A alive at his death, and the issue by representation of any children who may
+have predeceased him.
+In an effort to resolve the issue, s 2D(1)(c) of the Wills Act provides that unless the
+context otherwise indicates, any benefit allocated to the children of a person, or to the
+members of a class of persons, mentioned in the will shall vest in the children, or the
+members of the class, alive at the time of the devolution of the benefit, or who have
+already been conceived at the time and who are later born alive. The effect of this is
+to create a rebuttable presumption that after-born children or members of a class are
+excluded, but there is still room for controversy as to whether the context indicates
+otherwise. It is better to be explicit than to rely on s 2D of the Wills Act.
+
+5.14 Substitution of beneficiaries
+Unless a beneficiary is alive at the date of death of the testator and adiates (ie elects to
+take his bequest), the bequest to him does not take effect. In such an event the testator,
+had he contemplated it, may well have wanted to substitute someone else, for example,
+the beneficiary’s wife or children. Unfortunately this point is only too frequently
+overlooked, so much so that the legislature has especially enacted that where a
+descendant, whether as a member of a class or otherwise, would have been entitled to a
+benefit had he been alive at the testator’s death, or had not been disqualified from
+inheriting, or had not renounced his bequest, then his descendants, per stirpes, will
+become entitled to the benefit.5 This provision is, however, subject to two provisos. The
+first is that the substitution will not follow if the will indicates otherwise.6
+The second proviso concerns bequests to any descendant or descendants of the testator
+and his surviving spouse. Where this is the case, then whether or not the jus accrescendi
+would apply as discussed in 5.15, a renunciation by a descendant results in his share
+accruing to the surviving spouse.7 There is no reservation that this result is subject to the
+context indicating otherwise. If the testator wants to prevent this result, he must not join
+his surviving spouse in the bequests to his descendants.8
+Even more important is the question of substitution of beneficiaries when the will
+makes provision for the future long after the testator’s death, for example, when vesting is
+postponed until the death of the usufructuary, or fideicommissary interests are created for
+one or more generations. At least before his death the testator can alter his will to suit
+altered circumstances, and precisely because this is not possible after his death and
+because the longer the operation of the will the more circumstances have to be provided
+for, the draftsman should make proper provision for all contingencies.
+Where a will provides that upon the death of the legatee, and if such legatee dies
+childless, the property so bequeathed must pass to a third person, but the legatee in fact
+dies with children, it is held that the deceased intended that a fideicommissum be created
+in favour of the children of the legatee, if the children are also descendants of the testator;
+if, however, they are not the descendants of the testator, no tacit fideicommissum is
+created.9
+
+5.15 Equal shares and jus accrescendi
+When a bequest or inheritance is left to two or more persons and nothing is said as to
+how it is to be divided among them, the bequest or inheritance must in law be divided
+equally among them. Where this is the intention of the testator, therefore, it is
+unnecessary for the will to state it expressly. Where this is done, however, then it must be
+borne in mind that the addition of the words ‘in equal shares’ is regarded in law (in the
+absence of sufficient indiciae in the will to show that the testator intended the jus
+accrescendi to apply, that is, that his share is to go to his co-legatees or co-heirs10) as a
+joinder verbis tantum, that is, as an institution of beneficiaries to separate shares; should
+one of the beneficiaries die before the vesting of his share, it will, in the case of a legacy,
+fall into the residue and, in the case of an inheritance, devolve upon intestacy,11 unless the
+testator has substituted other beneficiaries in his place, for example, his issue or the
+remaining beneficiaries. Whenever, therefore, any bequest or inheritance is left to more
+than one person either in equal or differing shares, portions, fractions or percentages, the
+draftsman must bear in mind the effect of any one of them dying before his share vests in
+him.
+When a bequest or inheritance is left to more than one person without there being any
+stipulation as to how it is to be divided among them, then upon the death of one before his
+share vests in him, it will devolve upon his co-legatees or co-heirs by the jus accrescendi
+unless the testator has expressly substituted someone else for the deceased beneficiary.
+
+5.16 Children and issue
+Although the word ‘children’ primarily means descendants in the first degree only,
+grandchildren and further descendants may be included if the will lends itself to this
+construction. If the draftsman uses the words ‘children’ and ‘issue’ interchangeably, the
+latter construction may be placed upon the word ‘children’. If ‘children’ in the sense of
+descendants in the first degree is intended, then the draftsman should use that word in that
+meaning throughout, and where remoter issue is intended, he should use the word ‘issue’
+or ’descendants’. If grandchildren only are intended, that word should be used and ‘issue’
+or ‘descendants’ avoided.
+Section 2D of the Wills Act 7 of 1953 provides the following, unless the context
+otherwise indicates, for the purpose of the will:
+Adopted children
+An adopted child shall be regarded as being born from his adoptive parent or
+parents. So, for example, if the testator makes a bequest to his children, or
+descendants, or to the children or descendants of X, the adopted children or
+descendants of the testator or X fall under the bequest unless the will indicates the
+contrary. On the other hand, where the bequest is to the children or descendants of X,
+those natural children or descendants of X who have been adopted by someone else
+are excluded, unless the context of the will indicates otherwise. Where the natural
+parent is also the adoptive parent, or was married to the adoptive parent at the time of
+adoption of the child, this exclusion will not apply. In short, for testamentary
+purposes, adopted children are regarded as the children of the adoptive parent and not
+as children of the blood parent. A testator who does not want this situation should
+deal specifically with the matter in his will.12
+Children born out of wedlock
+The fact that a person was born out of wedlock shall be ignored in determining his
+relationship to the testator or another person for the purpose of the will. For example,
+if the testator leaves a bequest to his children, or the children of X, the illegitimate,
+adulterous and incestuous children of the testator or X will be included in the bequest.
+If the testator does not want this situation, he should deal specifically with the matter
+in his will.
+Section 4 of the Reform of Customary Law of Succession and Regulation of
+Related Matters Act 11 of 2009 provides that, for the purposes of a will of a woman
+who had property allotted or accruing to her or her house under customary law by
+virtue of her customary marriage, any reference in such will to her child or children in
+relation to such a woman, must be construed as including the following:
+(a) any child born of a union between the husband of such a woman and another woman
+entered into in accordance with customary law for the purpose of providing children
+for the first-mentioned woman’s house; or
+(b) any child born to a woman to whom the first-mentioned woman was married
+under customary law for the purpose of providing children for the first-mentioned
+woman’s house.
+
+5.17 Habitatio (occupation) rights
+Testators often direct that a beneficiary should have the right to occupy a house, flat or
+similar premises. The common-law rights and obligations of the beneficiary are dealt with
+in 25.17, but it would be preferable for the will to detail the rights that the testator wishes
+to confer and the obligations he wishes to impose. This is particularly so in the case of
+premises held under sectional or share block title. The levy imposed by the body
+corporate on owners relates to a number of components and it is an open question as to
+how much of the levy under common law should be apportioned to the owner and how
+much to the beneficiary.
+
+5.18 Per stirpes and per capita
+‘Per stirpes’ means a distribution by representation or families, for example, where a
+bequest is left to the issue per stirpes of A and B, one-half must be divided among the
+children of A and one-half among the children of B. If any child has died leaving children,
+those children will receive the share their parent would have received had he been alive to
+take.
+‘Per capita’ means a distribution in equal shares among the persons entitled to take, for
+example, where a bequest is left to the children per capita of A and B, all the children of
+A and B share the bequest equally.
+
+5.19 Legacies and prelegacies
+Legacies, unless the will can be so construed, are not payable in any order of
+preference, nor do ‘special’ legacies, that is, legacies of things, take precedence over
+‘general’ legacies of money;13 nor does the order in which they are set out in the will
+create any precedence. The result is that if the estate is insufficient to pay all the legacies
+in full, each must abate pro rata. If it is the testator’s intention that there should be an
+order of precedence, the draftsman should expressly say so.
+Example
+(a) I bequeath as a prelegacy to my wife the sum of R20 000.
+(b) I bequeath the following legacies to be paid to the legatees in the order of
+precedence set out—
+(i) to my daughter Jane the sum of R10 000;
+(ii) to my daughter Mary the sum of R5 000;
+(iii) to my son John the sum of R5 000.
+(c) After payment of the above legacies I bequeath to each of my nephews and
+nieces the sum of R1 000.
+
+5.20 Liabilities attached to bequeathed property
+A beneficiary is entitled to the property bequeathed to him free from any liabilities or
+burdens upon it, unless the will indicates the contrary. Thus, if a house over which there
+exists a bond, or an insurance policy on which the deceased in his lifetime took a loan, is
+bequeathed, it is the executor’s duty to use the residue to free the house from the bond or
+pay over the full proceeds of the policy to the beneficiary without deducting the loan,
+unless the will has provided to the contrary.14
+It may be the intention of a testator when bequeathing burdened property that the
+beneficiary should receive the property as burdened, but often that intention is not
+expressed in the will because it is taken for granted that this result will follow. The
+draftsman will do well by his client, therefore, if at the time of taking instructions he
+ascertains whether any intended bequest is burdened with a liability and, if so, points out
+the effect of such bequest without any direction as to who is to bear the liability.
+
+5.21 Fideicommissum or usufruct
+Both fideicommissum and usufruct have as their object the enjoyment by the fiduciary
+or the usufructuary of the fruits of the estate or the asset during their lifetimes or until the
+event contemplated by the testator, but not of the capital which is to devolve upon the
+beneficiaries chosen by the testator. They differ, however, in their legal incidence in that,
+firstly, the fiduciary is the legal owner of the assets subject to the obligation of passing
+them on to the fideicommissaries when the fideicommissum ceases, whereas in the case of
+usufruct the legal owner is (unless vesting has been postponed, in which case ownership
+remains vested in the testator’s estate) the ultimate heir of the property, but the
+usufructuary is entitled (unless the testator has provided otherwise) to control and
+possession of the property during his usufruct. Secondly, if the fideicommissum fails for
+any reason, for example, the fideicommissaries predecease the fiduciary, the fiduciary
+obtains automatically and by law ownership of the property free from any condition of
+fideicommissum, whereas the usufructuary cannot become owner of the property, unless
+he is substituted as beneficiary for any heir who predeceases the date of vesting.
+Without specific provision in the will neither the usufructuary nor the fiduciary can
+alienate the capital.15 In the case of the fiduciary, the property can only be alienated with
+the consent of the major fideicommissaries and the consent of the court in the case of
+minors or undetermined beneficiaries,16 or with the sanction of the court where certain
+circumstances exist.17 In the case of the usufructuary, only the ultimate heirs to the
+property can sell, minors only with the consent of the court (or the Master),18 and in the
+case of unborn issue with the consent of the court. If the testator contemplates the
+possibility of selling the property, and this is particularly desirable where the life interest
+is likely to endure for a considerable period, special provision must be made in the will
+authorising the sale of the property by the fiduciary or usufructuary.
+The question of repairs and in the case of farms, improvements, fencing, etc also
+presents a problem. The property cannot be mortgaged in order to raise a loan to effect
+these, except on the same conditions as in the case of sale, unless the will expressly
+authorises mortgage. Here again the testator should be made aware of the position in case
+he wishes to provide for such contingencies.
+Another aspect that should be dealt with in a will is the liability of the usufructuary to
+pay, in the case of the occupation of property held by the deceased under sectional title,
+the levy required by the corporate body, particularly where a portion of the levy relates to
+renovations and other expenditure not directly connected with the usufructuary property.
+A fideicommissary bequest should not be unfairly discriminatory; where, for example,
+a will provides that women cannot be fideicommissaries, it will be regarded as pro non
+scripto.19
+Example
+(a) I bequeath to my son John my farm Doornkloof held by me under Deed of Transfer
+No. 1671 dated 14 March 1981, subject to the condition that upon his death the said farm
+shall devolve upon his issue then alive per stirpes. I direct that my said son John shall be
+entitled to sell the said farm in which event the proceeds thereof shall be subject also to
+the condition of fideicommissum in favour of his issue. I also direct that my said son John
+shall be entitled to mortgage the said farm but to no greater extent than R100 000 for the
+purpose of effecting such repairs or improvements to the farm as he may deem necessary.
+(b) I bequeath to my wife Mary Smith the right to occupy my house No. 23 Broad
+Street, Cape Town. If for any reason whatsoever she shall no longer desire to live
+in the said house, my executor shall when called upon to do so by my wife, sell the
+house and in their discretion (alternatively, in the discretion of my wife) invest the
+proceeds in another house or in income-producing investments and pay the
+income thereof to my wife.
+Often it is a matter of small consequence to the testator whether he bequeaths a life
+interest by way of usufruct or fideicommissum. In such a case the incidence of estate duty
+may be the deciding factor, particularly where the estate is a large one.
+
+5.22 Fideicommissum residui
+Where the testator wishes his heir to enjoy full rights of ownership subject only to the
+condition that whatever may be left at his death should devolve upon someone else, this
+can be done by way of fideicommissum residui.
+20 The point to be remembered is that it
+must be made clear that the fiduciary is entitled to use the estate in his lifetime; merely to
+give him the power of alienation may be construed as only the right to convert the estate
+without the right to use the capital. The law also presumes that where the fiduciary is
+given the right to dispose of capital, he must restore at least one-quarter of the estate to the
+fideicommissaries.21 If the testator does not want this limitation placed upon the
+fiduciary, appropriate words should be used to make this clear.
+Example
+We appoint the survivor of us to be the sole and universal heir of the first-dying with full
+and absolute power to alienate all or any portion of the estate subject to the condition that
+upon the death of the survivor whatever (if anything) shall then be left of the estate shall
+devolve upon the children of our marriage then alive and the issue per stirpes of any child
+who may have predeceased the survivor leaving issue.
+
+5.23 Prohibitions and forfeitures
+It has happened often enough that a will has contained a prohibition against a
+beneficiary dealing with his bequest in a particular way, for example, alienating or
+mortgaging the property, or a condition that a beneficiary will lose his rights in certain
+circumstances, for example, on his insolvency, and yet in the event such prohibition or
+forfeiture has proved ineffective. This is because the draftsman omitted to provide for a
+‘gift over’ on the breach of the condition by the beneficiary. A prohibition or forfeiture is
+in itself ineffective unless it becomes enforceable against the beneficiary penalised and it
+can only be enforced if the will provides for a substitution of another beneficiary on the
+breach of the condition. If there is no substitution or ‘gift over’ the prohibition or
+forfeiture is said to be ‘nude’—such a nudum praeceptum will have no effect. Where
+there is a ‘gift over’ it is usually by way of fideicommissum.
+Example of a nude prohibition
+I bequeath my farm to my son John subject to the condition that he shall not be entitled to
+alienate or mortgage it.
+Examples of effective prohibitions
+(a) I bequeath my farm to my son John subject to the condition that he shall not be
+entitled to alienate or mortgage it and upon his death it shall devolve upon his
+children.
+(b) If before his inheritance shall have been paid him any of my children shall cede
+or pledge his inheritance or in any way assign his rights under this will or
+become insolvent, then such child shall immediately forfeit and lose his share of
+my estate whether of capital or income; and my trustees shall apply the income,
+which would have devolved upon such child, to the maintenance of the children
+of such child until the termination of the trust and upon such termination to pay
+to them the share of capital which would have been payable to such child.
+
+5.24 Minor’s portion
+The share of a minor beneficiary may be retained by his natural guardian if the will so
+directs and exempts him from security.22 In the absence of such exemption, the natural
+guardian cannot retain the minor’s share without security. If he cannot give security, any
+money awarded to the minors must be deposited in the Guardian’s Fund. Where there is
+no natural guardian, moneys due to a minor must be deposited in the Guardian’s Fund,
+unless the will provides otherwise.
+Example
+If any beneficiary shall be a minor my trustees shall retain his or her share and invest it in
+any assets they deem fit and use so much of the income and capital as they deem
+necessary for his maintenance, education and well-being and shall pay him the capital and
+any accumulated income when he reaches the age of 18.
+
+5.25 Collation
+Collation is an obligation imposed by law on the descendants of a deceased who inherit
+to account to the estate for the purpose of distributions for certain kinds of gifts received
+from or debts owing to the deceased (see 18.18 et seq). The obligation is based on the
+assumption that the deceased intended equality in the distribution. Consequently, a
+testator may expressly or by implication dispense with collation by all or any of the heirs.
+To avoid any doubt, a testator may in his will direct what should be collated or he may
+direct that there should be no collation. I caution that where it is a debt owing to the
+testator which would have had to be collated but for the dispensation by the testator,
+SARS may claim that para 12(5) of the Eighth Schedule requires the heirs to pay capital
+gains tax on the face value of the debt. It is advised that a loan should be dealt with by a
+testator in his will as a debt, and that the testator should not attempt to deal with it by way
+of collation.
+
+5.26 Ambiguous words and phrases
+It is impossible to even attempt to give an exhaustive list of words and phrases which
+create ambiguity. If the draftsman follows the general rules set out at the beginning of the
+chapter there will be less chance of ambiguity, and vagueness can and always should be
+avoided by preciseness of expression and, if necessary, by definition. The following
+words and phrases have been more or less commonly used and have given rise to
+difficulties in construction.
+5.26.1 Business
+The use of this word may create doubt as to whether only the goodwill is bequeathed or
+all the assets of the business, or the assets together with the liabilities. The draftsman
+should specify in exact terms what the beneficiary is to receive and what obligations he is
+to undertake when he is bequeathed a ‘business’.
+Where a business takes the form of a registered company, the testator should keep in
+mind that he can bequeath his shares to the said company in his will. A testator should shy
+away from attempting to bequeath specific assets in the company.
+5.26.2 Dying childless
+These words may mean either dying without having had a child or dying without
+leaving a child surviving. The draftsman should, therefore, not use them, but set out
+exactly what is intended, for example:
+I appoint my daughter as my heir subject to the condition that upon her death after me
+her inheritance shall devolve upon her brothers and sisters if she leaves no children
+surviving her; or,
+I appoint my daughter as my heir subject to the condition that upon her death after me,
+her inheritance shall devolve upon her brothers or sisters if she shall not have had any
+children.
+In the first example, it should be noted, there is a fideicommissum in favour of the
+brothers and sisters which will only fail if the daughter dies leaving a child surviving
+her.23 Whether the fideicommissum fails or not cannot be determined until the daughter’s
+death, for it is at that time only that the condition is fulfilled or not, and, consequently, the
+daughter is not free to deal with the property. In the second example, the moment the
+daughter has a child the fideicommissum fails and she becomes absolute owner, even if
+she dies leaving no children surviving.
+5.26.3 Family
+Various meanings can be ascribed to this word and, depending upon the context, it may
+be given a wide or narrow construction. It should never be used without the limits of the
+family being defined.
+5.26.4 Free of taxes or duties
+It is better to specify exactly what taxes or duties the bequest is to be free of, rather than
+to use a comprehensive term such as ‘free of taxes or duties’ or ‘free of all charges and
+duties’.
+When an annuity is bequeathed ‘free of tax’, the draftsman should make it clear as to
+what tax is meant, and whether that freedom relates only to South African taxes or also to
+taxes imposed by other governments. Moreover, the words ‘free of tax’ create this
+ambiguity, namely: whether the tax must be calculated as if the annuitant had no other
+income but the annuity, or whether the estate must pay that proportion of the total tax
+payable by the annuitant as the annuity bears to his total income, or whether the estate
+must pay the difference between the annuitant’s total tax with the annuity and the tax he
+would have paid without the annuity. All these constructions have in particular cases been
+adopted by the courts and the latter two interpretations can often have serious
+consequences for the estate. The draftsman should, therefore, always explain the exact
+extent of the tax which the estate must bear.
+5.26.5 Issue
+This word usually means descendants to any degree. If, therefore, the draftsman means
+children or grandchildren he should use these words in preference to ‘issue’.
+5.26.6 Money
+This word is ambiguous; it has been construed in some cases as confined to cash and in
+others as covering all kinds of assets. It should never be used without qualification or
+definition. If the draftsman does use it, he should enumerate the things it is intended to
+cover, for example, money in banking accounts or post offices or savings banks.
+5.26.7 Personal effects
+These words, too, may give rise to doubt as to what exactly is intended, and the
+draftsman should enumerate the articles or types of articles comprehended in the bequest
+rather than use this term without qualification.
+5.26.8 Predecease or dying
+These words, as has been mentioned earlier,24 should always have the event to which
+they relate added, for example, ‘predecease me’ or ‘dying after the survivor’.
+
+5.27 Trusts and trustees (administrators)
+The creation of a trust by testators has become increasingly favoured because it makes
+for flexibility of administration and can allow for unforeseen changes in circumstances
+which the more rigid forms of fideicommissum or usufruct cannot provide. It also often
+provides greater security not only in respect of the capital and its ultimate devolution but
+also in ensuring that the testator’s wishes are properly carried out. Within the framework
+of a trust the testator can clothe his trustees with a variety of powers and discretions.
+A trust is created by bequeathing the subject matter of the trust to a person or persons
+whom the Administration of Estates Act now calls trustee/s instead of administrator/s, to
+be held by him or them in trust for the purposes and subject to the powers and conditions
+set out in the will.
+The usual trust provides for the distribution of income during the period of the trust and
+the devolution of the capital at its termination, the powers and duties of the trustees in
+relation to the administration and distribution of the estate, and particularly the disposal
+and investment of the assets.
+A trust can be a very effective mechanism for ringfencing maintenance obligations
+towards a child or a spouse, by preventing abuse by the spouse or child and having the
+assets managed by the trustees.
+Care needs to be taken that the powers conferred upon the trustee do not amount to a
+delegation of testamentary power. Our law does not recognise such a delegation; for
+example, power conferred upon a trustee which leaves him at large to determine the
+devolution of the estate or the identity of the beneficiaries. In Braun v Blann and Botha
+NNO and Another25 the Appellate Division held as valid a power conferred upon trustees
+to appoint in their discretion the income beneficiaries from a group of persons designated
+by the testatrix, as well as the power to appoint the capital beneficiaries from a group of
+persons designated by the testatrix. However, it held as invalid a power given to the
+trustees in a certain contingency to create a new trust for her great-grandchildren and in so
+doing to appoint trustees to decide on vital terms regarding the determination of payments
+of income and/or capital entirely within the trustees’ discretion. These powers are
+nevertheless frequently desired by testators who do not wish to ‘rule from the grave’ and
+their wishes could be validly served by creating an inter vivos trust or trusts and making
+bequests to the trustees of such trusts. The Appellate Division has held that a bequest to
+an inter vivos trust is not a bequest by incorporation of a document not executed with the
+formalities of a will.26
+
+5.28 Appointment of trustees
+An executor is not a trustee and while it may be possible for the terms of a particular
+will to construe the word ‘executor’ as including ‘trustee’, it is better expressly to appoint
+a trustee. The same persons may be appointed executors and trustees.
+As a trust lasts usually for some period of time, there should be some provision for
+successors to the original trustees when they cease to be such by death or otherwise. In the
+absence of a provision for such substitution, a new trustee will have to be appointed by
+the court.
+5.28.1 Security
+A trustee must furnish security unless he falls within the class of persons which the
+Trust Property Control Act exempts from security,27 or the will exempts him.
+5.28.2 Powers
+The trustee derives his authority and powers from the will.28 They may be limited or as
+wide as possible and the will should, therefore, expressly indicate what powers the
+trustees are to have.
+5.28.3 Investments
+Where the testator has prescribed the securities in which the funds are to be invested
+the trustees are bound thereby; the court may authorise alternative investments if the
+circumstances referred to in the Trust Property Control Act are present.29 If he wishes, the
+testator can empower his trustees to invest in any type of asset or he can give them an
+absolute or limited discretion.30
+Wills frequently set out the powers of trustees in detail greater than is necessary, for
+example, to open and operate banking accounts; to sign transfer forms; to appear before
+the Registrar of Deeds, and so on. These powers flow, it is submitted, from the office of
+trustee and the nature of the investments etc, and need not be detailed if the general
+powers conferred upon the trustees are wide enough.
+Example
+The trustees shall have the fullest and widest power to contract and to invest and reinvest
+as they would have were they acting for themselves and in particular, but without
+limitation upon the generality of their powers, they shall have power:
+1. to realise any movable or immovable property by public auction, private treaty or
+howsoever and upon such terms and conditions as they shall deem fit and upon such
+terms and conditions as they think fit to acquire movable or immovable property of
+any kind whatsoever;
+2. 3. to carry on any business whatsoever alone or in partnership or howsoever;
+to build or improve any property;
+4. to bind themselves in their capacity as trustees as sureties, guarantors and
+co-principal debtors in respect of the debts or obligations of any person or
+company and to secure such suretyships and guarantees by mortgage or pledge of
+all or any assets of my estate;
+5. to borrow any money for any purpose whatsoever including, without limiting the
+generality thereof, the purpose of advancing the same to any beneficiary with or
+without security and with or without charging interest, and to mortgage or pledge
+all or any of the assets of my estate as security therefor;
+6. to enter into any contracts of whatsoever kind or nature.
+
+5.29 International estates and offshore assets
+It is becoming more common for people to have multi-jurisdictional estates, whether
+due to immigration or the diversification of their investments, whereby they hold assets in
+both South Africa and offshore. The question that arises is whether a single South African
+will is sufficient to cover the worldwide assets, or whether a separate will should be
+drafted in each country. Unfortunately, there is no standard answer, as each country has
+its own laws and rules relating to the recognition of foreign wills, succession rules, and
+the devolution of assets, and which assets are governed by a bequest or the nomination of
+beneficiaries. When faced with this issue, the draftsperson must consider the international
+private law pertaining to the succession rules of the other country such as matrimonial
+property regimes, forced heirship and testamentary freedom, whether the foreign
+jurisdiction will accept the South African will, whether the foreign jurisdiction will
+recognise the South African executor and their rules of probate, whether both movables
+and immovables can be bequeathed by a will, language differences, and double estate
+duty agreements.31
+If it is established that the laws of the other country will not accept a South African
+will, or that it may be easier to have multiple wills for practical reasons, care should be
+taken to ensure that the multiple wills align with each other, and that they do not
+contradict each other, revoke each other, or create ambiguity by dealing with the same
+assets.
+Example
+I revoke, cancel and annul all previous South African wills, codicils and other
+testamentary writings and declare this to be my last will concerning my South African
+assets. I declare that this will does not deal with any of my assets in any other country and
+does not revoke any of my wills in any other country.
+
+5.30 Islamic wills
+Where a Muslim person wishes his estate to devolve in terms of Islamic law, he can
+either draft his will to accord with the devolution of assets as would be required by
+Islamic law, or he can draft his will to provide that upon his death, his executor can
+request an Islamic legal expert or Islamic institution to provide a distribution certificate
+which reflects the beneficiaries’ and heirs’ shares in terms of the Islamic law of
+succession.32 An Islamic will often makes provision for the payment of religious debts
+and obligations.
+Example
+The residue of my estate will devolve in accordance with the Islamic Law of Succession.
+For these purposes my Executor shall obtain a certificate executed by an expert on Islamic
+Law or by an Islamic Jurist appointed by the Jamiatul Ulama South Africa setting out who
+my lawful heirs are and the inheritance to which they are entitled in accordance with the
+Islamic Law of Succession.
+Alternatively:
+The residue of my estate will devolve upon my spouse and children in accordance
+with the Islamic Law of Succession. For these purposes my Executor shall obtain a
+certificate executed by an expert on Islamic Law or by an Islamic Jurist appointed by
+the Jamiatul Ulama South Africa setting out the inheritance to which they are entitled
+in accordance with the Islamic Law of Succession.
+
+5.31 Living wills
+A living will is a document in which a person makes a declaration or directive in
+advance or anticipation wherein he refuses certain medical attention or treatments in
+certain circumstances, should he become incompetent or unable to make such decisions,
+such as being kept alive artificially, or the administration of certain medicines. It can
+include a person’s wishes, requests, values and beliefs.
+A living will must not be confused with a will and should also not be included in the
+body of a will. Where a will speaks to the testator’s wishes upon his death, a living will
+speaks to the deponent’s wishes when he is still alive, but when he is not competent any
+longer to reproduce those wishes. Although there are no legal transcripts or statutes that
+regulate the living will, it can be argued that the living will finds its recognition in the
+common-law doctrine of informed consent as well as each individual’s right to dignity.
+Living wills have not been found by any court to be either enforceable or unenforceable.33
+The Health Professions Council of South Africa has issued certain ethical guidelines
+regarding the legal enforceability of living wills. Statutory intervention is, however,
+recommended.
