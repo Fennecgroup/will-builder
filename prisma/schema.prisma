@@ -37,3 +37,24 @@ model Will {
 
   @@index([userId])
 }
+
+model ManualChunk {
+  id             String   @id
+  source         String
+  edition        String?
+  chapterNumber  Int?     @map("chapter_number")
+  chapterTitle   String?  @map("chapter_title")
+  sectionNumber  String?  @map("section_number")
+  sectionTitle   String?  @map("section_title")
+  pageStart      Int?     @map("page_start")
+  pageEnd        Int?     @map("page_end")
+  docType        String?  @map("doc_type")
+  jurisdiction   String?
+  text           String
+  tags           String[]
+  contentType    String?  @map("content_type")
+  complexity     String?
+  embedding      Unsupported("vector(1536)")?
+
+  @@map("manual_chunks")
+}

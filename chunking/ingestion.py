@@ -1,11 +1,14 @@
 # ingest_manual_chunks.py
 
 import os
-import psycopg2
+import psycopg2 #pip install psycopg2-binary
 from typing import List, Dict
-from openai import OpenAI
+from openai import OpenAI #pip install openai
 
-from build_chunks import build_manual_chunks_from_text
+from chunker import build_manual_chunks_from_text
+
+from dotenv import load_dotenv
+load_dotenv()
 
 OPENAI_EMBEDDING_MODEL = "text-embedding-3-large"  # or 'text-embedding-3-small'
 
@@ -22,7 +25,8 @@ def get_embedding(client: OpenAI, text: str) -> list[float]:
     # It's a good idea to truncate very long text to model's max tokens for embeddings
     response = client.embeddings.create(
         model=OPENAI_EMBEDDING_MODEL,
-        input=text
+        input=text,
+        dimensions=1536
     )
     return response.data[0].embedding
 
@@ -83,7 +87,7 @@ def ingest_chunks(chunks: List[Dict], text_path: str):
     conn.close()
 
 if __name__ == "__main__":
-    text_path = "manual_ch5.txt"
+    text_path = "docs/will_manual.txt"
     chunks = build_manual_chunks_from_text(text_path)
     print(f"Built {len(chunks)} chunks from {text_path}")
     ingest_chunks(chunks, text_path)
