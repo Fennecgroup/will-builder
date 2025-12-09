@@ -1,6 +1,7 @@
 import type { WillContent } from '@/lib/types/will';
 
 export const sampleWillContent: WillContent = {
+  
   testator: {
     id: 'testator-001',
     fullName: 'Thabo Johannes Molefe',
@@ -18,6 +19,8 @@ export const sampleWillContent: WillContent = {
     occupation: 'Software Engineer',
   },
 
+  maritalStatus: 'married',
+
   marriage: {
     status: 'married',
     spouse: {
@@ -25,6 +28,7 @@ export const sampleWillContent: WillContent = {
       idNumber: '7808155234092', // SA ID format
       dateOfBirth: '1978-08-15',
       dateOfMarriage: '2005-12-10',
+      maritalRegime: 'ICOP',
     },
     hasChildren: true,
     numberOfChildren: 2,

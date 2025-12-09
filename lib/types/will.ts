@@ -1,7 +1,7 @@
 // Will Builder - TypeScript Type Definitions
 
 export type MaritalStatus = 'single' | 'married' | 'divorced' | 'widowed' | 'separated';
-
+export type MaritalRegime = 'ICOP' | 'OCOP' | 'OCOP-A' | 'OCOP-NA';
 // South African Provinces
 export type SAProvince =
   | 'Gauteng'
@@ -49,6 +49,7 @@ export interface SpouseInfo {
   idNumber?: string; // For SA: 13-digit ID number
   dateOfBirth?: string;
   dateOfMarriage?: string;
+  maritalRegime: MaritalRegime;
 }
 
 export interface Child {
@@ -172,6 +173,7 @@ export interface MinorBeneficiaryProvisions {
 
 export interface WillContent {
   testator: TestatorInfo;
+  maritalStatus: MaritalStatus;
   marriage: MarriageInfo;
   assets: Asset[];
   beneficiaries: Beneficiary[];
