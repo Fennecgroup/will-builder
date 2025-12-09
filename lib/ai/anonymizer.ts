@@ -32,6 +32,10 @@ export class Anonymizer {
       anonymizedData += this.anonymizeMarriage(willContent);
     }
 
+    if (sections.includes('children') && willContent.children && willContent.children.length > 0) {
+      anonymizedData += this.anonymizeChildren(willContent.children);
+    }
+
     if (sections.includes('assets') && willContent.assets?.length > 0) {
       anonymizedData += this.anonymizeAssets(willContent.assets);
     }
@@ -145,42 +149,52 @@ export class Anonymizer {
     let data = `## Marriage Information\n`;
     data += `Status: ${marriage.status}\n`;
 
-    if (marriage.spouse) {
-      const spouseToken = '[SPOUSE]';
-      this.tokenMap.set(spouseToken, marriage.spouse.fullName);
-      data += `Spouse: ${spouseToken}\n`;
+    if (marriage.spouses && marriage.spouses.length > 0) {
+      marriage.spouses.forEach((spouse, spouseIndex) => {
+        const spouseToken = `[SPOUSE-${spouseIndex + 1}]`;
+        this.tokenMap.set(spouseToken, spouse.fullName);
+        data += `Spouse ${spouseIndex + 1}: ${spouseToken}\n`;
 
-      if (marriage.spouse.dateOfMarriage) {
-        data += `Date of Marriage: ${marriage.spouse.dateOfMarriage}\n`;
-      }
+        if (spouse.dateOfMarriage) {
+          data += `Date of Marriage: ${spouse.dateOfMarriage}\n`;
+        }
 
-      if (marriage.spouse.idNumber) {
-        const idToken = this.createToken('id');
-        this.tokenMap.set(idToken, marriage.spouse.idNumber);
-        data += `Spouse ID: ${idToken}\n`;
-      }
-    }
-
-    if (marriage.hasChildren && marriage.children && marriage.children.length > 0) {
-      data += `\n### Children\n`;
-      data += `Total Children: ${marriage.children.length}\n\n`;
-
-      marriage.children.forEach((child, index) => {
-        const childToken = `[CHILD-${index + 1}]`;
-        this.tokenMap.set(childToken, child.fullName);
-
-        data += `${index + 1}. ${childToken}\n`;
-        data += `   Born: ${child.dateOfBirth}\n`;
-        data += `   Status: ${child.isMinor ? 'Minor' : 'Adult'}\n`;
-
-        if (child.idNumber) {
-          const childIdToken = this.createToken('id');
-          this.tokenMap.set(childIdToken, child.idNumber);
-          data += `   ID: ${childIdToken}\n`;
+        if (spouse.idNumber) {
+          const idToken = this.createToken('id');
+          this.tokenMap.set(idToken, spouse.idNumber);
+          data += `Spouse ID: ${idToken}\n`;
         }
         data += `\n`;
       });
     }
+
+    data += `\n`;
+    return data;
+  }
+
+  /**
+   * Anonymize children information
+   */
+  private anonymizeChildren(children: any[]): string {
+    let data = `## Children\n`;
+    data += `Total Children: ${children.length}\n\n`;
+
+    children.forEach((child, index) => {
+      const childToken = `[CHILD-${index + 1}]`;
+      this.tokenMap.set(childToken, child.fullName);
+
+      data += `${index + 1}. ${childToken}\n`;
+      data += `   Born: ${child.dateOfBirth}\n`;
+      data += `   Status: ${child.isMinor ? 'Minor' : 'Adult'}\n`;
+      data += `   Relationship: ${child.relationshipToTestator}\n`;
+
+      if (child.idNumber) {
+        const childIdToken = this.createToken('id');
+        this.tokenMap.set(childIdToken, child.idNumber);
+        data += `   ID: ${childIdToken}\n`;
+      }
+      data += `\n`;
+    });
 
     data += `\n`;
     return data;

@@ -137,25 +137,29 @@ export function WillPDFTemplate({ title, content, createdAt }: WillPDFTemplatePr
             <Text style={styles.text}>
               Marital Status: <Text style={styles.bold}>{content.marriage.status}</Text>
             </Text>
-            {content.marriage.spouse && (
-              <Text style={styles.text}>
-                I am married to <Text style={styles.bold}>{content.marriage.spouse.fullName}</Text>
-                {content.marriage.spouse.idNumber && (
-                  <Text> (ID: {content.marriage.spouse.idNumber})</Text>
-                )}
-                {content.marriage.spouse.dateOfMarriage && (
-                  <Text>. We were married on {content.marriage.spouse.dateOfMarriage}</Text>
-                )}.
-              </Text>
+            {content.marriage.spouses && content.marriage.spouses.length > 0 && (
+              <>
+                {content.marriage.spouses.map((spouse, idx) => (
+                  <Text key={spouse.id || idx} style={styles.text}>
+                    I am married to <Text style={styles.bold}>{spouse.fullName}</Text>
+                    {spouse.idNumber && (
+                      <Text> (ID: {spouse.idNumber})</Text>
+                    )}
+                    {spouse.dateOfMarriage && (
+                      <Text>. We were married on {spouse.dateOfMarriage}</Text>
+                    )}.
+                  </Text>
+                ))}
+              </>
             )}
-            {content.marriage.children && content.marriage.children.length > 0 && (
+            {content.children && content.children.length > 0 && (
               <>
                 <Text style={styles.text}>
-                  I have {content.marriage.numberOfChildren}{' '}
-                  {content.marriage.numberOfChildren === 1 ? 'child' : 'children'}:
+                  I have {content.children.length}{' '}
+                  {content.children.length === 1 ? 'child' : 'children'}:
                 </Text>
-                {content.marriage.children.map((child, index) => (
-                  <Text key={index} style={styles.listItem}>
+                {content.children.map((child, index) => (
+                  <Text key={child.id || index} style={styles.listItem}>
                     • {child.fullName}
                     {child.idNumber && ` (ID: ${child.idNumber})`}, born {child.dateOfBirth}
                     {child.isMinor && ' (minor)'}

@@ -23,31 +23,37 @@ export const sampleWillContent: WillContent = {
 
   marriage: {
     status: 'married',
-    spouse: {
-      fullName: 'Naledi Grace Molefe',
-      idNumber: '7808155234092', // SA ID format
-      dateOfBirth: '1978-08-15',
-      dateOfMarriage: '2005-12-10',
-      maritalRegime: 'ICOP',
-    },
-    hasChildren: true,
-    numberOfChildren: 2,
-    children: [
+    spouses: [
       {
-        id: 'child-001',
-        fullName: 'Lerato Molefe',
-        idNumber: '0603145345087', // SA ID - over 16
-        dateOfBirth: '2006-03-14',
-        isMinor: false, // 18+ in 2025
-      },
-      {
-        id: 'child-002',
-        fullName: 'Kgosi Molefe',
-        dateOfBirth: '2012-11-22',
-        isMinor: true, // Under 18
+        id: 'spouse-001',
+        fullName: 'Naledi Grace Molefe',
+        idNumber: '7808155234092', // SA ID format
+        dateOfBirth: '1978-08-15',
+        dateOfMarriage: '2005-12-10',
+        maritalRegime: 'ICOP',
       },
     ],
   },
+
+  children: [
+    {
+      id: 'child-001',
+      fullName: 'Lerato Molefe',
+      idNumber: '0603145345087', // SA ID - over 16
+      dateOfBirth: '2006-03-14',
+      isMinor: false, // 18+ in 2025
+      parentSpouseId: 'spouse-001', // Child from marriage
+      relationshipToTestator: 'biological',
+    },
+    {
+      id: 'child-002',
+      fullName: 'Kgosi Molefe',
+      dateOfBirth: '2012-11-22',
+      isMinor: true, // Under 18
+      parentSpouseId: 'spouse-001', // Child from marriage
+      relationshipToTestator: 'biological',
+    },
+  ],
 
   assets: [
     {

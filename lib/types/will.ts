@@ -45,6 +45,7 @@ export interface TestatorInfo {
 }
 
 export interface SpouseInfo {
+  id: string; // ID to track which spouse
   fullName: string;
   idNumber?: string; // For SA: 13-digit ID number
   dateOfBirth?: string;
@@ -58,14 +59,13 @@ export interface Child {
   idNumber?: string; // For SA: 13-digit ID number (if 16+)
   dateOfBirth: string;
   isMinor: boolean; // Under 18 in SA
+  parentSpouseId?: string; // ID of the spouse who is the parent (if child is from a marriage)
+  relationshipToTestator: 'biological' | 'adopted' | 'stepchild' | 'other';
 }
 
 export interface MarriageInfo {
   status: MaritalStatus;
-  spouse?: SpouseInfo;
-  hasChildren: boolean;
-  numberOfChildren?: number;
-  children?: Child[]; // SA: Required for guardianship and minor provisions
+  spouses?: SpouseInfo[]; // Support multiple spouses (polygamous marriages)
 }
 
 export interface Asset {
@@ -175,6 +175,7 @@ export interface WillContent {
   testator: TestatorInfo;
   maritalStatus: MaritalStatus;
   marriage: MarriageInfo;
+  children?: Child[]; // Children can be from marriages or out of marriage
   assets: Asset[];
   beneficiaries: Beneficiary[];
   executors: Executor[];

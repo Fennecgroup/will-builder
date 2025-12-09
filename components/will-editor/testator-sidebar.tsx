@@ -63,6 +63,7 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
   const {
     testator,
     marriage,
+    children,
     assets,
     beneficiaries,
     executors,
@@ -129,22 +130,28 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
               </AccordionTrigger>
               <AccordionContent>
                 <div className="space-y-2 pl-6">
-                  {marriage.spouse && (
+                  {marriage.spouses && marriage.spouses.length > 0 && (
                     <>
-                      <InfoRow icon={User} label="Spouse" value={marriage.spouse.fullName} />
-                      {marriage.spouse.dateOfMarriage && (
-                        <InfoRow
-                          icon={Calendar}
-                          label="Married"
-                          value={formatDate(marriage.spouse.dateOfMarriage)}
-                        />
-                      )}
+                      {marriage.spouses.map((spouse, idx) => (
+                        <div key={spouse.id || idx}>
+                          <InfoRow icon={User} label="Spouse" value={spouse.fullName} />
+                          {spouse.dateOfMarriage && (
+                            <InfoRow
+                              icon={Calendar}
+                              label="Married"
+                              value={formatDate(spouse.dateOfMarriage)}
+                            />
+                          )}
+                        </div>
+                      ))}
                     </>
                   )}
                   <InfoRow
                     icon={Users}
                     label="Children"
-                    value={marriage.hasChildren ? `Yes (${marriage.numberOfChildren || 0})` : 'No'}
+                    value={children && children.length > 0 
+                      ? `Yes (${children.length})` 
+                      : 'No'}
                   />
                 </div>
               </AccordionContent>

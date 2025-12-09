@@ -96,17 +96,19 @@ export function validateWitnesses(willContent: WillContent): WitnessConflict[] {
     }
 
     // Check if witness is spouse of testator (beneficiary check)
-    if (willContent.marriage.spouse) {
-      if (isSamePerson(witness, willContent.marriage.spouse as any)) {
-        conflicts.push({
-          witnessId: witness.id,
-          witnessName: witness.fullName,
-          conflictType: 'beneficiary',
-          conflictingParty: willContent.marriage.spouse.fullName,
-          severity: 'error',
-          message: `${witness.fullName} is the testator's spouse and likely a beneficiary. Spouses of beneficiaries cannot be witnesses.`,
-        })
-      }
+    if (willContent.marriage.spouses && willContent.marriage.spouses.length > 0) {
+      willContent.marriage.spouses.forEach((spouse) => {
+        if (isSamePerson(witness, spouse as any)) {
+          conflicts.push({
+            witnessId: witness.id,
+            witnessName: witness.fullName,
+            conflictType: 'beneficiary',
+            conflictingParty: spouse.fullName,
+            severity: 'error',
+            message: `${witness.fullName} is the testator's spouse and likely a beneficiary. Spouses of beneficiaries cannot be witnesses.`,
+          })
+        }
+      })
     }
 
     // Age validation (if date of birth is available)
@@ -227,9 +229,11 @@ export function getDisqualifiedWitnesses(willContent: WillContent): string[] {
     disqualified.push(g.fullName)
   })
 
-  // Add spouse (if exists)
-  if (willContent.marriage.spouse) {
-    disqualified.push(willContent.marriage.spouse.fullName)
+  // Add all spouses (if exist)
+  if (willContent.marriage.spouses && willContent.marriage.spouses.length > 0) {
+    willContent.marriage.spouses.forEach((spouse) => {
+      disqualified.push(spouse.fullName)
+    })
   }
 
   // Remove duplicates

@@ -78,17 +78,18 @@ export function buildMinimalContext(willContent: WillContent): string {
     parts.push(`Testator: ${willContent.testator.fullName}`);
   }
 
-  // Spouse name
-  if (willContent.marriage?.spouse?.fullName) {
-    parts.push(`Spouse: ${willContent.marriage.spouse.fullName}`);
+  // Spouse names
+  if (willContent.marriage?.spouses && willContent.marriage.spouses.length > 0) {
+    const spouseNames = willContent.marriage.spouses.map(s => s.fullName).join(', ');
+    parts.push(`Spouses: ${spouseNames}`);
   }
 
   // Children count
-  if (willContent.marriage?.children && willContent.marriage.children.length > 0) {
-    parts.push(`Children: ${willContent.marriage.children.length}`);
+  if (willContent.children && willContent.children.length > 0) {
+    parts.push(`Children: ${willContent.children.length}`);
 
     // Add first names of children
-    const childNames = willContent.marriage.children.map(c => c.fullName).join(', ');
+    const childNames = willContent.children.map(c => c.fullName).join(', ');
     parts.push(`Child names: ${childNames}`);
   }
 

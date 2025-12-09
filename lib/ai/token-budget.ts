@@ -11,12 +11,18 @@ import type { RelevanceScore } from './types';
 const SECTION_TOKEN_ESTIMATES: Record<keyof WillContent, (content: any, willContent?: WillContent) => number> = {
   testator: () => 150,  // Basic testator info
 
+  maritalStatus: () => 10,  // Marital status
+
   marriage: (marriage: MarriageInfo) => {
     let tokens = 100;  // Base marriage info
-    if (marriage.children && marriage.children.length > 0) {
-      tokens += marriage.children.length * 50;  // ~50 tokens per child
+    if (marriage.spouses && marriage.spouses.length > 0) {
+      tokens += marriage.spouses.length * 40;  // ~40 tokens per spouse
     }
     return tokens;
+  },
+
+  children: (children: any[]) => {
+    return 80 + (children.length * 50);  // Base + per child
   },
 
   assets: (assets: Asset[]) => {

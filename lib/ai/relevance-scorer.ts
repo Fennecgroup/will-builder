@@ -20,6 +20,7 @@ export function scoreRelevance(
   // Initialize scores for all potentially relevant sections
   const sections: (keyof WillContent)[] = [
     'marriage',
+    'children',
     'assets',
     'beneficiaries',
     'executors',
@@ -83,11 +84,12 @@ function applyContextualScoring(
   scores: Map<keyof WillContent, RelevanceScore>
 ): void {
   // If asking about minors and there are minor children, boost relevant sections
-  if ((queryText.includes('minor') || queryText.includes('child')) && willContent.marriage?.children) {
-    const hasMinors = willContent.marriage.children.some(child => child.isMinor);
+  if ((queryText.includes('minor') || queryText.includes('child')) && willContent.children) {
+    const hasMinors = willContent.children.some(child => child.isMinor);
     if (hasMinors) {
       boostScore(scores, 'guardians', 15);
       boostScore(scores, 'minorBeneficiaryProvisions', 15);
+      boostScore(scores, 'children', 15);
     }
   }
 
