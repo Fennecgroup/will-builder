@@ -77,6 +77,10 @@ export interface Asset {
   currency?: string;
   accountNumber?: string; // For bank accounts, investments
   notes?: string;
+  beneficiaryAllocations?: {
+    beneficiaryId: string;
+    percentage: number; // Must sum to 100% if present
+  }[];
 }
 
 export interface Beneficiary {

@@ -64,6 +64,10 @@ export const sampleWillContent: WillContent = {
       estimatedValue: 4500000,
       currency: 'ZAR',
       notes: 'Title Deed No. T12345/2010',
+      beneficiaryAllocations: [
+        { beneficiaryId: 'ben-001', percentage: 50 }, // Spouse Naledi
+        { beneficiaryId: 'ben-002', percentage: 50 }, // Daughter Lerato
+      ],
     },
     {
       id: 'asset-002',
@@ -73,6 +77,9 @@ export const sampleWillContent: WillContent = {
       estimatedValue: 2800000,
       currency: 'ZAR',
       notes: 'Sectional Title Unit 405',
+      beneficiaryAllocations: [
+        { beneficiaryId: 'ben-001', percentage: 100 }, // Spouse Naledi
+      ],
     },
     {
       id: 'asset-003',
@@ -81,6 +88,9 @@ export const sampleWillContent: WillContent = {
       estimatedValue: 1200000,
       currency: 'ZAR',
       notes: 'Registration: ABC123GP',
+      beneficiaryAllocations: [
+        { beneficiaryId: 'ben-002', percentage: 100 }, // Daughter Lerato
+      ],
     },
     {
       id: 'asset-004',

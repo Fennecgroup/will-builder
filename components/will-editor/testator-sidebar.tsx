@@ -174,22 +174,46 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
                 <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                   Total Value: {formatCurrency(totalAssetValue)}
                 </div>
-                {assets?.map((asset) => (
-                  <div key={asset.id} className="border-l-2 border-neutral-200 pl-3 dark:border-neutral-700">
-                    <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                      {asset.description}
-                    </div>
-                    <div className="text-xs text-neutral-500">
-                      <span className="capitalize">{asset.type.replace('-', ' ')}</span>
-                      {asset.estimatedValue && (
-                        <> • {formatCurrency(asset.estimatedValue, asset.currency)}</>
+                {assets?.map((asset) => {
+                  const hasAllocations = asset.beneficiaryAllocations && asset.beneficiaryAllocations.length > 0;
+                  return (
+                    <div key={asset.id} className="border-l-2 border-neutral-200 pl-3 dark:border-neutral-700">
+                      <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                        {asset.description}
+                      </div>
+                      <div className="text-xs text-neutral-500">
+                        <span className="capitalize">{asset.type.replace('-', ' ')}</span>
+                        {asset.estimatedValue && (
+                          <> • {formatCurrency(asset.estimatedValue, asset.currency)}</>
+                        )}
+                      </div>
+                      {asset.location && (
+                        <div className="text-xs text-neutral-500">{asset.location}</div>
+                      )}
+                      {hasAllocations ? (
+                        <div className="mt-2 space-y-1">
+                          {asset.beneficiaryAllocations.map((allocation, idx) => {
+                            const beneficiary = beneficiaries?.find(b => b.id === allocation.beneficiaryId);
+                            return beneficiary ? (
+                              <div key={idx} className="flex items-center gap-2 text-xs">
+                                <Badge variant="outline" className="text-xs">
+                                  {allocation.percentage}%
+                                </Badge>
+                                <span className="text-neutral-600 dark:text-neutral-400">
+                                  {beneficiary.fullName}
+                                </span>
+                              </div>
+                            ) : null;
+                          })}
+                        </div>
+                      ) : (
+                        <Badge variant="secondary" className="mt-2 text-xs">
+                          Unassigned
+                        </Badge>
                       )}
                     </div>
-                    {asset.location && (
-                      <div className="text-xs text-neutral-500">{asset.location}</div>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -207,24 +231,71 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
             </AccordionTrigger>
             <AccordionContent>
               <div className="space-y-3 pl-6">
-                {beneficiaries?.map((beneficiary) => (
-                  <div key={beneficiary.id} className="border-l-2 border-neutral-200 pl-3 dark:border-neutral-700">
-                    <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                      {beneficiary.fullName}
-                      {beneficiary.allocationPercentage && (
-                        <Badge variant="outline" className="ml-2 text-xs">
-                          {beneficiary.allocationPercentage}%
-                        </Badge>
+                {beneficiaries?.map((beneficiary) => {
+                  // Find all assets allocated to this beneficiary
+                  const allocatedAssets = assets?.filter(asset =>
+                    asset.beneficiaryAllocations?.some(alloc => alloc.beneficiaryId === beneficiary.id)
+                  ) || [];
+                  
+                  // Calculate total allocation value
+                  const totalAllocationValue = allocatedAssets.reduce((sum, asset) => {
+                    const allocation = asset.beneficiaryAllocations?.find(alloc => alloc.beneficiaryId === beneficiary.id);
+                    if (allocation && asset.estimatedValue) {
+                      return sum + (asset.estimatedValue * allocation.percentage / 100);
+                    }
+                    return sum;
+                  }, 0);
+
+                  return (
+                    <div key={beneficiary.id} className="border-l-2 border-neutral-200 pl-3 dark:border-neutral-700">
+                      <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                        {beneficiary.fullName}
+                        {beneficiary.allocationPercentage && (
+                          <Badge variant="outline" className="ml-2 text-xs">
+                            {beneficiary.allocationPercentage}%
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-xs text-neutral-500">{beneficiary.relationship}</div>
+                      {allocatedAssets.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          <div className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
+                            Allocated Assets:
+                          </div>
+                          {allocatedAssets.map((asset) => {
+                            const allocation = asset.beneficiaryAllocations?.find(alloc => alloc.beneficiaryId === beneficiary.id);
+                            const allocationValue = allocation && asset.estimatedValue
+                              ? asset.estimatedValue * allocation.percentage / 100
+                              : 0;
+                            return (
+                              <div key={asset.id} className="flex items-center gap-2 text-xs text-neutral-500">
+                                <Badge variant="outline" className="text-xs">
+                                  {allocation?.percentage}%
+                                </Badge>
+                                <span className="flex-1">{asset.description}</span>
+                                {allocationValue > 0 && (
+                                  <span className="text-neutral-600 dark:text-neutral-400">
+                                    {formatCurrency(allocationValue, asset.currency)}
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
+                          {totalAllocationValue > 0 && (
+                            <div className="mt-1 pt-1 border-t border-neutral-200 dark:border-neutral-700 text-xs font-medium text-neutral-900 dark:text-neutral-100">
+                              Total Allocation: {formatCurrency(totalAllocationValue, allocatedAssets.find(a => a.estimatedValue)?.currency || 'ZAR')}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {beneficiary.specificBequests && beneficiary.specificBequests.length > 0 && (
+                        <div className="mt-1 text-xs text-neutral-500">
+                          Bequests: {beneficiary.specificBequests.join(', ')}
+                        </div>
                       )}
                     </div>
-                    <div className="text-xs text-neutral-500">{beneficiary.relationship}</div>
-                    {beneficiary.specificBequests && beneficiary.specificBequests.length > 0 && (
-                      <div className="mt-1 text-xs text-neutral-500">
-                        Bequests: {beneficiary.specificBequests.join(', ')}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </AccordionContent>
           </AccordionItem>
