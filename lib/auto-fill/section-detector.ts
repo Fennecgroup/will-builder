@@ -13,6 +13,11 @@ import {
  * Regular expressions to match article headings
  */
 const ARTICLE_PATTERNS: Record<WillArticle, RegExp[]> = {
+  PREAMBLE: [
+    /LAST\s+WILL\s+AND\s+TESTAMENT/i,
+    /PREAMBLE/i,
+    /TESTATOR\s*[:]/i,
+  ],
   REVOCATION: [
     /ARTICLE\s+I\s*[-:]?\s*REVOCATION/i,
     /ARTICLE\s+1\s*[-:]?\s*REVOCATION/i,

@@ -22,6 +22,7 @@ export { AutoFillOrchestrator } from './orchestrator';
 
 // Generators
 export { BaseGenerator } from './generators/base-generator';
+export { PreambleGenerator } from './generators/preamble-generator';
 export { RevocationGenerator } from './generators/revocation-generator';
 export { DeclarationGenerator } from './generators/declaration-generator';
 export { FamilyInfoGenerator } from './generators/family-info-generator';

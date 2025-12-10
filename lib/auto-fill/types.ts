@@ -7,6 +7,7 @@ import { WillContent } from '@/lib/types/will';
  * Represents the different sections/articles in a South African will
  */
 export type WillArticle =
+  | 'PREAMBLE'            // Opening section with testator details
   | 'REVOCATION'          // Article I
   | 'DECLARATION'         // Article II
   | 'FAMILY_INFO'         // Article III
@@ -136,6 +137,7 @@ export interface ValidationResult {
  * Maps article types to their standard titles
  */
 export const ARTICLE_TITLES: Record<WillArticle, string> = {
+  PREAMBLE: 'PREAMBLE',
   REVOCATION: 'ARTICLE I - REVOCATION',
   DECLARATION: 'ARTICLE II - DECLARATION',
   FAMILY_INFO: 'ARTICLE III - FAMILY INFORMATION',
@@ -152,6 +154,7 @@ export const ARTICLE_TITLES: Record<WillArticle, string> = {
  * Defines the canonical order of articles in a will
  */
 export const ARTICLE_ORDER: WillArticle[] = [
+  'PREAMBLE',
   'REVOCATION',
   'DECLARATION',
   'FAMILY_INFO',

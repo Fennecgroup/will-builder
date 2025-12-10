@@ -10,6 +10,7 @@ import {
   PlateNode,
 } from './types';
 import { BaseGenerator } from './generators/base-generator';
+import { PreambleGenerator } from './generators/preamble-generator';
 import { RevocationGenerator } from './generators/revocation-generator';
 import { DeclarationGenerator } from './generators/declaration-generator';
 import { FamilyInfoGenerator } from './generators/family-info-generator';
@@ -47,8 +48,9 @@ export class AutoFillOrchestrator {
       jurisdiction: 'ZA', // Default to South Africa
     };
 
-    // Initialize ALL generators (9 total) in canonical article order
+    // Initialize ALL generators (10 total) in canonical article order
     this.generators = [
+      new PreambleGenerator(this.context),             // Preamble
       new RevocationGenerator(this.context),           // Article I
       new DeclarationGenerator(this.context),          // Article II
       new FamilyInfoGenerator(this.context),           // Article III
@@ -289,8 +291,9 @@ export class AutoFillOrchestrator {
       // Add section content
       nodes.push(...section.content);
 
-      // Add spacing between sections (except after attestation)
-      if (generator.getArticle() !== 'ATTESTATION') {
+      // Add spacing between sections (except after preamble and attestation)
+      const article = generator.getArticle();
+      if (article !== 'PREAMBLE' && article !== 'ATTESTATION') {
         nodes.push(this.createEmptyParagraph());
       }
     }

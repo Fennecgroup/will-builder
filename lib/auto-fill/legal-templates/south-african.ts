@@ -371,7 +371,7 @@ export function validateAndNormalizeAllocations(
  * @returns Formatted revocation clause
  */
 export function formatRevocationClause(): string {
-  return 'I hereby revoke all wills and codicils heretofore made by me and declare this to be my last will and testament.';
+  return 'I hereby revoke all Wills and Codicils previously made by me insofar as they may deal with my assets situated within the Republic of South Africa and declare this to be my Last Will and Testament in respect of my assets situated in South Africa only. I direct that no Will executed outside the Republic of South Africa shall revoke this Will unless it specifically purports to do so and/or specifically deals with my assets in South Africa.';
 }
 
 /**
