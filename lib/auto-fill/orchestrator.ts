@@ -10,8 +10,15 @@ import {
   PlateNode,
 } from './types';
 import { BaseGenerator } from './generators/base-generator';
+import { RevocationGenerator } from './generators/revocation-generator';
+import { DeclarationGenerator } from './generators/declaration-generator';
+import { FamilyInfoGenerator } from './generators/family-info-generator';
+import { ExecutorsGenerator } from './generators/executors-generator';
+import { GuardiansGenerator } from './generators/guardians-generator';
+import { MinorProvisionsGenerator } from './generators/minor-provisions-generator';
 import { SpecificBequestsGenerator } from './generators/specific-bequests-generator';
 import { ResiduaryEstateGenerator } from './generators/residuary-estate-generator';
+import { AttestationGenerator } from './generators/attestation-generator';
 import {
   detectSections,
   getSection,
@@ -40,10 +47,17 @@ export class AutoFillOrchestrator {
       jurisdiction: 'ZA', // Default to South Africa
     };
 
-    // Initialize generators
+    // Initialize ALL generators (9 total) in canonical article order
     this.generators = [
-      new SpecificBequestsGenerator(this.context),
-      new ResiduaryEstateGenerator(this.context),
+      new RevocationGenerator(this.context),           // Article I
+      new DeclarationGenerator(this.context),          // Article II
+      new FamilyInfoGenerator(this.context),           // Article III
+      new ExecutorsGenerator(this.context),            // Article IV
+      new GuardiansGenerator(this.context),            // Article V
+      new MinorProvisionsGenerator(this.context),      // Article VI
+      new SpecificBequestsGenerator(this.context),     // Article VII
+      new ResiduaryEstateGenerator(this.context),      // Article VIII
+      new AttestationGenerator(this.context),          // Attestation
     ];
   }
 
@@ -250,5 +264,42 @@ export class AutoFillOrchestrator {
    */
   getContext(): GeneratorContext {
     return this.context;
+  }
+
+  /**
+   * Generate full initial document
+   * Runs all generators that have sufficient data and combines their output
+   * Used for creating initial will content from testator data
+   * @returns Complete Value (Plate.js document) with all generated sections
+   */
+  generateFullDocument(): Value {
+    const nodes: PlateNode[] = [];
+
+    // Generate sections from all generators that can run
+    for (const generator of this.generators) {
+      if (!generator.shouldGenerate()) {
+        continue;
+      }
+
+      const section = generator.generate();
+      if (!section) {
+        continue;
+      }
+
+      // Add section content
+      nodes.push(...section.content);
+
+      // Add spacing between sections (except after attestation)
+      if (generator.getArticle() !== 'ATTESTATION') {
+        nodes.push(this.createEmptyParagraph());
+      }
+    }
+
+    // If no content generated, return empty document
+    if (nodes.length === 0) {
+      return [this.createEmptyParagraph()] as Value;
+    }
+
+    return nodes as Value;
   }
 }

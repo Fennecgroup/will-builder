@@ -25,6 +25,7 @@ import { updateWill, deleteWill } from '@/lib/actions/wills'
 import { DeleteDialog } from '@/components/wills/delete-dialog'
 import { WillContent } from '@/lib/types/will'
 import { AutoFillOrchestrator, AutoFillSuggestion, WillArticle } from '@/lib/auto-fill'
+import { InitialDocumentGenerator } from '@/lib/will/initial-document-generator'
 import { toast } from 'sonner'
 
 interface WillEditorProps {
@@ -33,9 +34,26 @@ interface WillEditorProps {
 
 export function WillEditor({ will }: WillEditorProps) {
   const router = useRouter()
-  const [editorValue, setEditorValue] = useState<Value>(
-    (will.editorContent as unknown as Value) || (initialEditorContent as Value)
-  )
+  const [editorValue, setEditorValue] = useState<Value>(() => {
+    // If editorContent exists and has content, use it (preserve user edits)
+    if (will.editorContent && Array.isArray(will.editorContent) && will.editorContent.length > 0) {
+      return will.editorContent as unknown as Value
+    }
+
+    // Generate dynamic content from willContent
+    const content = will.content as unknown as WillContent
+    if (content && Object.keys(content).length > 0) {
+      // Check if we have minimum data to generate
+      if (InitialDocumentGenerator.hasMinimumData(content)) {
+        console.log('Generating initial document from testator data')
+        return InitialDocumentGenerator.generate(content)
+      }
+    }
+
+    // Ultimate fallback to sample content
+    console.log('Using sample initial content as fallback')
+    return initialEditorContent as Value
+  })
   const [willContent, setWillContent] = useState<WillContent>(() => {
     const content = will.content as unknown as WillContent
     // Use sample if content is falsy or an empty object

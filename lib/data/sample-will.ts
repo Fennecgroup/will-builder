@@ -434,7 +434,8 @@ export const sampleWillContent: WillContent = {
 };
 
 // Initial editor content for Plate.js - South African Will Format
-export const initialEditorContent = [
+export const initialEditorContent = []
+export const initialEditorContent1 = [
   {
     type: 'h1',
     children: [{ text: 'LAST WILL AND TESTAMENT' }],

@@ -360,3 +360,364 @@ export function validateAndNormalizeAllocations(
     normalized: validAllocations,
   };
 }
+
+// ========================================
+// New Template Functions for Additional Generators
+// ========================================
+
+/**
+ * Format revocation clause (Article I)
+ * Standard clause revoking all previous wills
+ * @returns Formatted revocation clause
+ */
+export function formatRevocationClause(): string {
+  return 'I hereby revoke all wills and codicils heretofore made by me and declare this to be my last will and testament.';
+}
+
+/**
+ * Format declaration clause (Article II)
+ * Declaration with testator information
+ * @param testator Testator information
+ * @returns Formatted declaration clause
+ */
+export function formatDeclarationClause(testator: {
+  fullName: string;
+  idNumber?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+  };
+}): string {
+  const parts: string[] = [];
+
+  parts.push(`I, ${testator.fullName}`);
+
+  if (testator.idNumber) {
+    parts.push(`ID Number ${testator.idNumber}`);
+  }
+
+  if (testator.address) {
+    const addressParts: string[] = [];
+    if (testator.address.street) addressParts.push(testator.address.street);
+    if (testator.address.city) addressParts.push(testator.address.city);
+    if (testator.address.state) addressParts.push(testator.address.state);
+    if (testator.address.postalCode) addressParts.push(testator.address.postalCode);
+    if (testator.address.country) addressParts.push(testator.address.country);
+
+    if (addressParts.length > 0) {
+      parts.push(`of ${addressParts.join(', ')}`);
+    }
+  }
+
+  parts.push('being of sound mind and disposing memory, do hereby make, publish, and declare this to be my last will and testament.');
+
+  return parts.join(', ');
+}
+
+/**
+ * Format family information section (Article III)
+ * Lists marital status, spouse(s), and children
+ * @param maritalStatus Marital status
+ * @param marriage Marriage information
+ * @param children Array of children
+ * @returns Formatted family information text
+ */
+export function formatFamilyInfoSection(
+  maritalStatus: string,
+  marriage?: {
+    spouses?: Array<{
+      fullName: string;
+      idNumber?: string;
+      dateOfMarriage?: string;
+      maritalRegime?: string;
+    }>;
+  },
+  children?: Array<{
+    fullName: string;
+    dateOfBirth?: string;
+    isMinor?: boolean;
+    relationshipToTestator?: string;
+  }>
+): string {
+  const sections: string[] = [];
+
+  // Marital status section
+  if (maritalStatus === 'married' && marriage?.spouses && marriage.spouses.length > 0) {
+    const spouseNames = marriage.spouses.map((spouse) => {
+      const parts = [spouse.fullName];
+      if (spouse.idNumber) {
+        parts.push(`ID Number ${spouse.idNumber}`);
+      }
+      if (spouse.maritalRegime) {
+        parts.push(`married ${spouse.maritalRegime === 'ICOP' ? 'in community of property' : spouse.maritalRegime === 'ANC' ? 'out of community of property with accrual' : 'out of community of property without accrual'}`);
+      }
+      return parts.join(', ');
+    }).join(' and ');
+
+    sections.push(`I am married to ${spouseNames}.`);
+  } else if (maritalStatus === 'divorced') {
+    sections.push('I am divorced.');
+  } else if (maritalStatus === 'widowed') {
+    sections.push('I am widowed.');
+  } else {
+    sections.push('I am single.');
+  }
+
+  // Children section
+  if (children && children.length > 0) {
+    const childDescriptions = children.map((child) => {
+      const parts = [child.fullName];
+      if (child.dateOfBirth) {
+        parts.push(`born ${child.dateOfBirth}`);
+      }
+      if (child.isMinor !== undefined) {
+        parts.push(child.isMinor ? 'a minor' : 'an adult');
+      }
+      return parts.join(', ');
+    });
+
+    sections.push(`I have ${children.length} ${children.length === 1 ? 'child' : 'children'}: ${childDescriptions.join('; ')}.`);
+  } else {
+    sections.push('I have no children.');
+  }
+
+  return sections.join(' ');
+}
+
+/**
+ * Format executor appointment clause (Article IV)
+ * Appoints executor(s) with succession order
+ * @param executors Array of executors
+ * @returns Formatted executor appointment clause
+ */
+export function formatExecutorAppointment(
+  executors: Array<{
+    fullName: string;
+    idNumber?: string;
+    relationship?: string;
+    isAlternate?: boolean;
+  }>
+): string {
+  if (executors.length === 0) {
+    return '';
+  }
+
+  const primary = executors.filter((e) => !e.isAlternate);
+  const alternates = executors.filter((e) => e.isAlternate);
+
+  const sections: string[] = [];
+
+  // Primary executor(s)
+  if (primary.length > 0) {
+    const primaryDescriptions = primary.map((exec) => {
+      const parts = [exec.fullName];
+      if (exec.idNumber) {
+        parts.push(`ID Number ${exec.idNumber}`);
+      }
+      if (exec.relationship) {
+        parts.push(`(${exec.relationship})`);
+      }
+      return parts.join(', ');
+    });
+
+    if (primary.length === 1) {
+      sections.push(`I appoint ${primaryDescriptions[0]} as the executor of this my will.`);
+    } else {
+      sections.push(`I appoint ${primaryDescriptions.join(' and ')} as joint executors of this my will.`);
+    }
+  }
+
+  // Alternate executor(s)
+  if (alternates.length > 0) {
+    const alternateDescriptions = alternates.map((exec) => {
+      const parts = [exec.fullName];
+      if (exec.idNumber) {
+        parts.push(`ID Number ${exec.idNumber}`);
+      }
+      if (exec.relationship) {
+        parts.push(`(${exec.relationship})`);
+      }
+      return parts.join(', ');
+    });
+
+    sections.push(`Should the above-named executor(s) be unable or unwilling to serve, I appoint ${alternateDescriptions.join(' and ')} as alternate executor(s).`);
+  }
+
+  // Powers clause
+  sections.push('I grant my executor(s) full power and authority to administer and distribute my estate in accordance with the terms of this will, including the power to sell, transfer, or otherwise dispose of any assets as may be necessary.');
+
+  return sections.join(' ');
+}
+
+/**
+ * Format guardian appointment clause (Article V)
+ * Appoints guardian(s) for minor children
+ * @param guardians Array of guardians
+ * @param children Array of minor children
+ * @returns Formatted guardian appointment clause
+ */
+export function formatGuardianAppointment(
+  guardians: Array<{
+    fullName: string;
+    idNumber?: string;
+    relationship?: string;
+    isAlternate?: boolean;
+  }>,
+  children?: Array<{
+    fullName: string;
+    isMinor?: boolean;
+  }>
+): string {
+  if (guardians.length === 0) {
+    return '';
+  }
+
+  const minorChildren = children?.filter((c) => c.isMinor) || [];
+  if (minorChildren.length === 0) {
+    return '';
+  }
+
+  const primary = guardians.filter((g) => !g.isAlternate);
+  const alternates = guardians.filter((g) => g.isAlternate);
+
+  const sections: string[] = [];
+
+  // Primary guardian(s)
+  if (primary.length > 0) {
+    const primaryDescriptions = primary.map((guard) => {
+      const parts = [guard.fullName];
+      if (guard.idNumber) {
+        parts.push(`ID Number ${guard.idNumber}`);
+      }
+      if (guard.relationship) {
+        parts.push(`(${guard.relationship})`);
+      }
+      return parts.join(', ');
+    });
+
+    if (primary.length === 1) {
+      sections.push(`I appoint ${primaryDescriptions[0]} as guardian of my minor ${minorChildren.length === 1 ? 'child' : 'children'}.`);
+    } else {
+      sections.push(`I appoint ${primaryDescriptions.join(' and ')} as joint guardians of my minor ${minorChildren.length === 1 ? 'child' : 'children'}.`);
+    }
+  }
+
+  // Alternate guardian(s)
+  if (alternates.length > 0) {
+    const alternateDescriptions = alternates.map((guard) => {
+      const parts = [guard.fullName];
+      if (guard.idNumber) {
+        parts.push(`ID Number ${guard.idNumber}`);
+      }
+      if (guard.relationship) {
+        parts.push(`(${guard.relationship})`);
+      }
+      return parts.join(', ');
+    });
+
+    sections.push(`Should the above-named guardian(s) be unable or unwilling to serve, I appoint ${alternateDescriptions.join(' and ')} as alternate guardian(s).`);
+  }
+
+  // Powers clause
+  sections.push('I grant the appointed guardian(s) full parental responsibilities and rights as provided for in the Children\'s Act 38 of 2005, including the care, maintenance, and education of my minor children.');
+
+  return sections.join(' ');
+}
+
+/**
+ * Format minor provisions clause (Article VI)
+ * Provisions for inheritance by minor beneficiaries
+ * @param minorBeneficiaries Array of minor beneficiaries
+ * @param guardianName Optional guardian name
+ * @returns Formatted minor provisions clause
+ */
+export function formatMinorProvisionsClause(
+  minorBeneficiaries: Array<{
+    fullName: string;
+    isMinor?: boolean;
+  }>,
+  guardianName?: string
+): string {
+  const minors = minorBeneficiaries.filter((b) => b.isMinor === true);
+
+  if (minors.length === 0) {
+    return '';
+  }
+
+  const sections: string[] = [];
+
+  sections.push('With regard to any inheritance by minor beneficiaries:');
+
+  if (guardianName) {
+    sections.push(`Until each minor beneficiary reaches the age of majority (18 years), their inheritance shall be held in trust by ${guardianName} for their benefit, maintenance, and education.`);
+  } else {
+    sections.push('Until each minor beneficiary reaches the age of majority (18 years), their inheritance shall be paid into the Guardian\'s Fund as established under the Guardians\' Fund Act 1965, to be held for their benefit.');
+  }
+
+  sections.push('Upon reaching the age of majority, each beneficiary shall receive their full inheritance.');
+
+  // List minor beneficiaries
+  if (minors.length > 0) {
+    const minorNames = minors.map((m) => m.fullName).join(', ');
+    sections.push(`The following beneficiaries are currently minors: ${minorNames}.`);
+  }
+
+  return sections.join(' ');
+}
+
+/**
+ * Format attestation clause
+ * Signature and witness section
+ * @param dateExecuted Date will was executed
+ * @param placeExecuted Place where will was executed
+ * @param witnesses Array of witnesses
+ * @returns Formatted attestation clause
+ */
+export function formatAttestationClause(
+  dateExecuted?: string,
+  placeExecuted?: string,
+  witnesses?: Array<{
+    fullName: string;
+    idNumber?: string;
+    address?: string;
+  }>
+): string {
+  const sections: string[] = [];
+
+  sections.push('IN WITNESS WHEREOF, I have hereunto set my hand and seal to this my last will and testament');
+
+  const details: string[] = [];
+  if (placeExecuted) {
+    details.push(`at ${placeExecuted}`);
+  }
+  if (dateExecuted) {
+    details.push(`on this ${dateExecuted}`);
+  }
+
+  if (details.length > 0) {
+    sections.push(details.join(' ') + '.');
+  } else {
+    sections.push('.');
+  }
+
+  // Witness section
+  if (witnesses && witnesses.length > 0) {
+    sections.push('\n\nSIGNED by the testator in our presence and by us in the presence of the testator and of each other:');
+
+    witnesses.forEach((witness, index) => {
+      const witnessParts = [`Witness ${index + 1}: ${witness.fullName}`];
+      if (witness.idNumber) {
+        witnessParts.push(`ID Number: ${witness.idNumber}`);
+      }
+      if (witness.address) {
+        witnessParts.push(`Address: ${witness.address}`);
+      }
+      sections.push('\n' + witnessParts.join(', '));
+    });
+  }
+
+  return sections.join(' ');
+}

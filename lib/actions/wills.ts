@@ -3,6 +3,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 import { WillContent } from '@/lib/types/will'
+import { InitialDocumentGenerator } from '@/lib/will/initial-document-generator'
 import { revalidatePath } from 'next/cache'
 
 export async function createWill(title: string, content?: WillContent) {
@@ -12,10 +13,23 @@ export async function createWill(title: string, content?: WillContent) {
     throw new Error('Unauthorized')
   }
 
+  // Generate initial editor content from testator data if available
+  let editorContent: any = null
+  if (content && InitialDocumentGenerator.hasMinimumData(content)) {
+    try {
+      editorContent = InitialDocumentGenerator.generate(content)
+      console.log('Generated initial document for new will')
+    } catch (error) {
+      console.error('Error generating initial document:', error)
+      // Continue without editorContent if generation fails
+    }
+  }
+
   const will = await prisma.will.create({
     data: {
       title,
       content: (content as any) || {},
+      editorContent: editorContent,
       status: 'draft',
       user: {
         connectOrCreate: {
