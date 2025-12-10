@@ -399,24 +399,24 @@ export const sampleWillContent: WillContent = {
     'All the rest, residue, and remainder of my estate, both movable and immovable, of whatever kind and wherever situated, which I have not herein otherwise disposed of, I give, devise, and bequeath to my spouse, Naledi Grace Molefe (ID: 7808155234092), failing whom to my children in equal shares.',
 
   specificBequests: [
-    {
-      id: 'bequest-001',
-      description: 'My 2022 BMW X5 xDrive30d, Registration ABC123GP',
-      beneficiaryId: 'ben-002', // Daughter Lerato
-      substituteBeneficiaryId: 'ben-003',
-    },
-    {
-      id: 'bequest-002',
-      description: 'My Art Collection - Contemporary South African Art',
-      beneficiaryId: 'ben-001', // Spouse Naledi
-      substituteBeneficiaryId: 'ben-002',
-    },
-    {
-      id: 'bequest-003',
-      description: 'Vacation Property - Umhlanga Rocks Apartment',
-      beneficiaryId: 'ben-001', // Spouse Naledi
-      substituteBeneficiaryId: 'ben-002',
-    },
+    // {
+    //   id: 'bequest-001',
+    //   description: 'My 2022 BMW X5 xDrive30d, Registration ABC123GP',
+    //   beneficiaryId: 'ben-002', // Daughter Lerato
+    //   substituteBeneficiaryId: 'ben-003',
+    // },
+    // {
+    //   id: 'bequest-002',
+    //   description: 'My Art Collection - Contemporary South African Art',
+    //   beneficiaryId: 'ben-001', // Spouse Naledi
+    //   substituteBeneficiaryId: 'ben-002',
+    // },
+    // {
+    //   id: 'bequest-003',
+    //   description: 'Vacation Property - Umhlanga Rocks Apartment',
+    //   beneficiaryId: 'ben-001', // Spouse Naledi
+    //   substituteBeneficiaryId: 'ben-002',
+    // },
   ],
 
   minorBeneficiaryProvisions: {

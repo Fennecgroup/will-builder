@@ -18,10 +18,13 @@ import {
 import { PlateEditor } from '@/components/will-editor/plate-editor'
 import { TestatorSidebar } from '@/components/will-editor/testator-sidebar'
 import { AIChat } from '@/components/plate-ui/ai-chat'
+import { AutoFillNotification } from '@/components/will-editor/auto-fill-notification'
+import { AutoFillPreviewPanel } from '@/components/will-editor/auto-fill-preview-panel'
 import { initialEditorContent, sampleWillContent } from '@/lib/data/sample-will'
 import { updateWill, deleteWill } from '@/lib/actions/wills'
 import { DeleteDialog } from '@/components/wills/delete-dialog'
 import { WillContent } from '@/lib/types/will'
+import { AutoFillOrchestrator, AutoFillSuggestion, WillArticle } from '@/lib/auto-fill'
 import { toast } from 'sonner'
 
 interface WillEditorProps {
@@ -50,6 +53,10 @@ export function WillEditor({ will }: WillEditorProps) {
   const [title, setTitle] = useState(will.title)
   const [isSavingTitle, setIsSavingTitle] = useState(false)
   const titleInputRef = useRef<HTMLInputElement>(null)
+
+  // Auto-fill state
+  const [autoFillSuggestions, setAutoFillSuggestions] = useState<AutoFillSuggestion[]>([])
+  const [showAutoFillPreview, setShowAutoFillPreview] = useState(false)
 
   // Auto-save function
   const saveWill = useCallback(async () => {
@@ -83,6 +90,21 @@ export function WillEditor({ will }: WillEditorProps) {
 
     return () => clearInterval(autoSaveInterval)
   }, [saveWill, hasUnsavedChanges])
+
+  // Auto-fill suggestions (debounced)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        const orchestrator = new AutoFillOrchestrator(willContent, editorValue)
+        const suggestions = orchestrator.getSuggestions()
+        setAutoFillSuggestions(suggestions)
+      } catch (error) {
+        console.error('Error generating auto-fill suggestions:', error)
+      }
+    }, 2000) // 2-second debounce
+
+    return () => clearTimeout(timer)
+  }, [willContent, editorValue])
 
   // Handle editor changes
   const handleEditorChange = (value: Value) => {
@@ -147,6 +169,24 @@ export function WillEditor({ will }: WillEditorProps) {
     setHasUnsavedChanges(true);
     toast.success('Text inserted into editor');
   }, []);
+
+  // Handle auto-fill apply
+  const handleApplyAutoFill = useCallback((article: WillArticle, mode: 'replace' | 'merge') => {
+    try {
+      const orchestrator = new AutoFillOrchestrator(willContent, editorValue)
+      const newValue = orchestrator.applySection(article, mode)
+      setEditorValue(newValue)
+      setHasUnsavedChanges(true)
+
+      // Remove applied suggestion from list
+      setAutoFillSuggestions(prev => prev.filter(s => s.section.article !== article))
+
+      toast.success('Will section updated')
+    } catch (error) {
+      console.error('Error applying auto-fill:', error)
+      toast.error('Failed to apply auto-fill')
+    }
+  }, [willContent, editorValue]);
 
   // Handle title edit start
   const handleTitleEdit = () => {
@@ -287,6 +327,12 @@ export function WillEditor({ will }: WillEditorProps) {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {autoFillSuggestions.length > 0 && (
+            <AutoFillNotification
+              suggestionCount={autoFillSuggestions.length}
+              onOpenPreview={() => setShowAutoFillPreview(true)}
+            />
+          )}
           <Button
             variant="outline"
             size="sm"
@@ -343,6 +389,15 @@ export function WillEditor({ will }: WillEditorProps) {
           />
         </aside>
       </div>
+
+      {/* Auto-Fill Preview Panel */}
+      <AutoFillPreviewPanel
+        suggestions={autoFillSuggestions}
+        onApply={handleApplyAutoFill}
+        onDismiss={() => setShowAutoFillPreview(false)}
+        open={showAutoFillPreview}
+        onOpenChange={setShowAutoFillPreview}
+      />
 
       {/* Delete Dialog */}
       <DeleteDialog

@@ -192,7 +192,7 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
                       )}
                       {hasAllocations ? (
                         <div className="mt-2 space-y-1">
-                          {asset.beneficiaryAllocations.map((allocation, idx) => {
+                          {asset.beneficiaryAllocations?.map((allocation, idx) => {
                             const beneficiary = beneficiaries?.find(b => b.id === allocation.beneficiaryId);
                             return beneficiary ? (
                               <div key={idx} className="flex items-center gap-2 text-xs">
