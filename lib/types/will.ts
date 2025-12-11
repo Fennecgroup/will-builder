@@ -135,6 +135,21 @@ export interface Guardian {
   isAlternate?: boolean;
 }
 
+export interface Trustee {
+  id: string;
+  fullName: string;
+  idNumber: string; // For SA: 13-digit ID number (required)
+  relationship: string;
+  address: Address;
+  phone: string;
+  email?: string;
+  forBeneficiaries: string[]; // IDs of minor beneficiaries
+  isAlternate?: boolean;
+  // Special flag for when trustee is same as guardian
+  isGuardian?: boolean;
+  guardianId?: string; // If trustee is guardian, reference guardian ID
+}
+
 export interface Liability {
   id: string;
   type: 'mortgage' | 'loan' | 'credit-card' | 'tax' | 'other';
@@ -188,6 +203,7 @@ export interface WillContent {
   executors: Executor[];
   witnesses: Witness[]; // SA: Minimum 2 required
   guardians: Guardian[];
+  trustees?: Trustee[]; // For managing minor beneficiaries' inheritance
   liabilities: Liability[];
   funeralWishes?: FuneralWishes;
   digitalAssets: DigitalAsset[];

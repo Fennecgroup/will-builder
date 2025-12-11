@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Save, FileDown, Clock, Trash2, CheckCircle2, Pencil } from 'lucide-react'
+import { ArrowLeft, Save, FileDown, Clock, Trash2, CheckCircle2, Pencil, AlertCircle } from 'lucide-react'
 import type { Value } from '@udecode/plate'
 import { Will } from '@prisma/client'
 import { Button } from '@/components/ui/button'
@@ -20,6 +20,9 @@ import { TestatorSidebar } from '@/components/will-editor/testator-sidebar'
 import { AIChat } from '@/components/plate-ui/ai-chat'
 import { AutoFillNotification } from '@/components/will-editor/auto-fill-notification'
 import { AutoFillPreviewPanel } from '@/components/will-editor/auto-fill-preview-panel'
+import { QuestionnaireModal } from '@/components/will-editor/questionnaire-modal'
+import { MissingInfoDetector } from '@/lib/questionnaire/missing-info-detector'
+import { MissingInfoContext } from '@/lib/types/questionnaire'
 import { initialEditorContent, sampleWillContent } from '@/lib/data/sample-will'
 import { updateWill, deleteWill } from '@/lib/actions/wills'
 import { DeleteDialog } from '@/components/wills/delete-dialog'
@@ -76,8 +79,13 @@ export function WillEditor({ will }: WillEditorProps) {
   const [autoFillSuggestions, setAutoFillSuggestions] = useState<AutoFillSuggestion[]>([])
   const [showAutoFillPreview, setShowAutoFillPreview] = useState(false)
 
+  // Questionnaire state
+  const [questionnaireContext, setQuestionnaireContext] = useState<MissingInfoContext | null>(null)
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false)
+
   // Auto-save function
   const saveWill = useCallback(async () => {
+    debugger;
     if (!hasUnsavedChanges) return
 
     setIsSaving(true)
@@ -97,6 +105,10 @@ export function WillEditor({ will }: WillEditorProps) {
       setIsSaving(false)
     }
   }, [will.id, editorValue, willContent, status, hasUnsavedChanges])
+
+  useEffect(() => {
+    setWillContent(sampleWillContent)
+  }, [])
 
   // Auto-save every 30 seconds if there are unsaved changes
   useEffect(() => {
@@ -123,6 +135,35 @@ export function WillEditor({ will }: WillEditorProps) {
 
     return () => clearTimeout(timer)
   }, [willContent, editorValue])
+
+  // Detect missing information (runs on load and when data changes)
+  useEffect(() => {
+    // Run immediately on mount if we have data
+    debugger;
+    const runDetection = () => {
+      try {
+        const detector = new MissingInfoDetector(willContent)
+        const context = detector.analyze()
+
+        // Only show if there are questions
+        if (context.questions.length > 0) {
+          setQuestionnaireContext(context)
+        } else {
+          setQuestionnaireContext(null)
+        }
+      } catch (error) {
+        console.error('Error detecting missing info:', error)
+      }
+    }
+
+    // Run immediately on mount
+    runDetection()
+
+    // Also run with debounce when data changes
+    const timer = setTimeout(runDetection, 2000) // 2-second debounce for changes
+
+    return () => clearTimeout(timer)
+  }, [willContent])
 
   // Handle editor changes
   const handleEditorChange = (value: Value) => {
@@ -205,6 +246,35 @@ export function WillEditor({ will }: WillEditorProps) {
       toast.error('Failed to apply auto-fill')
     }
   }, [willContent, editorValue]);
+
+  // Handle questionnaire completion
+  const handleQuestionnaireComplete = useCallback(async (updates: Partial<WillContent>) => {
+    try {
+      // Merge updates into willContent
+      const updatedContent = {
+        ...willContent,
+        ...updates,
+      }
+
+      setWillContent(updatedContent)
+      setHasUnsavedChanges(true)
+
+      // Save immediately
+      await updateWill(will.id, {
+        content: updatedContent,
+      })
+
+      toast.success('Information added successfully')
+
+      // Trigger auto-fill regeneration
+      const orchestrator = new AutoFillOrchestrator(updatedContent, editorValue)
+      const suggestions = orchestrator.getSuggestions()
+      setAutoFillSuggestions(suggestions)
+    } catch (error) {
+      toast.error('Failed to save information')
+      console.error('Error saving questionnaire answers:', error)
+    }
+  }, [willContent, editorValue, will.id])
 
   // Handle title edit start
   const handleTitleEdit = () => {
@@ -351,6 +421,17 @@ export function WillEditor({ will }: WillEditorProps) {
               onOpenPreview={() => setShowAutoFillPreview(true)}
             />
           )}
+          {questionnaireContext && questionnaireContext.questions.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowQuestionnaire(true)}
+              className="gap-2"
+            >
+              <AlertCircle className="h-4 w-4" />
+              Complete Missing Info ({questionnaireContext.questions.length})
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
@@ -424,6 +505,17 @@ export function WillEditor({ will }: WillEditorProps) {
         onConfirm={handleDelete}
         willTitle={title}
       />
+
+      {/* Questionnaire Modal */}
+      {questionnaireContext && (
+        <QuestionnaireModal
+          open={showQuestionnaire}
+          onOpenChange={setShowQuestionnaire}
+          context={questionnaireContext}
+          currentWillContent={willContent}
+          onComplete={handleQuestionnaireComplete}
+        />
+      )}
     </div>
   )
 }

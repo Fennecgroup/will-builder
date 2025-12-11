@@ -16,6 +16,7 @@ import { DeclarationGenerator } from './generators/declaration-generator';
 import { FamilyInfoGenerator } from './generators/family-info-generator';
 import { ExecutorsGenerator } from './generators/executors-generator';
 import { GuardiansGenerator } from './generators/guardians-generator';
+import { TrusteesGenerator } from './generators/trustees-generator';
 import { MinorProvisionsGenerator } from './generators/minor-provisions-generator';
 import { SpecificBequestsGenerator } from './generators/specific-bequests-generator';
 import { ResiduaryEstateGenerator } from './generators/residuary-estate-generator';
@@ -48,7 +49,7 @@ export class AutoFillOrchestrator {
       jurisdiction: 'ZA', // Default to South Africa
     };
 
-    // Initialize ALL generators (10 total) in canonical article order
+    // Initialize ALL generators (11 total) in canonical article order
     this.generators = [
       new PreambleGenerator(this.context),             // Preamble
       new RevocationGenerator(this.context),           // Article I
@@ -56,6 +57,7 @@ export class AutoFillOrchestrator {
       new FamilyInfoGenerator(this.context),           // Article III
       new ExecutorsGenerator(this.context),            // Article IV
       new GuardiansGenerator(this.context),            // Article V
+      new TrusteesGenerator(this.context),             // Article VI (Trustees - merged with Minor Provisions)
       new MinorProvisionsGenerator(this.context),      // Article VI
       new SpecificBequestsGenerator(this.context),     // Article VII
       new ResiduaryEstateGenerator(this.context),      // Article VIII

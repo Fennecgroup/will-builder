@@ -47,6 +47,10 @@ const SECTION_TOKEN_ESTIMATES: Record<keyof WillContent, (content: any, willCont
     return 70 + (guardians.length * 60);  // Base + per guardian
   },
 
+  trustees: (trustees: any[]) => {
+    return trustees?.length ? 70 + (trustees.length * 60) : 0;  // Base + per trustee
+  },
+
   liabilities: (liabilities: Liability[]) => {
     return 80 + (liabilities.length * 45);  // Base + per liability
   },

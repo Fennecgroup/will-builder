@@ -612,9 +612,9 @@ export function formatGuardianAppointment(
     });
 
     if (primary.length === 1) {
-      sections.push(`I appoint ${primaryDescriptions[0]} as guardian of my minor ${minorChildren.length === 1 ? 'child' : 'children'}.`);
+      sections.push(`Failing a natural, parental guardian, I appoint ${primaryDescriptions[0]} as guardian of my minor ${minorChildren.length === 1 ? 'child' : 'children'}.`);
     } else {
-      sections.push(`I appoint ${primaryDescriptions.join(' and ')} as joint guardians of my minor ${minorChildren.length === 1 ? 'child' : 'children'}.`);
+      sections.push(`Failing a natural, parental guardian, I appoint ${primaryDescriptions.join(' and ')} as joint guardians of my minor ${minorChildren.length === 1 ? 'child' : 'children'}.`);
     }
   }
 
@@ -636,6 +636,86 @@ export function formatGuardianAppointment(
 
   // Powers clause
   sections.push('I grant the appointed guardian(s) full parental responsibilities and rights as provided for in the Children\'s Act 38 of 2005, including the care, maintenance, and education of my minor children.');
+
+  return sections.join(' ');
+}
+
+/**
+ * Format trustee appointment clause
+ * Appoints trustee(s) for managing minor beneficiaries' inheritance
+ * @param trustees Array of trustees
+ * @param beneficiaries Array of beneficiaries (to identify minors)
+ * @returns Formatted trustee appointment clause
+ */
+export function formatTrusteeAppointment(
+  trustees: Array<{
+    fullName: string;
+    idNumber?: string;
+    relationship?: string;
+    isAlternate?: boolean;
+    isGuardian?: boolean;
+    guardianId?: string;
+  }>,
+  beneficiaries: Array<{
+    fullName: string;
+    isMinor?: boolean;
+  }>
+): string {
+  if (trustees.length === 0) {
+    return '';
+  }
+
+  const minorBeneficiaries = beneficiaries.filter((b) => b.isMinor);
+  if (minorBeneficiaries.length === 0) {
+    return '';
+  }
+
+  const primary = trustees.filter((t) => !t.isAlternate);
+  const alternates = trustees.filter((t) => t.isAlternate);
+
+  const sections: string[] = [];
+
+  // Primary trustee(s)
+  if (primary.length > 0) {
+    const primaryDescriptions = primary.map((trustee) => {
+      const parts = [trustee.fullName];
+      if (trustee.idNumber) {
+        parts.push(`ID Number ${trustee.idNumber}`);
+      }
+      if (trustee.relationship) {
+        parts.push(`(${trustee.relationship})`);
+      }
+      if (trustee.isGuardian) {
+        parts.push('also serving as guardian');
+      }
+      return parts.join(', ');
+    });
+
+    if (primary.length === 1) {
+      sections.push(`I appoint ${primaryDescriptions[0]} as trustee to manage the inheritance of my minor beneficiaries until they reach the age of majority (18 years).`);
+    } else {
+      sections.push(`I appoint ${primaryDescriptions.join(' and ')} as joint trustees to manage the inheritance of my minor beneficiaries until they reach the age of majority (18 years).`);
+    }
+  }
+
+  // Alternate trustee(s)
+  if (alternates.length > 0) {
+    const alternateDescriptions = alternates.map((trustee) => {
+      const parts = [trustee.fullName];
+      if (trustee.idNumber) {
+        parts.push(`ID Number ${trustee.idNumber}`);
+      }
+      if (trustee.relationship) {
+        parts.push(`(${trustee.relationship})`);
+      }
+      return parts.join(', ');
+    });
+
+    sections.push(`Should the above-named trustee(s) be unable or unwilling to serve, I appoint ${alternateDescriptions.join(' and ')} as alternate trustee(s).`);
+  }
+
+  // Powers clause with Trust Property Control Act reference
+  sections.push('I grant the appointed trustee(s) full power to invest, manage, and distribute the inheritance for the benefit, maintenance, and education of the minor beneficiaries, in accordance with the Trust Property Control Act 57 of 1988.');
 
   return sections.join(' ');
 }
