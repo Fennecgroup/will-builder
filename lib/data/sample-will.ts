@@ -2,7 +2,7 @@ import type { WillContent } from '@/lib/types/will';
 
 export const sampleWillContent: WillContent = {
   //willType: 'individual',
-  willType: 'joint',
+  //willType: 'joint',
   testator: {
     id: 'testator-001',
     fullName: 'Thabo Johannes Molefe',
@@ -272,40 +272,40 @@ export const sampleWillContent: WillContent = {
   ],
 
   guardians: [
-    {
-      id: 'guard-001',
-      fullName: 'Sipho David Molefe',
-      idNumber: '7201105187083',
-      relationship: 'Brother (Uncle)',
-      address: {
-        street: '78 Jan Smuts Avenue',
-        city: 'Rosebank',
-        state: 'Gauteng',
-        postalCode: '2196',
-        country: 'South Africa',
-      },
-      phone: '+27 84 678 9012',
-      email: 'sipho.molefe@email.co.za',
-      forChildren: ['Kgosi Molefe'],
-      isAlternate: false,
-    },
-    {
-      id: 'guard-002',
-      fullName: 'Nomsa Rebecca Khumalo',
-      idNumber: '7703105289087',
-      relationship: 'Sister (Aunt)',
-      address: {
-        street: '22 Oxford Road',
-        city: 'Parktown',
-        state: 'Gauteng',
-        postalCode: '2193',
-        country: 'South Africa',
-      },
-      phone: '+27 82 789 0123',
-      email: 'nomsa.khumalo@email.co.za',
-      forChildren: ['Kgosi Molefe'],
-      isAlternate: true,
-    },
+    // {
+    //   id: 'guard-001',
+    //   fullName: 'Sipho David Molefe',
+    //   idNumber: '7201105187083',
+    //   relationship: 'Brother (Uncle)',
+    //   address: {
+    //     street: '78 Jan Smuts Avenue',
+    //     city: 'Rosebank',
+    //     state: 'Gauteng',
+    //     postalCode: '2196',
+    //     country: 'South Africa',
+    //   },
+    //   phone: '+27 84 678 9012',
+    //   email: 'sipho.molefe@email.co.za',
+    //   forChildren: ['Kgosi Molefe'],
+    //   isAlternate: false,
+    // },
+    // {
+    //   id: 'guard-002',
+    //   fullName: 'Nomsa Rebecca Khumalo',
+    //   idNumber: '7703105289087',
+    //   relationship: 'Sister (Aunt)',
+    //   address: {
+    //     street: '22 Oxford Road',
+    //     city: 'Parktown',
+    //     state: 'Gauteng',
+    //     postalCode: '2193',
+    //     country: 'South Africa',
+    //   },
+    //   phone: '+27 82 789 0123',
+    //   email: 'nomsa.khumalo@email.co.za',
+    //   forChildren: ['Kgosi Molefe'],
+    //   isAlternate: true,
+    // },
   ],
 
   liabilities: [

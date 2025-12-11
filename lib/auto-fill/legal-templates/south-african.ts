@@ -514,12 +514,13 @@ export function formatExecutorAppointment(
   // Primary executor(s)
   if (primary.length > 0) {
     // Check for surviving spouse executor
-    const hasSurvivingSpouse = primary.some((e) => e.isSurvivingSpouse === true);
+    // const hasSurvivingSpouse = primary.some((e) => e.isSurvivingSpouse === true);
 
-    if (hasSurvivingSpouse && primary.length === 1) {
-      // Special case: Single surviving spouse executor
-      sections.push('I appoint my surviving spouse as the executor of this my will.');
-    } else {
+    // if (hasSurvivingSpouse && primary.length === 1) {
+    //   // Special case: Single surviving spouse executor
+    //   sections.push('I appoint my surviving spouse as the executor of this my will.');
+    // } else 
+    {
       // Regular executor appointment with names (existing code)
       const primaryDescriptions = primary
         .filter((e) => !e.isSurvivingSpouse) // Exclude surviving spouse from name list
