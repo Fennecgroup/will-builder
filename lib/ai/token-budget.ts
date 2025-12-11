@@ -9,6 +9,8 @@ import type { RelevanceScore } from './types';
  * These are rough estimates based on typical content sizes (1 token ≈ 4 characters)
  */
 const SECTION_TOKEN_ESTIMATES: Record<keyof WillContent, (content: any, willContent?: WillContent) => number> = {
+  willType: () => 5,  // Will type (individual/mutual/joint)
+
   testator: () => 150,  // Basic testator info
 
   maritalStatus: () => 10,  // Marital status

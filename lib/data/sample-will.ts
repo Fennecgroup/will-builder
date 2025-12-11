@@ -1,7 +1,8 @@
 import type { WillContent } from '@/lib/types/will';
 
 export const sampleWillContent: WillContent = {
-  
+  //willType: 'individual',
+  willType: 'joint',
   testator: {
     id: 'testator-001',
     fullName: 'Thabo Johannes Molefe',
@@ -233,7 +234,7 @@ export const sampleWillContent: WillContent = {
       },
       phone: '+27 84 678 9012',
       email: 'sipho.molefe@email.co.za',
-      isAlternate: true,
+      isAlternate: false,
     },
   ],
 

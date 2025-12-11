@@ -16,6 +16,12 @@ export class ExecutorsGenerator extends BaseGenerator {
    * Requires at least one executor
    */
   shouldGenerate(): boolean {
+    // Always generate for mutual wills with one spouse
+    if (this.isMutualWillWithOneSpouse()) {
+      return true;
+    }
+
+    // Existing validation for individual wills
     const executors = this.context.willContent.executors;
 
     if (!executors || executors.length === 0) {
@@ -31,6 +37,21 @@ export class ExecutorsGenerator extends BaseGenerator {
     }
 
     return true;
+  }
+
+  /**
+   * Check if this is a mutual/joint will with exactly one spouse
+   */
+  private isMutualWillWithOneSpouse(): boolean {
+    const willType = this.context.willContent.willType;
+    const marriage = this.context.willContent.marriage;
+
+    return !!(
+      (willType === 'mutual' || willType === 'joint') &&
+      marriage?.status === 'married' &&
+      marriage?.spouses &&
+      marriage.spouses.length === 1
+    );
   }
 
   /**
@@ -65,11 +86,39 @@ export class ExecutorsGenerator extends BaseGenerator {
    */
   private generateContent() {
     const content: PlateNode[] = [];
-    const executors = this.context.willContent.executors || [];
+    let executors = this.context.willContent.executors || [];
 
     // Article heading
     content.push(this.createHeading(2, 'ARTICLE IV - APPOINTMENT OF EXECUTOR'));
     content.push(this.createEmptyParagraph());
+
+    // Auto-generate surviving spouse executor for mutual wills
+    if (this.isMutualWillWithOneSpouse()) {
+      const spouse = this.context.willContent.marriage?.spouses?.[0];
+
+      if (executors.length === 0) {
+        // No executors defined - create virtual surviving spouse executor
+        executors = [
+          {
+            id: 'surviving-spouse-executor',
+            fullName: spouse?.fullName || 'Surviving Spouse',
+            idNumber: spouse?.idNumber || '',
+            relationship: 'Spouse',
+            address: this.context.willContent.testator.address,
+            phone: '',
+            email: '',
+            isAlternate: false,
+            isSurvivingSpouse: true,
+          },
+        ];
+      } else {
+        // Mark spouse as surviving spouse if already in executors
+        executors = executors.map((exec) => {
+          const isSpouse = this.isExecutorTheSpouse(exec);
+          return { ...exec, isSurvivingSpouse: isSpouse };
+        });
+      }
+    }
 
     // Executor appointment text
     const executorText = formatExecutorAppointment(executors);
@@ -79,5 +128,22 @@ export class ExecutorsGenerator extends BaseGenerator {
     }
 
     return content;
+  }
+
+  /**
+   * Check if executor is the spouse (matches by name or relationship)
+   */
+  private isExecutorTheSpouse(executor: any): boolean {
+    const spouse = this.context.willContent.marriage?.spouses?.[0];
+    if (!spouse) return false;
+
+    // Match by full name
+    if (executor.fullName === spouse.fullName) {
+      return true;
+    }
+
+    // Match by relationship field
+    const rel = executor.relationship?.toLowerCase() || '';
+    return rel.includes('spouse') || rel.includes('wife') || rel.includes('husband');
   }
 }

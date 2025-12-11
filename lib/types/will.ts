@@ -2,6 +2,7 @@
 
 export type MaritalStatus = 'single' | 'married' | 'divorced' | 'widowed' | 'separated';
 export type MaritalRegime = 'ICOP' | 'OCOP' | 'OCOP-A' | 'OCOP-NA';
+export type WillType = 'individual' | 'mutual' | 'joint';
 // South African Provinces
 export type SAProvince =
   | 'Gauteng'
@@ -108,6 +109,7 @@ export interface Executor {
   phone: string;
   email?: string;
   isAlternate?: boolean; // Primary or alternate executor
+  isSurvivingSpouse?: boolean; // Identifies surviving spouse executor in mutual/joint wills
 }
 
 export interface Witness {
@@ -176,6 +178,7 @@ export interface MinorBeneficiaryProvisions {
 }
 
 export interface WillContent {
+  willType?: WillType; // Optional for backward compatibility
   testator: TestatorInfo;
   maritalStatus: MaritalStatus;
   marriage: MarriageInfo;

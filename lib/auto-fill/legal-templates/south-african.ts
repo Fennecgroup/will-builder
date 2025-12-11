@@ -499,6 +499,7 @@ export function formatExecutorAppointment(
     idNumber?: string;
     relationship?: string;
     isAlternate?: boolean;
+    isSurvivingSpouse?: boolean;
   }>
 ): string {
   if (executors.length === 0) {
@@ -512,21 +513,32 @@ export function formatExecutorAppointment(
 
   // Primary executor(s)
   if (primary.length > 0) {
-    const primaryDescriptions = primary.map((exec) => {
-      const parts = [exec.fullName];
-      if (exec.idNumber) {
-        parts.push(`ID Number ${exec.idNumber}`);
-      }
-      if (exec.relationship) {
-        parts.push(`(${exec.relationship})`);
-      }
-      return parts.join(', ');
-    });
+    // Check for surviving spouse executor
+    const hasSurvivingSpouse = primary.some((e) => e.isSurvivingSpouse === true);
 
-    if (primary.length === 1) {
-      sections.push(`I appoint ${primaryDescriptions[0]} as the executor of this my will.`);
+    if (hasSurvivingSpouse && primary.length === 1) {
+      // Special case: Single surviving spouse executor
+      sections.push('I appoint my surviving spouse as the executor of this my will.');
     } else {
-      sections.push(`I appoint ${primaryDescriptions.join(' and ')} as joint executors of this my will.`);
+      // Regular executor appointment with names (existing code)
+      const primaryDescriptions = primary
+        .filter((e) => !e.isSurvivingSpouse) // Exclude surviving spouse from name list
+        .map((exec) => {
+          const parts = [exec.fullName];
+          if (exec.idNumber) {
+            parts.push(`ID Number ${exec.idNumber}`);
+          }
+          if (exec.relationship) {
+            parts.push(`(${exec.relationship})`);
+          }
+          return parts.join(', ');
+        });
+
+      if (primary.length === 1) {
+        sections.push(`I appoint ${primaryDescriptions[0]} as the executor of this my will.`);
+      } else {
+        sections.push(`I appoint ${primaryDescriptions.join(' and ')} as joint executors of this my will.`);
+      }
     }
   }
 
