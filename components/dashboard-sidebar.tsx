@@ -24,16 +24,24 @@ const navigation = [
 export function DashboardSidebar() {
   const pathname = usePathname()
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  // Auto-collapse when entering will editor
+  // Track when component has mounted to avoid hydration mismatch
   useEffect(() => {
-    setIsCollapsed(isWillEditorRoute(pathname))
-  }, [pathname])
+    setMounted(true)
+  }, [])
+
+  // Auto-collapse when entering will editor (only after mount)
+  useEffect(() => {
+    if (mounted) {
+      setIsCollapsed(isWillEditorRoute(pathname))
+    }
+  }, [pathname, mounted])
 
   return (
     <div className={cn(
       "flex h-screen flex-col border-r bg-neutral-50 dark:bg-neutral-900 transition-all duration-300 ease-in-out",
-      isCollapsed ? "w-16" : "w-64"
+      mounted && isCollapsed ? "w-16" : "w-64"
     )}>
       {/* Logo */}
       <div className="flex h-16 items-center justify-between border-b px-4">
@@ -45,7 +53,7 @@ export function DashboardSidebar() {
             height={32}
             className="h-8 w-8 flex-shrink-0"
           />
-          {!isCollapsed && (
+          {!(mounted && isCollapsed) && (
             <span className="text-lg font-semibold">Fennec</span>
           )}
         </Link>
@@ -53,9 +61,9 @@ export function DashboardSidebar() {
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="p-1.5 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md transition-colors"
-          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-label={mounted && isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          {isCollapsed ? (
+          {mounted && isCollapsed ? (
             <ChevronRight className="h-4 w-4" />
           ) : (
             <ChevronLeft className="h-4 w-4" />
@@ -78,18 +86,18 @@ export function DashboardSidebar() {
                 href={item.href}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                  isCollapsed && "justify-center",
+                  mounted && isCollapsed && "justify-center",
                   isActive
                     ? "bg-neutral-900 text-neutral-50 dark:bg-neutral-50 dark:text-neutral-900"
                     : "text-neutral-700 hover:bg-neutral-200 dark:text-neutral-300 dark:hover:bg-neutral-800"
                 )}
               >
                 <item.icon className="h-5 w-5 flex-shrink-0" />
-                {!isCollapsed && item.name}
+                {!(mounted && isCollapsed) && item.name}
               </Link>
             )
 
-            return isCollapsed ? (
+            return mounted && isCollapsed ? (
               <Tooltip key={item.name}>
                 <TooltipTrigger asChild>
                   {linkContent}
@@ -107,7 +115,7 @@ export function DashboardSidebar() {
       <div className="border-t p-4">
         <div className={cn(
           "flex items-center gap-3",
-          isCollapsed && "justify-center"
+          mounted && isCollapsed && "justify-center"
         )}>
           <UserButton
             appearance={{
@@ -116,7 +124,7 @@ export function DashboardSidebar() {
               },
             }}
           />
-          {!isCollapsed && (
+          {!(mounted && isCollapsed) && (
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate">
                 Your Account

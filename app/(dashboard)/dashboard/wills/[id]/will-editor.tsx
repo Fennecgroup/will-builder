@@ -24,7 +24,7 @@ import { QuestionnaireModal } from '@/components/will-editor/questionnaire-modal
 import { MissingInfoDetector } from '@/lib/questionnaire/missing-info-detector'
 import { MissingInfoContext } from '@/lib/types/questionnaire'
 import { initialEditorContent, sampleWillContent } from '@/lib/data/sample-will'
-import { updateWill, deleteWill } from '@/lib/actions/wills'
+import { updateWill, deleteWill, benzona } from '@/lib/actions/wills'
 import { DeleteDialog } from '@/components/wills/delete-dialog'
 import { WillContent } from '@/lib/types/will'
 import { AutoFillOrchestrator, AutoFillSuggestion, WillArticle } from '@/lib/auto-fill'
@@ -37,6 +37,7 @@ interface WillEditorProps {
 
 export function WillEditor({ will }: WillEditorProps) {
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)
   const [editorValue, setEditorValue] = useState<Value>(() => {
     // If editorContent exists and has content, use it (preserve user edits)
     if (will.editorContent && Array.isArray(will.editorContent) && will.editorContent.length > 0) {
@@ -83,9 +84,13 @@ export function WillEditor({ will }: WillEditorProps) {
   const [questionnaireContext, setQuestionnaireContext] = useState<MissingInfoContext | null>(null)
   const [showQuestionnaire, setShowQuestionnaire] = useState(false)
 
+  // Track mount state to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   // Auto-save function
   const saveWill = useCallback(async () => {
-    debugger;
     if (!hasUnsavedChanges) return
 
     setIsSaving(true)
@@ -106,9 +111,9 @@ export function WillEditor({ will }: WillEditorProps) {
     }
   }, [will.id, editorValue, willContent, status, hasUnsavedChanges])
 
-  useEffect(() => {
-    setWillContent(sampleWillContent)
-  }, [])
+  // useEffect(() => {
+  //   setWillContent(sampleWillContent)
+  // }, [])
 
   // Auto-save every 30 seconds if there are unsaved changes
   useEffect(() => {
@@ -139,7 +144,6 @@ export function WillEditor({ will }: WillEditorProps) {
   // Detect missing information (runs on load and when data changes)
   useEffect(() => {
     // Run immediately on mount if we have data
-    debugger;
     const runDetection = () => {
       try {
         const detector = new MissingInfoDetector(willContent)
@@ -255,9 +259,12 @@ export function WillEditor({ will }: WillEditorProps) {
         ...willContent,
         ...updates,
       }
-
+      debugger;
       setWillContent(updatedContent)
       setHasUnsavedChanges(true)
+
+      const result = await benzona()
+      console.log('result', result)
 
       // Save immediately
       await updateWill(will.id, {
@@ -407,8 +414,10 @@ export function WillEditor({ will }: WillEditorProps) {
                   'Saving...'
                 ) : hasUnsavedChanges ? (
                   'Unsaved changes'
-                ) : (
+                ) : mounted ? (
                   <>Saved {lastSaved.toLocaleTimeString()}</>
+                ) : (
+                  'Saved'
                 )}
               </span>
             </div>

@@ -90,6 +90,11 @@ export async function getWillById(willId: string) {
   return will
 }
 
+export async function benzona() {
+  debugger;
+  return await Promise.resolve("sharmuta")
+}
+
 export async function updateWill(
   willId: string,
   data: {
@@ -99,8 +104,8 @@ export async function updateWill(
     status?: string
   }
 ) {
+  debugger;
   const { userId } = await auth()
-
   if (!userId) {
     throw new Error('Unauthorized')
   }
@@ -119,12 +124,24 @@ export async function updateWill(
     throw new Error('Will not found or unauthorized')
   }
 
+  // const will = await prisma.will.update({
+  //   where: { id: willId },
+  //   data: {
+  //     ...(data as any),
+  //     updatedAt: new Date(),
+  //   },
+  // })
+
+  // Build update data object, filtering out undefined values
+  const updateData: any = {}
+  if (data.title !== undefined) updateData.title = data.title
+  if (data.content !== undefined) updateData.content = data.content
+  if (data.editorContent !== undefined) updateData.editorContent = data.editorContent
+  if (data.status !== undefined) updateData.status = data.status
+
   const will = await prisma.will.update({
     where: { id: willId },
-    data: {
-      ...(data as any),
-      updatedAt: new Date(),
-    },
+    data: updateData,
   })
 
   revalidatePath('/dashboard/wills')
