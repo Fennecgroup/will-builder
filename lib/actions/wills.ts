@@ -104,7 +104,7 @@ export async function updateWill(
     status?: string
   }
 ) {
-  debugger;
+  
   const { userId } = await auth()
   if (!userId) {
     throw new Error('Unauthorized')

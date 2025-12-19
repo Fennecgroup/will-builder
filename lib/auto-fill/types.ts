@@ -165,3 +165,4 @@ export const ARTICLE_ORDER: WillArticle[] = [
   'RESIDUARY_ESTATE',
   'ATTESTATION',
 ];
+
