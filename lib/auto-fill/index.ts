@@ -12,6 +12,8 @@ export type {
   AutoFillSuggestion,
   AutoFillOptions,
   BeneficiaryAllocation,
+  BeneficiaryAssetLink,
+  AutoFillResult,
   ValidationResult,
 } from './types';
 

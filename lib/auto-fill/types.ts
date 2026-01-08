@@ -1,6 +1,7 @@
 // Auto-Fill System Type Definitions
 
-import { WillContent } from '@/lib/types/will';
+import { WillContent, Asset, Beneficiary, SpecificBequest } from '@/lib/types/will';
+import type { Value } from '@udecode/plate';
 
 /**
  * Will Article Types
@@ -108,9 +109,12 @@ export interface AutoFillSuggestion {
  * Configuration options for the auto-fill system
  */
 export interface AutoFillOptions {
-  mode: 'suggestion' | 'auto-insert' | 'replace';
+  mode?: 'suggestion' | 'auto-insert' | 'replace';
   sections?: WillArticle[];  // If specified, only generate these sections
-  mergeStrategy: 'append' | 'replace' | 'skip-if-exists';
+  mergeStrategy?: 'append' | 'replace' | 'skip-if-exists';
+  onlyFullAllocations?: boolean;  // Only generate bequests for 100% allocations (default: true)
+  skipExisting?: boolean;  // Skip generating bequests for assets that already have bequests (default: true)
+  updateEditorContent?: boolean;  // Update the editor content with generated bequests (default: true)
 }
 
 /**
@@ -120,6 +124,29 @@ export interface AutoFillOptions {
 export interface BeneficiaryAllocation {
   beneficiaryId: string;
   percentage: number;
+}
+
+/**
+ * Beneficiary Asset Link
+ * Represents the relationship between an asset and a beneficiary with allocation details
+ */
+export interface BeneficiaryAssetLink {
+  assetId: string;
+  asset: Asset;
+  beneficiaryId: string;
+  beneficiary: Beneficiary;
+  percentage: number;  // 0-100 allocation percentage
+}
+
+/**
+ * Auto-Fill Result
+ * Result of the auto-fill operation with updated content and change tracking
+ */
+export interface AutoFillResult {
+  newBequests: SpecificBequest[];
+  updatedWillContent: WillContent;
+  updatedEditorContent: Value;
+  hasChanges: boolean;
 }
 
 /**
@@ -165,4 +192,5 @@ export const ARTICLE_ORDER: WillArticle[] = [
   'RESIDUARY_ESTATE',
   'ATTESTATION',
 ];
+
 
