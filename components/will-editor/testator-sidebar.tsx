@@ -8,6 +8,7 @@ import {
   UserCheck,
   Eye,
   Shield,
+  Scale,
   CreditCard,
   Flower2,
   Globe,
@@ -69,6 +70,7 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
     executors,
     witnesses,
     guardians,
+    trustees,
     liabilities,
     funeralWishes,
     digitalAssets,
@@ -391,6 +393,58 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
                       </div>
                     </div>
                   ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+
+          {/* Trustees */}
+          {(trustees?.length || 0) > 0 && (
+            <AccordionItem value="trustees">
+              <AccordionTrigger className="text-sm font-medium">
+                <div className="flex items-center gap-2">
+                  <Scale className="h-4 w-4" />
+                  Trustees
+                  <Badge variant="secondary" className="ml-2 text-xs">
+                    {trustees?.length || 0}
+                  </Badge>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-3 pl-6">
+                  {trustees?.map((trustee) => {
+                    // Find beneficiaries managed by this trustee
+                    const managedBeneficiaries = beneficiaries?.filter(b =>
+                      trustee.forBeneficiaries.includes(b.id)
+                    ) || [];
+
+                    return (
+                      <div key={trustee.id} className="border-l-2 border-neutral-200 pl-3 dark:border-neutral-700">
+                        <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                          {trustee.fullName}
+                          {trustee.isAlternate && (
+                            <Badge variant="outline" className="ml-2 text-xs">
+                              Alternate
+                            </Badge>
+                          )}
+                          {trustee.isGuardian && (
+                            <Badge variant="secondary" className="ml-2 text-xs">
+                              Also Guardian
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="text-xs text-neutral-500">{trustee.relationship}</div>
+                        {managedBeneficiaries.length > 0 && (
+                          <div className="text-xs text-neutral-500">
+                            Managing for: {managedBeneficiaries.map(b => b.fullName).join(', ')}
+                          </div>
+                        )}
+                        {trustee.phone && (
+                          <div className="text-xs text-neutral-500">{trustee.phone}</div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </AccordionContent>
             </AccordionItem>

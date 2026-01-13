@@ -316,42 +316,42 @@ export const complexBlendedContent: WillContent = {
     },
   ],
 
-  guardians: [
-    {
-      id: 'guard-complex-001',
-      fullName: 'Marina Isabel Da Silva',
-      idNumber: '7511155234089',
-      relationship: 'Mother (Spouse)',
-      address: {
-        street: '156 Constantia Main Road',
-        city: 'Cape Town',
-        state: 'Western Cape',
-        postalCode: '7806',
-        country: 'South Africa',
-      },
-      phone: '+27 83 678 9012',
-      email: 'marina.vanwyk@email.co.za',
-      forChildren: ['Emma Sofia Van Wyk', 'Liam Daniel Da Silva'],
-      isAlternate: false,
-    },
-    {
-      id: 'guard-complex-002',
-      fullName: 'Pieter Johannes Van Wyk',
-      idNumber: '9701105456082',
-      relationship: 'Brother (Half-brother to minors)',
-      address: {
-        street: '45 Camps Bay Drive',
-        city: 'Cape Town',
-        state: 'Western Cape',
-        postalCode: '8005',
-        country: 'South Africa',
-      },
-      phone: '+27 84 901 2345',
-      email: 'pieter.vanwyk@email.co.za',
-      forChildren: ['Emma Sofia Van Wyk', 'Liam Daniel Da Silva'],
-      isAlternate: true,
-    },
-  ],
+  // guardians: [
+  //   {
+  //     id: 'guard-complex-001',
+  //     fullName: 'Marina Isabel Da Silva',
+  //     idNumber: '7511155234089',
+  //     relationship: 'Mother (Spouse)',
+  //     address: {
+  //       street: '156 Constantia Main Road',
+  //       city: 'Cape Town',
+  //       state: 'Western Cape',
+  //       postalCode: '7806',
+  //       country: 'South Africa',
+  //     },
+  //     phone: '+27 83 678 9012',
+  //     email: 'marina.vanwyk@email.co.za',
+  //     forChildren: ['Emma Sofia Van Wyk', 'Liam Daniel Da Silva'],
+  //     isAlternate: false,
+  //   },
+  //   {
+  //     id: 'guard-complex-002',
+  //     fullName: 'Pieter Johannes Van Wyk',
+  //     idNumber: '9701105456082',
+  //     relationship: 'Brother (Half-brother to minors)',
+  //     address: {
+  //       street: '45 Camps Bay Drive',
+  //       city: 'Cape Town',
+  //       state: 'Western Cape',
+  //       postalCode: '8005',
+  //       country: 'South Africa',
+  //     },
+  //     phone: '+27 84 901 2345',
+  //     email: 'pieter.vanwyk@email.co.za',
+  //     forChildren: ['Emma Sofia Van Wyk', 'Liam Daniel Da Silva'],
+  //     isAlternate: true,
+  //   },
+  // ],
 
   liabilities: [
     {
