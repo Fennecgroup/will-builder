@@ -30,7 +30,7 @@ export { DeclarationGenerator } from './generators/declaration-generator';
 export { FamilyInfoGenerator } from './generators/family-info-generator';
 export { ExecutorsGenerator } from './generators/executors-generator';
 export { GuardiansGenerator } from './generators/guardians-generator';
-export { MinorProvisionsGenerator } from './generators/minor-provisions-generator';
+//export { MinorProvisionsGenerator } from './generators/minor-provisions-generator';
 export { SpecificBequestsGenerator } from './generators/specific-bequests-generator';
 export { ResiduaryEstateGenerator } from './generators/residuary-estate-generator';
 export { AttestationGenerator } from './generators/attestation-generator';

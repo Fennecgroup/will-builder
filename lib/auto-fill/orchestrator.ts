@@ -58,7 +58,7 @@ export class AutoFillOrchestrator {
       new ExecutorsGenerator(this.context),            // Article IV
       new GuardiansGenerator(this.context),            // Article V
       new TrusteesGenerator(this.context),             // Article VI (Trustees - merged with Minor Provisions)
-      new MinorProvisionsGenerator(this.context),      // Article VI
+      //new MinorProvisionsGenerator(this.context),      // Article VI
       new SpecificBequestsGenerator(this.context),     // Article VII
       new ResiduaryEstateGenerator(this.context),      // Article VIII
       new AttestationGenerator(this.context),          // Attestation
@@ -88,18 +88,23 @@ export class AutoFillOrchestrator {
       const article = generator.getArticle();
       const existingSection = getSection(this.editorValue, article);
 
-      // Create suggestion
-      const suggestion: AutoFillSuggestion = {
-        section,
-        existingContent: existingSection?.content || null,
-        generatedContent: section.content,
-        diff: existingSection
-          ? generateDiff(existingSection.content, section.content)
-          : null,
-        canAutoApply: !existingSection || !existingSection.hasManualEdits,
-      };
+      // Generate diff if section exists
+      const diff = existingSection
+        ? generateDiff(existingSection.content, section.content)
+        : null;
 
-      suggestions.push(suggestion);
+      // Only create suggestion if this is a new section OR there are actual changes
+      if (!existingSection || (diff && diff.hasChanges)) {
+        const suggestion: AutoFillSuggestion = {
+          section,
+          existingContent: existingSection?.content || null,
+          generatedContent: section.content,
+          diff,
+          canAutoApply: !existingSection || !existingSection.hasManualEdits,
+        };
+
+        suggestions.push(suggestion);
+      }
     }
 
     return suggestions;
