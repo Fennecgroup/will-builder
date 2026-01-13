@@ -470,6 +470,34 @@ export function PlateEditor({ initialValue, onChange, className, willContent }: 
     []
   );
 
+  // Update editor value when initialValue prop changes externally
+  useEffect(() => {
+    if (initialValue && Array.isArray(initialValue) && initialValue.length > 0) {
+      // Only update if the value actually changed
+      const currentValue = editor.children;
+      const hasChanged = JSON.stringify(currentValue) !== JSON.stringify(initialValue);
+
+      if (hasChanged) {
+        console.log('[PlateEditor] Updating editor with new value from prop');
+        console.log('Old value length:', currentValue.length);
+        console.log('New value length:', initialValue.length);
+
+        // Remove all existing children (from end to beginning to avoid index issues)
+        const nodeCount = editor.children.length;
+        for (let i = nodeCount - 1; i >= 0; i--) {
+          editor.tf.removeNodes({ at: [i] });
+        }
+
+        // Insert all new nodes
+        (initialValue as any[]).forEach((node, index) => {
+          editor.tf.insertNodes(node, { at: [index] });
+        });
+
+        console.log('[PlateEditor] Editor updated successfully');
+      }
+    }
+  }, [initialValue, editor]);
+
   const handleAIAction = useCallback(async (action: string, selectedText: string) => {
     setIsLoading(true);
     setLastAIAction({ action, text: selectedText });

@@ -331,7 +331,7 @@ export const complexBlendedContent: WillContent = {
   //     },
   //     phone: '+27 83 678 9012',
   //     email: 'marina.vanwyk@email.co.za',
-  //     forChildren: ['Emma Sofia Van Wyk', 'Liam Daniel Da Silva'],
+  //     forChildren: ['child-complex-003', 'child-complex-004'],
   //     isAlternate: false,
   //   },
   //   {
@@ -348,7 +348,7 @@ export const complexBlendedContent: WillContent = {
   //     },
   //     phone: '+27 84 901 2345',
   //     email: 'pieter.vanwyk@email.co.za',
-  //     forChildren: ['Emma Sofia Van Wyk', 'Liam Daniel Da Silva'],
+  //     forChildren: ['child-complex-003', 'child-complex-004'],
   //     isAlternate: true,
   //   },
   // ],

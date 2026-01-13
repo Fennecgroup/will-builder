@@ -24,7 +24,7 @@ import { QuestionnaireModal } from '@/components/will-editor/questionnaire-modal
 import { MissingInfoDetector } from '@/lib/questionnaire/missing-info-detector'
 import { MissingInfoContext } from '@/lib/types/questionnaire'
 import { initialEditorContent, sampleWillContent } from '@/lib/data/sample-will'
-import { updateWill, deleteWill, benzona } from '@/lib/actions/wills'
+import { updateWill, deleteWill } from '@/lib/actions/wills'
 import { DeleteDialog } from '@/components/wills/delete-dialog'
 import { WillContent } from '@/lib/types/will'
 import { AutoFillOrchestrator, AutoFillSuggestion, WillArticle } from '@/lib/auto-fill'
@@ -259,12 +259,8 @@ export function WillEditor({ will }: WillEditorProps) {
         ...willContent,
         ...updates,
       }
-      debugger;
       setWillContent(updatedContent)
       setHasUnsavedChanges(true)
-
-      const result = await benzona()
-      console.log('result', result)
 
       // Save immediately
       await updateWill(will.id, {
@@ -275,8 +271,19 @@ export function WillEditor({ will }: WillEditorProps) {
 
       // Trigger auto-fill regeneration
       const orchestrator = new AutoFillOrchestrator(updatedContent, editorValue)
-      const suggestions = orchestrator.getSuggestions()
-      setAutoFillSuggestions(suggestions)
+
+      // Auto-apply safe suggestions (guardians/trustees on new documents)
+      const newEditorValue = orchestrator.applyAllSuggestions()
+
+      // Update editor if any suggestions were applied
+      if (newEditorValue !== editorValue) {
+        setEditorValue(newEditorValue)
+        toast.success('Guardian and trustee clauses added to document')
+      }
+
+      // Update suggestions list (will be empty if all were auto-applied)
+      const remainingSuggestions = orchestrator.getSuggestions()
+      setAutoFillSuggestions(remainingSuggestions)
     } catch (error) {
       toast.error('Failed to save information')
       console.error('Error saving questionnaire answers:', error)

@@ -1,5 +1,6 @@
-// Trustees Generator (Merged into Article VI - Minor Provisions)
+// Trustees Generator (Article VI)
 // Generates trustee appointment clause for minor beneficiaries
+// Creates Article VI - Minor Beneficiary Provisions with trustee details
 
 import { WillArticle, WillSection, PlateNode } from '../types';
 import { BaseGenerator } from './base-generator';
@@ -7,8 +8,8 @@ import { formatTrusteeAppointment } from '../legal-templates/south-african';
 
 /**
  * Trustees Generator
- * Generates trustee appointment clause for minor beneficiaries
- * Merged into Article VI - Minor Provisions
+ * Generates Article VI - Minor Beneficiary Provisions with trustee appointment
+ * Note: MinorProvisionsGenerator is currently disabled in orchestrator
  * Requires: trustees array AND minor beneficiaries
  */
 export class TrusteesGenerator extends BaseGenerator {
@@ -86,13 +87,17 @@ export class TrusteesGenerator extends BaseGenerator {
   }
 
   /**
-   * Generate content nodes
-   * This is merged into Minor Provisions article, so we don't generate a heading
+   * Generate content nodes for Article VI
+   * Includes heading and trustee appointment details
    */
   private generateContent(): PlateNode[] {
     const content: PlateNode[] = [];
     const trustees = this.context.willContent.trustees || [];
     const beneficiaries = this.context.willContent.beneficiaries || [];
+
+    // Article heading
+    content.push(this.createHeading(2, 'ARTICLE VI - MINOR BENEFICIARY PROVISIONS'));
+    content.push(this.createEmptyParagraph());
 
     // Generate trustee appointment text
     const trusteeText = formatTrusteeAppointment(trustees, beneficiaries);
