@@ -20,6 +20,7 @@ import { TrusteesGenerator } from './generators/trustees-generator';
 import { MinorProvisionsGenerator } from './generators/minor-provisions-generator';
 import { SpecificBequestsGenerator } from './generators/specific-bequests-generator';
 import { ResiduaryEstateGenerator } from './generators/residuary-estate-generator';
+import { InheritanceExclusionsGenerator } from './generators/inheritance-exclusions-generator';
 import { AttestationGenerator } from './generators/attestation-generator';
 import {
   detectSections,
@@ -61,6 +62,7 @@ export class AutoFillOrchestrator {
       //new MinorProvisionsGenerator(this.context),      // Article VI
       new SpecificBequestsGenerator(this.context),     // Article VII
       new ResiduaryEstateGenerator(this.context),      // Article VIII
+      new InheritanceExclusionsGenerator(this.context), // Article IX
       new AttestationGenerator(this.context),          // Attestation
     ];
   }

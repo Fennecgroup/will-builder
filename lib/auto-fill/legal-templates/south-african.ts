@@ -814,3 +814,17 @@ export function formatAttestationClause(
 
   return sections.join(' ');
 }
+
+/**
+ * Format general inheritance exclusion clause
+ * This is a standard South African will clause protecting all inheritances
+ * from community of property and accrual systems
+ *
+ * Applies universally to ALL beneficiaries (no individual tracking needed)
+ * Covers current and future marriages, ICOP and accrual regimes
+ *
+ * @returns Formatted inheritance exclusion clause
+ */
+export function formatGeneralInheritanceExclusionClause(): string {
+  return 'Should any person who benefits from my estate in terms of my Last Will, be married or marry or remarry at any time in the future, in community of property or subject to any law of accrual, then notwithstanding such community of property or accrual, the benefits payable to him/her under my Last Will shall devolve upon and belong to him/her personally and shall be excluded of any such community or accrual and shall be free from any marital power which any spouse might otherwise have or acquire by virtue of such marriage.';
+}
