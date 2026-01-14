@@ -71,6 +71,13 @@ const ARTICLE_PATTERNS: Record<WillArticle, RegExp[]> = {
     /RIGHT\s+OF\s+REPUDIATION/i,
     /REPUDIATION/i,
   ],
+  JOINT_ASSET_CLAUSE: [
+    /ARTICLE\s+XI\s*[-:]?\s*JOINT\s+ASSET/i,
+    /ARTICLE\s+11\s*[-:]?\s*JOINT\s+ASSET/i,
+    /JOINT\s+ASSET\s+CLAUSE/i,
+    /JOINT\s+ASSET\s+DIVISION/i,
+    /BENEFICIARIES\s+TO\s+AGREE\s+AMONGST\s+THEMSELVES/i,
+  ],
   ATTESTATION: [
     /ATTESTATION/i,
     /ATTESTATION\s+AND\s+SIGNATURES/i,
@@ -279,6 +286,9 @@ export function findInsertionPoint(
     'MINOR_PROVISIONS',
     'SPECIFIC_BEQUESTS',
     'RESIDUARY_ESTATE',
+    'INHERITANCE_EXCLUSIONS',
+    'RIGHT_OF_REPUDIATION',
+    'JOINT_ASSET_CLAUSE',
     'ATTESTATION',
   ];
 

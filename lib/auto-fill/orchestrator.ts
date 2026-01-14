@@ -22,6 +22,7 @@ import { SpecificBequestsGenerator } from './generators/specific-bequests-genera
 import { ResiduaryEstateGenerator } from './generators/residuary-estate-generator';
 import { InheritanceExclusionsGenerator } from './generators/inheritance-exclusions-generator';
 import { RightOfRepudiationGenerator } from './generators/right-of-repudiation-generator';
+import { JointAssetClauseGenerator } from './generators/joint-asset-clause-generator';
 import { AttestationGenerator } from './generators/attestation-generator';
 import {
   detectSections,
@@ -51,7 +52,7 @@ export class AutoFillOrchestrator {
       jurisdiction: 'ZA', // Default to South Africa
     };
 
-    // Initialize ALL generators (11 total) in canonical article order
+    // Initialize ALL generators (12 total) in canonical article order
     this.generators = [
       new PreambleGenerator(this.context),             // Preamble
       new RevocationGenerator(this.context),           // Article I
@@ -65,6 +66,7 @@ export class AutoFillOrchestrator {
       new ResiduaryEstateGenerator(this.context),      // Article VIII
       new InheritanceExclusionsGenerator(this.context), // Article IX
       new RightOfRepudiationGenerator(this.context),    // Article X
+      new JointAssetClauseGenerator(this.context),      // Article XI
       new AttestationGenerator(this.context),          // Attestation
     ];
   }

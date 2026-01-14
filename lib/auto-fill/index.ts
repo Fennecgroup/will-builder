@@ -35,6 +35,7 @@ export { SpecificBequestsGenerator } from './generators/specific-bequests-genera
 export { ResiduaryEstateGenerator } from './generators/residuary-estate-generator';
 export { InheritanceExclusionsGenerator } from './generators/inheritance-exclusions-generator';
 export { RightOfRepudiationGenerator } from './generators/right-of-repudiation-generator';
+export { JointAssetClauseGenerator } from './generators/joint-asset-clause-generator';
 export { AttestationGenerator } from './generators/attestation-generator';
 
 // Section Detection
@@ -72,6 +73,7 @@ export {
   formatAttestationClause,
   formatGeneralInheritanceExclusionClause,
   formatRightOfRepudiationClause,
+  formatJointAssetClause,
   getSpecificBequestsIntro,
   validateAndNormalizeAllocations,
 } from './legal-templates/south-african';

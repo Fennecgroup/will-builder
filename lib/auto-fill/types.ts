@@ -19,6 +19,7 @@ export type WillArticle =
   | 'RESIDUARY_ESTATE'    // Article VIII (Phase 1 focus)
   | 'INHERITANCE_EXCLUSIONS'  // Article IX - Protection from community of property
   | 'RIGHT_OF_REPUDIATION'    // Article X - Right to repudiate inheritance
+  | 'JOINT_ASSET_CLAUSE'      // Article XI - Joint asset division agreement
   | 'ATTESTATION';
 
 /**
@@ -177,6 +178,7 @@ export const ARTICLE_TITLES: Record<WillArticle, string> = {
   RESIDUARY_ESTATE: 'ARTICLE VIII - RESIDUARY ESTATE',
   INHERITANCE_EXCLUSIONS: 'ARTICLE IX - INHERITANCE EXCLUSIONS',
   RIGHT_OF_REPUDIATION: 'ARTICLE X - RIGHT OF REPUDIATION',
+  JOINT_ASSET_CLAUSE: 'ARTICLE XI - JOINT ASSET CLAUSE',
   ATTESTATION: 'ATTESTATION AND SIGNATURES',
 };
 
@@ -196,6 +198,7 @@ export const ARTICLE_ORDER: WillArticle[] = [
   'RESIDUARY_ESTATE',
   'INHERITANCE_EXCLUSIONS',
   'RIGHT_OF_REPUDIATION',
+  'JOINT_ASSET_CLAUSE',
   'ATTESTATION',
 ];
 

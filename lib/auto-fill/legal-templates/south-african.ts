@@ -842,3 +842,17 @@ export function formatGeneralInheritanceExclusionClause(): string {
 export function formatRightOfRepudiationClause(): string {
   return 'Any beneficiary(ies) under my Last Will shall be entitled to repudiate the whole or only a part of his inheritance or legacy, without affecting his right to the remainder of the inheritance or legacy.';
 }
+
+/**
+ * Format joint asset clause
+ * This is a standard South African will clause allowing beneficiaries
+ * to agree amongst themselves on division of jointly bequeathed assets
+ *
+ * Applies when assets are left to multiple beneficiaries jointly
+ * Reduces executor involvement in asset division decisions
+ *
+ * @returns Formatted joint asset clause
+ */
+export function formatJointAssetClause(): string {
+  return 'I wish my beneficiaries to agree amongst themselves as to the division between them of any assets left to them jointly. My Executor(s) need not be involved in this decision, and a receipt signed by all the beneficiaries will be given to the Executor(s).';
+}
