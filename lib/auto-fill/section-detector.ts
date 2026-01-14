@@ -65,6 +65,12 @@ const ARTICLE_PATTERNS: Record<WillArticle, RegExp[]> = {
     /INHERITANCE\s+EXCLUSIONS/i,
     /COMMUNITY\s+OF\s+PROPERTY\s+EXCLUSION/i,
   ],
+  RIGHT_OF_REPUDIATION: [
+    /ARTICLE\s+X\s*[-:]?\s*RIGHT\s+OF\s+REPUDIATION/i,
+    /ARTICLE\s+10\s*[-:]?\s*RIGHT\s+OF\s+REPUDIATION/i,
+    /RIGHT\s+OF\s+REPUDIATION/i,
+    /REPUDIATION/i,
+  ],
   ATTESTATION: [
     /ATTESTATION/i,
     /ATTESTATION\s+AND\s+SIGNATURES/i,

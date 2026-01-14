@@ -21,6 +21,7 @@ import { MinorProvisionsGenerator } from './generators/minor-provisions-generato
 import { SpecificBequestsGenerator } from './generators/specific-bequests-generator';
 import { ResiduaryEstateGenerator } from './generators/residuary-estate-generator';
 import { InheritanceExclusionsGenerator } from './generators/inheritance-exclusions-generator';
+import { RightOfRepudiationGenerator } from './generators/right-of-repudiation-generator';
 import { AttestationGenerator } from './generators/attestation-generator';
 import {
   detectSections,
@@ -63,6 +64,7 @@ export class AutoFillOrchestrator {
       new SpecificBequestsGenerator(this.context),     // Article VII
       new ResiduaryEstateGenerator(this.context),      // Article VIII
       new InheritanceExclusionsGenerator(this.context), // Article IX
+      new RightOfRepudiationGenerator(this.context),    // Article X
       new AttestationGenerator(this.context),          // Attestation
     ];
   }

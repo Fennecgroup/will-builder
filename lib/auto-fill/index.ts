@@ -33,6 +33,8 @@ export { GuardiansGenerator } from './generators/guardians-generator';
 //export { MinorProvisionsGenerator } from './generators/minor-provisions-generator';
 export { SpecificBequestsGenerator } from './generators/specific-bequests-generator';
 export { ResiduaryEstateGenerator } from './generators/residuary-estate-generator';
+export { InheritanceExclusionsGenerator } from './generators/inheritance-exclusions-generator';
+export { RightOfRepudiationGenerator } from './generators/right-of-repudiation-generator';
 export { AttestationGenerator } from './generators/attestation-generator';
 
 // Section Detection
@@ -68,6 +70,8 @@ export {
   formatExecutorAppointment,
   formatGuardianAppointment,
   formatAttestationClause,
+  formatGeneralInheritanceExclusionClause,
+  formatRightOfRepudiationClause,
   getSpecificBequestsIntro,
   validateAndNormalizeAllocations,
 } from './legal-templates/south-african';

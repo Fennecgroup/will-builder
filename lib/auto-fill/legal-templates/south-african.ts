@@ -828,3 +828,17 @@ export function formatAttestationClause(
 export function formatGeneralInheritanceExclusionClause(): string {
   return 'Should any person who benefits from my estate in terms of my Last Will, be married or marry or remarry at any time in the future, in community of property or subject to any law of accrual, then notwithstanding such community of property or accrual, the benefits payable to him/her under my Last Will shall devolve upon and belong to him/her personally and shall be excluded of any such community or accrual and shall be free from any marital power which any spouse might otherwise have or acquire by virtue of such marriage.';
 }
+
+/**
+ * Format right of repudiation clause
+ * This is a standard South African will clause allowing beneficiaries
+ * to repudiate (reject) all or part of their inheritance
+ *
+ * Applies universally to ALL beneficiaries (no individual tracking needed)
+ * Protects beneficiary rights to selective acceptance/rejection of bequests
+ *
+ * @returns Formatted right of repudiation clause
+ */
+export function formatRightOfRepudiationClause(): string {
+  return 'Any beneficiary(ies) under my Last Will shall be entitled to repudiate the whole or only a part of his inheritance or legacy, without affecting his right to the remainder of the inheritance or legacy.';
+}

@@ -36,7 +36,7 @@ export async function createWill(title: string, content?: WillContent) {
           where: { clerkId: userId },
           create: {
             clerkId: userId,
-            email: '', // Will be updated by webhook
+            email: `${userId}@temp.clerk.user`, // Unique placeholder - will be updated by webhook
           },
         },
       },

@@ -18,6 +18,7 @@ export type WillArticle =
   | 'SPECIFIC_BEQUESTS'   // Article VII (Phase 1 focus)
   | 'RESIDUARY_ESTATE'    // Article VIII (Phase 1 focus)
   | 'INHERITANCE_EXCLUSIONS'  // Article IX - Protection from community of property
+  | 'RIGHT_OF_REPUDIATION'    // Article X - Right to repudiate inheritance
   | 'ATTESTATION';
 
 /**
@@ -175,6 +176,7 @@ export const ARTICLE_TITLES: Record<WillArticle, string> = {
   SPECIFIC_BEQUESTS: 'ARTICLE VII - SPECIFIC BEQUESTS',
   RESIDUARY_ESTATE: 'ARTICLE VIII - RESIDUARY ESTATE',
   INHERITANCE_EXCLUSIONS: 'ARTICLE IX - INHERITANCE EXCLUSIONS',
+  RIGHT_OF_REPUDIATION: 'ARTICLE X - RIGHT OF REPUDIATION',
   ATTESTATION: 'ATTESTATION AND SIGNATURES',
 };
 
@@ -193,6 +195,7 @@ export const ARTICLE_ORDER: WillArticle[] = [
   'SPECIFIC_BEQUESTS',
   'RESIDUARY_ESTATE',
   'INHERITANCE_EXCLUSIONS',
+  'RIGHT_OF_REPUDIATION',
   'ATTESTATION',
 ];
 
