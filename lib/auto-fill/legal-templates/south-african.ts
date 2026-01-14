@@ -717,6 +717,7 @@ export function formatTrusteeAppointment(
   // Powers clause with Trust Property Control Act reference
   sections.push('I grant the appointed trustee(s) full power to invest, manage, and distribute the inheritance for the benefit, maintenance, and education of the minor beneficiaries, in accordance with the Trust Property Control Act 57 of 1988.');
 
+  sections.push();
   return sections.join(' ');
 }
 

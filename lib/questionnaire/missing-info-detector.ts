@@ -14,6 +14,7 @@ import {
  */
 export class MissingInfoDetector {
   private willContent: WillContent;
+  private questionIdMap: Map<string, string> = new Map();
 
   constructor(willContent: WillContent) {
     this.willContent = willContent;
@@ -167,9 +168,14 @@ export class MissingInfoDetector {
     const questions: QuestionnaireQuestion[] = [];
     let priority = 1;
 
+    // Clear previous IDs
+    this.questionIdMap.clear();
+
     for (const gap of gaps) {
       if (gap.type === 'guardian') {
-        questions.push(this.createGuardianQuestion(gap, priority++));
+        const question = this.createGuardianQuestion(gap, priority++);
+        this.questionIdMap.set('guardian', question.id);
+        questions.push(question);
       } else if (gap.type === 'trustee') {
         // Check if guardian exists - if so, add same-person question first
         const hasGuardian =
@@ -177,15 +183,19 @@ export class MissingInfoDetector {
 
         if (hasGuardian) {
           // Ask if trustee should be same as guardian
-          questions.push(this.createSamePersonQuestion(gap, priority++));
+          const samePersonQuestion = this.createSamePersonQuestion(gap, priority++);
+          this.questionIdMap.set('same-person', samePersonQuestion.id);
+          questions.push(samePersonQuestion);
         }
 
         // Add trustee question (will be conditional on same-person answer)
-        questions.push(
-          this.createTrusteeQuestion(gap, priority++, hasGuardian)
-        );
+        const trusteeQuestion = this.createTrusteeQuestion(gap, priority++, hasGuardian);
+        this.questionIdMap.set('trustee', trusteeQuestion.id);
+        questions.push(trusteeQuestion);
       } else if (gap.type === 'executor') {
-        questions.push(this.createExecutorQuestion(gap, priority++));
+        const question = this.createExecutorQuestion(gap, priority++);
+        this.questionIdMap.set('executor', question.id);
+        questions.push(question);
       }
     }
 
@@ -262,7 +272,7 @@ export class MissingInfoDetector {
         ? 'If you prefer a different person to manage finances, please specify:'
         : 'Who should manage the inheritance for minor beneficiaries until they reach age 18?',
       required: !hasGuardian, // Required only if no guardian to default to
-      dependsOn: hasGuardian ? [`same-person-${Date.now() - 1}`] : undefined,
+      dependsOn: hasGuardian ? [this.questionIdMap.get('same-person')!] : undefined,
       context: {
         minorBeneficiaries,
       },

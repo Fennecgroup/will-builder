@@ -36,20 +36,45 @@ export class QuestionnaireOrchestrator {
 
     const question = this.questions[this.currentQuestionIndex];
 
-    // Check if dependencies are satisfied
-    if (question.dependsOn && question.dependsOn.length > 0) {
-      const allDependenciesMet = question.dependsOn.every((depId) =>
-        this.answers.has(depId)
-      );
-
-      if (!allDependenciesMet) {
-        // Skip this question for now, move to next
-        this.currentQuestionIndex++;
-        return this.getCurrentQuestion();
-      }
+    // Check if question should be shown based on dependencies
+    if (!this.shouldShowQuestion(question)) {
+      // Skip this question, move to next
+      this.currentQuestionIndex++;
+      return this.getCurrentQuestion();
     }
 
     return question;
+  }
+
+  /**
+   * Check if a question should be shown based on dependency answer values
+   */
+  private shouldShowQuestion(question: QuestionnaireQuestion): boolean {
+    // If no dependencies, always show
+    if (!question.dependsOn || question.dependsOn.length === 0) {
+      return true;
+    }
+
+    // Check each dependency
+    for (const depId of question.dependsOn) {
+      const depAnswer = this.answers.get(depId);
+
+      // Dependency not answered yet
+      if (!depAnswer) {
+        return false;
+      }
+
+      // Special handling for same-person-guardian-trustee question
+      if (depAnswer.questionType === 'same-person-guardian-trustee') {
+        const samePersonAnswer = depAnswer.data as SamePersonAnswer;
+        // Only show trustee question if user said "no"
+        if (question.type === 'trustee-appointment') {
+          return !samePersonAnswer.useSamePersonForTrustee;
+        }
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -97,9 +122,35 @@ export class QuestionnaireOrchestrator {
    * Check if questionnaire is complete
    */
   isComplete(): boolean {
-    // All required questions must be answered
-    const requiredQuestions = this.questions.filter((q) => q.required);
-    return requiredQuestions.every((q) => this.answers.has(q.id));
+    // Check all questions to see which ones should be answered
+    const questionsToAnswer = this.questions.filter((question) => {
+      // Base required questions
+      if (question.required) {
+        return true;
+      }
+
+      // Check if question becomes required based on dependencies
+      if (question.type === 'trustee-appointment' && question.dependsOn) {
+        // Find same-person dependency
+        const samePersonDepId = question.dependsOn.find((depId) => {
+          const depQuestion = this.questions.find((q) => q.id === depId);
+          return depQuestion?.type === 'same-person-guardian-trustee';
+        });
+
+        if (samePersonDepId) {
+          const samePersonAnswer = this.answers.get(samePersonDepId);
+          if (samePersonAnswer) {
+            const data = samePersonAnswer.data as SamePersonAnswer;
+            // Trustee becomes required if user said "no"
+            return !data.useSamePersonForTrustee;
+          }
+        }
+      }
+
+      return false;
+    });
+
+    return questionsToAnswer.every((q) => this.answers.has(q.id));
   }
 
   /**
