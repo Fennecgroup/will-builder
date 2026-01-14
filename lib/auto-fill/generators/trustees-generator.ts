@@ -96,7 +96,7 @@ export class TrusteesGenerator extends BaseGenerator {
     const beneficiaries = this.context.willContent.beneficiaries || [];
 
     // Article heading
-    content.push(this.createHeading(2, 'ARTICLE VI - MINOR BENEFICIARY PROVISIONS'));
+    content.push(this.createHeading(2, 'ARTICLE VI - TRUSTEE APPOINTMENT FOR MINOR BENEFICIARY PROVISIONS'));
     content.push(this.createEmptyParagraph());
 
     // Generate trustee appointment text
