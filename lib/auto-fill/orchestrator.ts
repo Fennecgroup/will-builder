@@ -23,6 +23,7 @@ import { ResiduaryEstateGenerator } from './generators/residuary-estate-generato
 import { InheritanceExclusionsGenerator } from './generators/inheritance-exclusions-generator';
 import { RightOfRepudiationGenerator } from './generators/right-of-repudiation-generator';
 import { JointAssetClauseGenerator } from './generators/joint-asset-clause-generator';
+import { CollationExclusionGenerator } from './generators/collation-exclusion-generator';
 import { AttestationGenerator } from './generators/attestation-generator';
 import {
   detectSections,
@@ -67,6 +68,7 @@ export class AutoFillOrchestrator {
       new InheritanceExclusionsGenerator(this.context), // Article IX
       new RightOfRepudiationGenerator(this.context),    // Article X
       new JointAssetClauseGenerator(this.context),      // Article XI
+      new CollationExclusionGenerator(this.context),    // Article XII
       new AttestationGenerator(this.context),          // Attestation
     ];
   }

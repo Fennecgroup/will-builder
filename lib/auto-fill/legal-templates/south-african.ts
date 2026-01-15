@@ -909,3 +909,19 @@ export function formatRightOfRepudiationClause(): string {
 export function formatJointAssetClause(): string {
   return 'I wish my beneficiaries to agree amongst themselves as to the division between them of any assets left to them jointly. My Executor(s) need not be involved in this decision, and a receipt signed by all the beneficiaries will be given to the Executor(s).';
 }
+
+/**
+ * Format collation exclusion clause
+ * This is a standard South African will clause excluding the principle of collation
+ *
+ * Collation requires beneficiaries to account for lifetime gifts from testator
+ * when calculating their inheritance share. This clause waives that requirement.
+ *
+ * Applies universally to ALL beneficiaries (no individual tracking needed)
+ * Ensures lifetime gifts do not reduce inheritance entitlements
+ *
+ * @returns Formatted collation exclusion clause
+ */
+export function formatCollationExclusionClause(): string {
+  return 'The principle of collation will not apply to my estate. My Executor(s) will not take into account any benefits that I have given to any of my beneficiaries when I was alive, when distributing my assets in terms of my will.';
+}
