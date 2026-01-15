@@ -2,7 +2,7 @@
 // Functions for formatting will clauses according to South African legal standards
 
 import { Asset, Beneficiary } from '@/lib/types/will';
-import { BeneficiaryAllocation } from '../types';
+import { BeneficiaryAllocation, ValidationResult } from '../types';
 
 /**
  * Format age as legal text with written number
@@ -347,6 +347,91 @@ export function formatMinorProvisions(
  */
 export function getSpecificBequestsIntro(): string {
   return 'I give, devise, and bequeath the following specific items:';
+}
+
+/**
+ * Format intro clause for usufruct bequests
+ * @returns Standard intro clause for usufructs
+ */
+export function getUsufructBequestsIntro(): string {
+  return 'I create the following usufructs over my property:';
+}
+
+/**
+ * Validate usufruct configuration
+ * Ensures usufructuary and bare dominium owner exist and are different people
+ * @param asset Asset with usufruct configuration
+ * @param beneficiaries Array of all beneficiaries
+ * @returns Validation result
+ */
+export function validateUsufruct(
+  asset: Asset,
+  beneficiaries: Beneficiary[]
+): ValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  if (!asset.usufruct) {
+    errors.push('No usufruct configuration');
+    return { isValid: false, errors, warnings };
+  }
+
+  const beneficiaryIds = new Set(beneficiaries.map((b) => b.id));
+
+  // Validate usufructuary exists
+  if (!beneficiaryIds.has(asset.usufruct.usufructuaryId)) {
+    errors.push(`Usufructuary not found: ${asset.usufruct.usufructuaryId}`);
+  }
+
+  // Validate bare dominium owner exists
+  if (!beneficiaryIds.has(asset.usufruct.bareDominiumOwnerId)) {
+    errors.push(
+      `Bare dominium owner not found: ${asset.usufruct.bareDominiumOwnerId}`
+    );
+  }
+
+  // Ensure they are different people
+  if (
+    asset.usufruct.usufructuaryId === asset.usufruct.bareDominiumOwnerId
+  ) {
+    errors.push(
+      'Usufructuary and bare dominium owner cannot be the same person'
+    );
+  }
+
+  // Warn if conflicting allocations
+  if (asset.beneficiaryAllocations?.length) {
+    warnings.push(
+      'Asset has both usufruct and beneficiaryAllocations. Usufruct takes precedence.'
+    );
+  }
+
+  return { isValid: errors.length === 0, errors, warnings };
+}
+
+/**
+ * Format usufruct bequest clause
+ * Creates legal clause for asset with usufruct arrangement
+ * @param asset Asset with usufruct configuration
+ * @param usufructuary Beneficiary with right to use/enjoy
+ * @param bareDominiumOwner Beneficiary with bare ownership
+ * @returns Formatted usufruct bequest clause
+ */
+export function formatUsufructBequest(
+  asset: Asset,
+  usufructuary: Beneficiary,
+  bareDominiumOwner: Beneficiary
+): string {
+  const assetDesc = formatAssetDescription(asset);
+  const usufructuaryName = `${usufructuary.fullName} (${usufructuary.relationship})`;
+  const ownerName = `${bareDominiumOwner.fullName} (${bareDominiumOwner.relationship})`;
+
+  // Use gender-neutral pronouns for now (he/she, his/her)
+  // Could be enhanced to use actual gender if available in beneficiary data
+  const pronoun = 'he/she';
+  const possessive = 'his/her';
+
+  return `I bequeath the use and enjoyment of ${assetDesc} to ${usufructuaryName} as usufructuary for the duration of ${possessive} lifetime. During ${possessive} lifetime, ${pronoun} shall have the right to use the property and derive any benefit therefrom. Upon the death of the usufructuary, full ownership shall vest in ${ownerName}, who holds the bare dominium pending such vesting.`;
 }
 
 /**

@@ -18,6 +18,7 @@ import { ExecutorsGenerator } from './generators/executors-generator';
 import { GuardiansGenerator } from './generators/guardians-generator';
 import { TrusteesGenerator } from './generators/trustees-generator';
 import { MinorProvisionsGenerator } from './generators/minor-provisions-generator';
+import { UsufructBequestsGenerator } from './generators/usufruct-bequests-generator';
 import { SpecificBequestsGenerator } from './generators/specific-bequests-generator';
 import { ResiduaryEstateGenerator } from './generators/residuary-estate-generator';
 import { InheritanceExclusionsGenerator } from './generators/inheritance-exclusions-generator';
@@ -53,7 +54,7 @@ export class AutoFillOrchestrator {
       jurisdiction: 'ZA', // Default to South Africa
     };
 
-    // Initialize ALL generators (12 total) in canonical article order
+    // Initialize ALL generators (13 total) in canonical article order
     this.generators = [
       new PreambleGenerator(this.context),             // Preamble
       new RevocationGenerator(this.context),           // Article I
@@ -63,12 +64,13 @@ export class AutoFillOrchestrator {
       new GuardiansGenerator(this.context),            // Article V
       new TrusteesGenerator(this.context),             // Article VI (Trustees - merged with Minor Provisions)
       //new MinorProvisionsGenerator(this.context),      // Article VI
-      new SpecificBequestsGenerator(this.context),     // Article VII
-      new ResiduaryEstateGenerator(this.context),      // Article VIII
-      new InheritanceExclusionsGenerator(this.context), // Article IX
-      new RightOfRepudiationGenerator(this.context),    // Article X
-      new JointAssetClauseGenerator(this.context),      // Article XI
-      new CollationExclusionGenerator(this.context),    // Article XII
+      new UsufructBequestsGenerator(this.context),     // Article VII
+      new SpecificBequestsGenerator(this.context),     // Article VIII
+      new ResiduaryEstateGenerator(this.context),      // Article IX
+      new InheritanceExclusionsGenerator(this.context), // Article X
+      new RightOfRepudiationGenerator(this.context),    // Article XI
+      new JointAssetClauseGenerator(this.context),      // Article XII
+      new CollationExclusionGenerator(this.context),    // Article XIII
       new AttestationGenerator(this.context),          // Attestation
     ];
   }

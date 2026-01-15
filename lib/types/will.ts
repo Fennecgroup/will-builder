@@ -82,6 +82,13 @@ export interface Asset {
     beneficiaryId: string;
     percentage: number; // Must sum to 100% if present
   }[];
+  // Usufruct configuration: allows one beneficiary to use/enjoy the asset
+  // while another holds bare ownership
+  usufruct?: {
+    usufructuaryId: string;      // Beneficiary with right to use/enjoy
+    bareDominiumOwnerId: string; // Beneficiary with bare ownership
+    terminationType: 'death';     // Termination condition (currently only death)
+  };
 }
 
 export interface Beneficiary {

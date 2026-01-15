@@ -63,6 +63,11 @@ export class SpecificBequestsGenerator extends BaseGenerator {
     const beneficiaries = this.context.willContent.beneficiaries || [];
 
     return assets.filter((asset) => {
+      // Skip assets with usufruct (handled by UsufructBequestsGenerator)
+      if (asset.usufruct) {
+        return false;
+      }
+
       // Must have allocations
       if (!asset.beneficiaryAllocations || asset.beneficiaryAllocations.length === 0) {
         return false;
