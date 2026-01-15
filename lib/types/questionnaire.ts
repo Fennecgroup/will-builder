@@ -78,6 +78,7 @@ export interface Trustee {
 export interface TrusteeAnswer {
   trustee: Omit<Trustee, 'id'>;
   alternateTrustee?: Omit<Trustee, 'id'>;
+  ageOfInheritance?: number; // Global age threshold (18-100) for testamentary trust vesting
 }
 
 /**

@@ -95,12 +95,15 @@ export class TrusteesGenerator extends BaseGenerator {
     const trustees = this.context.willContent.trustees || [];
     const beneficiaries = this.context.willContent.beneficiaries || [];
 
+    // Get age threshold from MinorBeneficiaryProvisions
+    const ageOfInheritance = this.context.willContent.minorBeneficiaryProvisions?.ageOfInheritance;
+
     // Article heading
-    content.push(this.createHeading(2, 'ARTICLE VI - TRUSTEE APPOINTMENT FOR MINOR BENEFICIARY PROVISIONS'));
+    content.push(this.createHeading(2, 'ARTICLE VI - TRUSTEE APPOINTMENT'));
     content.push(this.createEmptyParagraph());
 
-    // Generate trustee appointment text
-    const trusteeText = formatTrusteeAppointment(trustees, beneficiaries);
+    // Generate trustee appointment text with age parameter
+    const trusteeText = formatTrusteeAppointment(trustees, beneficiaries, ageOfInheritance);
 
     if (trusteeText) {
       content.push(this.createParagraph(trusteeText));

@@ -213,6 +213,15 @@ export class QuestionnaireOrchestrator {
           }
 
           updates.trustees = newTrustees;
+
+          // Update MinorBeneficiaryProvisions with age threshold
+          if (trusteeAnswer.ageOfInheritance) {
+            updates.minorBeneficiaryProvisions = {
+              ...(currentWillContent.minorBeneficiaryProvisions || { method: 'testamentary-trust' }),
+              ageOfInheritance: trusteeAnswer.ageOfInheritance,
+            };
+          }
+
           break;
 
         case 'same-person-guardian-trustee':

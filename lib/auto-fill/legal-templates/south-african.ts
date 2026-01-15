@@ -5,6 +5,46 @@ import { Asset, Beneficiary } from '@/lib/types/will';
 import { BeneficiaryAllocation } from '../types';
 
 /**
+ * Format age as legal text with written number
+ * @param age Numeric age (e.g., 25)
+ * @returns Formatted age text (e.g., "twenty-five (25)")
+ */
+function formatAge(age: number): string {
+  const numberWords: Record<number, string> = {
+    18: 'eighteen',
+    19: 'nineteen',
+    20: 'twenty',
+    21: 'twenty-one',
+    22: 'twenty-two',
+    23: 'twenty-three',
+    24: 'twenty-four',
+    25: 'twenty-five',
+    26: 'twenty-six',
+    27: 'twenty-seven',
+    28: 'twenty-eight',
+    29: 'twenty-nine',
+    30: 'thirty',
+    35: 'thirty-five',
+    40: 'forty',
+    45: 'forty-five',
+    50: 'fifty',
+    55: 'fifty-five',
+    60: 'sixty',
+    65: 'sixty-five',
+    70: 'seventy',
+    75: 'seventy-five',
+    80: 'eighty',
+    85: 'eighty-five',
+    90: 'ninety',
+    95: 'ninety-five',
+    100: 'one hundred',
+  };
+
+  const wordForm = numberWords[age] || age.toString();
+  return `${wordForm} (${age})`;
+}
+
+/**
  * Format asset description based on asset type
  * Includes relevant details like location, registration, account numbers
  * @param asset Asset to format
@@ -645,6 +685,7 @@ export function formatGuardianAppointment(
  * Appoints trustee(s) for managing minor beneficiaries' inheritance
  * @param trustees Array of trustees
  * @param beneficiaries Array of beneficiaries (to identify minors)
+ * @param ageOfInheritance Optional age when beneficiaries receive full control (defaults to 18)
  * @returns Formatted trustee appointment clause
  */
 export function formatTrusteeAppointment(
@@ -659,7 +700,8 @@ export function formatTrusteeAppointment(
   beneficiaries: Array<{
     fullName: string;
     isMinor?: boolean;
-  }>
+  }>,
+  ageOfInheritance?: number
 ): string {
   if (trustees.length === 0) {
     return '';
@@ -674,6 +716,10 @@ export function formatTrusteeAppointment(
   const alternates = trustees.filter((t) => t.isAlternate);
 
   const sections: string[] = [];
+
+  // Get formatted age (defaults to 18)
+  const age = ageOfInheritance ?? 18;
+  const ageText = formatAge(age);
 
   // Primary trustee(s)
   if (primary.length > 0) {
@@ -692,9 +738,9 @@ export function formatTrusteeAppointment(
     });
 
     if (primary.length === 1) {
-      sections.push(`I appoint ${primaryDescriptions[0]} as trustee to manage the inheritance of my minor beneficiaries until they reach the age of majority (18 years).`);
+      sections.push(`I appoint ${primaryDescriptions[0]} as trustee to manage the inheritance of my minor beneficiaries until they reach the age of ${ageText} years.`);
     } else {
-      sections.push(`I appoint ${primaryDescriptions.join(' and ')} as joint trustees to manage the inheritance of my minor beneficiaries until they reach the age of majority (18 years).`);
+      sections.push(`I appoint ${primaryDescriptions.join(' and ')} as joint trustees to manage the inheritance of my minor beneficiaries until they reach the age of ${ageText} years.`);
     }
   }
 
@@ -726,6 +772,7 @@ export function formatTrusteeAppointment(
  * Provisions for inheritance by minor beneficiaries
  * @param minorBeneficiaries Array of minor beneficiaries
  * @param guardianName Optional guardian name
+ * @param ageOfInheritance Optional age for inheritance vesting (defaults to 18). Note: guardianship provisions always use 18.
  * @returns Formatted minor provisions clause
  */
 export function formatMinorProvisionsClause(
@@ -733,7 +780,8 @@ export function formatMinorProvisionsClause(
     fullName: string;
     isMinor?: boolean;
   }>,
-  guardianName?: string
+  guardianName?: string,
+  ageOfInheritance?: number
 ): string {
   const minors = minorBeneficiaries.filter((b) => b.isMinor === true);
 
@@ -745,13 +793,17 @@ export function formatMinorProvisionsClause(
 
   sections.push('With regard to any inheritance by minor beneficiaries:');
 
+  // Guardianship provisions always use age 18 (age of majority)
   if (guardianName) {
     sections.push(`Until each minor beneficiary reaches the age of majority (18 years), their inheritance shall be held in trust by ${guardianName} for their benefit, maintenance, and education.`);
   } else {
     sections.push('Until each minor beneficiary reaches the age of majority (18 years), their inheritance shall be paid into the Guardian\'s Fund as established under the Guardians\' Fund Act 1965, to be held for their benefit.');
   }
 
-  sections.push('Upon reaching the age of majority, each beneficiary shall receive their full inheritance.');
+  // Use configurable age for inheritance vesting (defaults to 18)
+  const vestingAge = ageOfInheritance ?? 18;
+  const vestingAgeText = formatAge(vestingAge);
+  sections.push(`Upon reaching the age of ${vestingAgeText} years, each beneficiary shall receive their full inheritance.`);
 
   // List minor beneficiaries
   if (minors.length > 0) {

@@ -82,6 +82,9 @@ export function TrusteeQuestionForm({ question, onSubmit }: TrusteeQuestionFormP
       } as Omit<Trustee, 'id'>;
     }
 
+    // Include age threshold for testamentary trust vesting
+    answer.ageOfInheritance = data.ageOfInheritance || 18;
+
     onSubmit(answer);
   };
 
@@ -164,6 +167,40 @@ export function TrusteeQuestionForm({ question, onSubmit }: TrusteeQuestionFormP
             <Label htmlFor="trustee.address.postalCode">Postal Code *</Label>
             <Input id="trustee.address.postalCode" {...register('trustee.address.postalCode', { required: true })} />
           </div>
+        </div>
+      </div>
+
+      {/* Age Threshold Section */}
+      <div className="col-span-2 pt-4 border-t">
+        <div className="space-y-2">
+          <Label htmlFor="ageOfInheritance">
+            Age of Inheritance *
+          </Label>
+          <p className="text-sm text-neutral-500">
+            Age at which beneficiaries will receive full control of their inheritance from the testamentary trust (guardianship remains at 18)
+          </p>
+          <Input
+            id="ageOfInheritance"
+            type="number"
+            min="18"
+            max="100"
+            defaultValue="18"
+            placeholder="18"
+            {...register('ageOfInheritance', {
+              required: 'Age threshold is required',
+              min: { value: 18, message: 'Minimum age is 18 years' },
+              max: { value: 100, message: 'Maximum age is 100 years' },
+              valueAsNumber: true,
+            })}
+          />
+          {errors?.ageOfInheritance && (
+            <span className="text-sm text-red-500">
+              {String(errors.ageOfInheritance.message)}
+            </span>
+          )}
+          <p className="text-xs text-neutral-400">
+            South African law requires minimum age of 18. You may specify a higher age (e.g., 21, 25) for inheritance vesting. Note: Guardianship provisions remain at 18 years (age of majority).
+          </p>
         </div>
       </div>
 

@@ -75,8 +75,11 @@ export class MinorProvisionsGenerator extends BaseGenerator {
     const primaryGuardian = guardians.find((g) => !g.isAlternate);
     const guardianName = primaryGuardian?.fullName;
 
-    // Minor provisions text
-    const provisionsText = formatMinorProvisionsClause(beneficiaries, guardianName);
+    // Get age threshold from MinorBeneficiaryProvisions
+    const ageOfInheritance = this.context.willContent.minorBeneficiaryProvisions?.ageOfInheritance;
+
+    // Minor provisions text with age parameter
+    const provisionsText = formatMinorProvisionsClause(beneficiaries, guardianName, ageOfInheritance);
 
     if (provisionsText) {
       content.push(this.createParagraph(provisionsText));
