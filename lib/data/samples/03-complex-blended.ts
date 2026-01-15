@@ -90,6 +90,11 @@ export const complexBlendedContent: WillContent = {
       estimatedValue: 12500000,
       currency: 'ZAR',
       notes: 'Title Deed No. T56789/2018, includes 2 hectare vineyard',
+      usufruct: {
+        usufructuaryId: 'ben-complex-001',
+        bareDominiumOwnerId: 'ben-complex-002',
+        terminationType: 'death',
+      },
     },
     {
       id: 'asset-complex-002',
