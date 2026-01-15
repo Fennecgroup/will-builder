@@ -47,6 +47,12 @@ const ARTICLE_PATTERNS: Record<WillArticle, RegExp[]> = {
     /ARTICLE\s+6\s*[-:]?\s*MINOR/i,
     /MINOR\s+BENEFICIARY\s+PROVISIONS/i,
   ],
+  USUFRUCT_BEQUESTS: [
+    /ARTICLE\s+VII\s*[-:]?\s*USUFRUCT/i,
+    /ARTICLE\s+7\s*[-:]?\s*USUFRUCT/i,
+    /USUFRUCT\s+BEQUESTS/i,
+    /USUFRUCT\s+ARRANGEMENTS/i,
+  ],
   SPECIFIC_BEQUESTS: [
     /ARTICLE\s+VII\s*[-:]?\s*SPECIFIC/i,
     /ARTICLE\s+7\s*[-:]?\s*SPECIFIC/i,
@@ -284,17 +290,19 @@ export function findInsertionPoint(
 
   // Define canonical order
   const order: WillArticle[] = [
-    'REVOCATION',
-    'DECLARATION',
-    'FAMILY_INFO',
-    'EXECUTORS',
-    'GUARDIANS',
-    'MINOR_PROVISIONS',
-    'SPECIFIC_BEQUESTS',
-    'RESIDUARY_ESTATE',
-    'INHERITANCE_EXCLUSIONS',
-    'RIGHT_OF_REPUDIATION',
-    'JOINT_ASSET_CLAUSE',
+    'REVOCATION',              // Article I
+    'DECLARATION',             // Article II
+    'FAMILY_INFO',             // Article III
+    'EXECUTORS',               // Article IV
+    'GUARDIANS',               // Article V
+    'MINOR_PROVISIONS',        // Article VI
+    'USUFRUCT_BEQUESTS',       // Article VII
+    'SPECIFIC_BEQUESTS',       // Article VIII
+    'RESIDUARY_ESTATE',        // Article IX
+    'INHERITANCE_EXCLUSIONS',  // Article X
+    'RIGHT_OF_REPUDIATION',    // Article XI
+    'JOINT_ASSET_CLAUSE',      // Article XII
+    'COLLATION_EXCLUSION',     // Article XIII
     'ATTESTATION',
   ];
 
