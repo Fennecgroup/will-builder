@@ -276,6 +276,28 @@ export class QuestionnaireOrchestrator {
 
           updates.executors = newExecutors;
           break;
+
+        case 'living-will-directives':
+          const livingWillAnswer = answer.data as import('@/lib/types/optional-clauses').LivingWillDirectives;
+
+          // Update living will directives
+          updates.livingWillDirectives = livingWillAnswer;
+
+          // Mark the Living Will clause as completed
+          const existingClauses = currentWillContent.optionalClauses || [];
+          const updatedClauses = existingClauses.map((clause) => {
+            if (clause.clauseType === 'living-will') {
+              return {
+                ...clause,
+                questionnaireCompleted: true,
+                data: livingWillAnswer,
+              };
+            }
+            return clause;
+          });
+
+          updates.optionalClauses = updatedClauses;
+          break;
       }
     }
 

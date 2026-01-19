@@ -222,6 +222,12 @@ export interface WillContent {
   attestationClause?: string; // SA: Recommended attestation clause
   dateExecuted?: string; // SA: Date will was signed (highly recommended)
   placeExecuted?: string; // SA: City/town where will was signed
+  // Optional clauses
+  optionalClauses?: import('./optional-clauses').OptionalClauseSelection[];
+  livingWillDirectives?: import('./optional-clauses').LivingWillDirectives;
+  petCareProvision?: import('./optional-clauses').PetCareProvision;
+  extendedBurialInstructions?: import('./optional-clauses').ExtendedBurialInstructions;
+  noContestClauseData?: import('./optional-clauses').NoContestClauseData;
 }
 
 export interface WillDocument {

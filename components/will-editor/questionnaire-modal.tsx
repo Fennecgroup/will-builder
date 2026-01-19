@@ -12,6 +12,7 @@ import { WillContent } from '@/lib/types/will';
 import { GuardianQuestionForm } from './questionnaire/guardian-question-form';
 import { TrusteeQuestionForm } from './questionnaire/trustee-question-form';
 import { SamePersonQuestionForm } from './questionnaire/same-person-question-form';
+import { LivingWillQuestionForm } from './questionnaire/living-will-question-form';
 
 interface QuestionnaireModalProps {
   open: boolean;
@@ -135,6 +136,10 @@ export function QuestionnaireModal({
 
           {currentQuestion.type === 'same-person-guardian-trustee' && (
             <SamePersonQuestionForm question={currentQuestion} onSubmit={handleAnswer} />
+          )}
+
+          {currentQuestion.type === 'living-will-directives' && (
+            <LivingWillQuestionForm question={currentQuestion} onSubmit={handleAnswer} />
           )}
         </div>
 

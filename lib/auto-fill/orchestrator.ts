@@ -25,6 +25,7 @@ import { InheritanceExclusionsGenerator } from './generators/inheritance-exclusi
 import { RightOfRepudiationGenerator } from './generators/right-of-repudiation-generator';
 import { JointAssetClauseGenerator } from './generators/joint-asset-clause-generator';
 import { CollationExclusionGenerator } from './generators/collation-exclusion-generator';
+import { LivingWillGenerator } from './generators/living-will-generator';
 import { AttestationGenerator } from './generators/attestation-generator';
 import {
   detectSections,
@@ -71,6 +72,7 @@ export class AutoFillOrchestrator {
       new RightOfRepudiationGenerator(this.context),    // Article XI
       new JointAssetClauseGenerator(this.context),      // Article XII
       new CollationExclusionGenerator(this.context),    // Article XIII
+      new LivingWillGenerator(this.context),            // Article XIV
       new AttestationGenerator(this.context),          // Attestation
     ];
   }

@@ -1010,3 +1010,91 @@ export function formatJointAssetClause(): string {
 export function formatCollationExclusionClause(): string {
   return 'The principle of collation will not apply to my estate. My Executor(s) will not take into account any benefits that I have given to any of my beneficiaries when I was alive, when distributing my assets in terms of my will.';
 }
+
+/**
+ * Format Living Will directives
+ * Formats medical treatment preferences and advance directives
+ *
+ * @param directives Living Will directives data
+ * @returns Formatted Living Will clause
+ */
+export function formatLivingWillDirectives(directives: {
+  noLifeSupportIfTerminal: boolean;
+  organDonation: boolean;
+  painManagement: 'comfort-care' | 'aggressive' | 'minimal';
+  resuscitation: boolean;
+  artificialNutrition: boolean;
+  specificInstructions?: string;
+}): string {
+  const clauses: string[] = [];
+
+  // Pain management preference
+  let painText = '';
+  switch (directives.painManagement) {
+    case 'comfort-care':
+      painText = 'I direct my healthcare providers to prioritize my comfort and pain relief, even if such measures may hasten my death. I wish to be kept as comfortable and pain-free as possible.';
+      break;
+    case 'aggressive':
+      painText = 'I direct my healthcare providers to use all available means to manage my pain and discomfort, regardless of side effects, to ensure I remain as comfortable as possible.';
+      break;
+    case 'minimal':
+      painText = 'I direct my healthcare providers to manage my pain conservatively, using medication sparingly to maintain my alertness and awareness as much as possible.';
+      break;
+  }
+  clauses.push(painText);
+
+  return clauses.join(' ');
+}
+
+/**
+ * Format end of life care instructions
+ * Formats specific directives for terminal illness scenarios
+ *
+ * @param directives Living Will directives data
+ * @returns Formatted end of life instructions
+ */
+export function formatEndOfLifeInstructions(directives: {
+  noLifeSupportIfTerminal: boolean;
+  resuscitation: boolean;
+  artificialNutrition: boolean;
+}): string {
+  const instructions: string[] = [];
+
+  if (directives.noLifeSupportIfTerminal) {
+    instructions.push(
+      'If I am diagnosed with a terminal illness and my death is reasonably imminent, I do not wish to receive life-sustaining treatment that would only serve to prolong the dying process. I direct that such treatment be withheld or withdrawn, and that I be permitted to die naturally.'
+    );
+  }
+
+  if (!directives.resuscitation) {
+    instructions.push(
+      'I do not wish to receive cardiopulmonary resuscitation (CPR) if my heart or breathing stops. This constitutes a Do Not Resuscitate (DNR) order and shall be honored by all healthcare providers.'
+    );
+  }
+
+  if (!directives.artificialNutrition) {
+    instructions.push(
+      'I do not wish to receive artificial nutrition or hydration through feeding tubes if I am in a persistent vegetative state or if such measures would only prolong the dying process.'
+    );
+  } else {
+    instructions.push(
+      'I wish to receive artificial nutrition and hydration, even if I am in a persistent vegetative state, unless my healthcare providers determine that such measures would be medically futile or cause undue suffering.'
+    );
+  }
+
+  return instructions.join(' ');
+}
+
+/**
+ * Format organ donation clause
+ * Formats consent for organ and tissue donation
+ *
+ * @param consent Whether organ donation is consented
+ * @returns Formatted organ donation clause
+ */
+export function formatOrganDonationClause(consent: boolean): string {
+  if (consent) {
+    return 'I hereby consent to the donation of my organs, tissues, and body parts for the purposes of transplantation, therapy, medical research, or education after my death. I authorize my Executor(s) and healthcare providers to take all necessary steps to facilitate such donations in accordance with the National Health Act, 2003 (Act No. 61 of 2003) and any applicable regulations.';
+  }
+  return 'I do not consent to organ or tissue donation.';
+}

@@ -14,7 +14,8 @@ export type QuestionType =
   | 'same-person-guardian-trustee'
   | 'executor-appointment'
   | 'witness-appointment'
-  | 'beneficiary-details';
+  | 'beneficiary-details'
+  | 'living-will-directives';
 
 /**
  * Individual question in the questionnaire

@@ -22,6 +22,7 @@ export type WillArticle =
   | 'RIGHT_OF_REPUDIATION'    // Article XI - Right to repudiate inheritance (was X)
   | 'JOINT_ASSET_CLAUSE'      // Article XII - Joint asset division agreement (was XI)
   | 'COLLATION_EXCLUSION'     // Article XIII - Collation exclusion (was XII)
+  | 'LIVING_WILL'             // Article XIV - Living Will (medical directives)
   | 'ATTESTATION';
 
 /**
@@ -183,6 +184,7 @@ export const ARTICLE_TITLES: Record<WillArticle, string> = {
   RIGHT_OF_REPUDIATION: 'ARTICLE XI - RIGHT OF REPUDIATION',
   JOINT_ASSET_CLAUSE: 'ARTICLE XII - JOINT ASSET CLAUSE',
   COLLATION_EXCLUSION: 'ARTICLE XIII - COLLATION EXCLUSION',
+  LIVING_WILL: 'ARTICLE XIV - LIVING WILL',
   ATTESTATION: 'ATTESTATION AND SIGNATURES',
 };
 
@@ -205,6 +207,7 @@ export const ARTICLE_ORDER: WillArticle[] = [
   'RIGHT_OF_REPUDIATION',
   'JOINT_ASSET_CLAUSE',
   'COLLATION_EXCLUSION',
+  'LIVING_WILL',
   'ATTESTATION',
 ];
 

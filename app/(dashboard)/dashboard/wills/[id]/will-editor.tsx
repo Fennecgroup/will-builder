@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Save, FileDown, Clock, Trash2, CheckCircle2, Pencil, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Save, FileDown, Clock, Trash2, CheckCircle2, Pencil, AlertCircle, ListPlus } from 'lucide-react'
 import type { Value } from '@udecode/plate'
 import { Will } from '@prisma/client'
 import { Button } from '@/components/ui/button'
@@ -21,8 +21,12 @@ import { AIChat } from '@/components/plate-ui/ai-chat'
 import { AutoFillNotification } from '@/components/will-editor/auto-fill-notification'
 import { AutoFillPreviewPanel } from '@/components/will-editor/auto-fill-preview-panel'
 import { QuestionnaireModal } from '@/components/will-editor/questionnaire-modal'
+import { OptionalClausesBrowser } from '@/components/will-editor/optional-clauses/optional-clauses-browser'
 import { MissingInfoDetector } from '@/lib/questionnaire/missing-info-detector'
+import { OptionalClausesDetector } from '@/lib/optional-clauses/detector'
 import { MissingInfoContext } from '@/lib/types/questionnaire'
+import { OptionalClauseType } from '@/lib/types/optional-clauses'
+import { requiresQuestionnaire } from '@/lib/optional-clauses/clause-definitions'
 import { initialEditorContent, sampleWillContent } from '@/lib/data/sample-will'
 import { updateWill, deleteWill } from '@/lib/actions/wills'
 import { DeleteDialog } from '@/components/wills/delete-dialog'
@@ -83,6 +87,9 @@ export function WillEditor({ will }: WillEditorProps) {
   // Questionnaire state
   const [questionnaireContext, setQuestionnaireContext] = useState<MissingInfoContext | null>(null)
   const [showQuestionnaire, setShowQuestionnaire] = useState(false)
+
+  // Optional clauses state
+  const [showOptionalClausesBrowser, setShowOptionalClausesBrowser] = useState(false)
 
   // Track mount state to avoid hydration mismatch
   useEffect(() => {
@@ -149,9 +156,22 @@ export function WillEditor({ will }: WillEditorProps) {
         const detector = new MissingInfoDetector(willContent)
         const context = detector.analyze()
 
-        // Only show if there are questions
-        if (context.questions.length > 0) {
+        // Also check for optional clauses that need questionnaires
+        const optionalClausesDetector = new OptionalClausesDetector()
+        const optionalContext = optionalClausesDetector.analyze(willContent.optionalClauses)
+
+        // Merge contexts if both have questions
+        if (context.questions.length > 0 && optionalContext) {
+          const mergedContext = {
+            ...context,
+            questions: [...context.questions, ...optionalContext.questions],
+            gaps: [...context.gaps, ...optionalContext.gaps],
+          }
+          setQuestionnaireContext(mergedContext)
+        } else if (context.questions.length > 0) {
           setQuestionnaireContext(context)
+        } else if (optionalContext) {
+          setQuestionnaireContext(optionalContext)
         } else {
           setQuestionnaireContext(null)
         }
@@ -289,6 +309,77 @@ export function WillEditor({ will }: WillEditorProps) {
       console.error('Error saving questionnaire answers:', error)
     }
   }, [willContent, editorValue, will.id])
+
+  // Handle optional clause toggle
+  const handleOptionalClauseToggle = useCallback(async (clauseType: OptionalClauseType, isSelected: boolean) => {
+    try {
+      const existingClauses = willContent.optionalClauses || []
+
+      if (isSelected) {
+        // Add the clause
+        const updatedClauses = [
+          ...existingClauses.filter(c => c.clauseType !== clauseType),
+          {
+            clauseType,
+            isSelected: true,
+            questionnaireCompleted: false,
+            addedAt: new Date(),
+          },
+        ]
+
+        const updatedContent = {
+          ...willContent,
+          optionalClauses: updatedClauses,
+        }
+
+        setWillContent(updatedContent)
+        setHasUnsavedChanges(true)
+
+        // Save immediately
+        await updateWill(will.id, {
+          content: updatedContent,
+        })
+
+        toast.success('Optional clause added')
+
+        // Close the browser modal
+        setShowOptionalClausesBrowser(false)
+
+        // If clause requires questionnaire, trigger it
+        if (requiresQuestionnaire(clauseType)) {
+          const detector = new OptionalClausesDetector()
+          const context = detector.analyze(updatedClauses)
+
+          if (context) {
+            setQuestionnaireContext(context)
+            setShowQuestionnaire(true)
+          }
+        }
+
+      } else {
+        // Remove the clause
+        const updatedClauses = existingClauses.filter(c => c.clauseType !== clauseType)
+
+        const updatedContent = {
+          ...willContent,
+          optionalClauses: updatedClauses,
+        }
+
+        setWillContent(updatedContent)
+        setHasUnsavedChanges(true)
+
+        // Save immediately
+        await updateWill(will.id, {
+          content: updatedContent,
+        })
+
+        toast.success('Optional clause removed')
+      }
+    } catch (error) {
+      toast.error('Failed to update optional clause')
+      console.error('Error updating optional clause:', error)
+    }
+  }, [willContent, will.id])
 
   // Handle title edit start
   const handleTitleEdit = () => {
@@ -437,6 +528,15 @@ export function WillEditor({ will }: WillEditorProps) {
               onOpenPreview={() => setShowAutoFillPreview(true)}
             />
           )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowOptionalClausesBrowser(true)}
+            className="gap-2"
+          >
+            <ListPlus className="h-4 w-4" />
+            Optional Clauses
+          </Button>
           {questionnaireContext && questionnaireContext.questions.length > 0 && (
             <Button
               variant="outline"
@@ -532,6 +632,14 @@ export function WillEditor({ will }: WillEditorProps) {
           onComplete={handleQuestionnaireComplete}
         />
       )}
+
+      {/* Optional Clauses Browser */}
+      <OptionalClausesBrowser
+        open={showOptionalClausesBrowser}
+        onOpenChange={setShowOptionalClausesBrowser}
+        selectedClauses={willContent.optionalClauses || []}
+        onClauseToggle={handleOptionalClauseToggle}
+      />
     </div>
   )
 }
