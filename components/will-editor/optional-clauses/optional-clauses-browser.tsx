@@ -9,15 +9,24 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { OptionalClauseDefinition, OptionalClauseSelection, OptionalClauseType } from '@/lib/types/optional-clauses';
 import {
   OPTIONAL_CLAUSES,
   getCategories,
   getClausesByCategory,
 } from '@/lib/optional-clauses/clause-definitions';
-import { ClauseCard } from './clause-card';
 import { ClauseDetailView } from './clause-detail-view';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Check, Plus } from 'lucide-react';
 
 interface OptionalClausesBrowserProps {
   open: boolean;
@@ -75,9 +84,9 @@ export function OptionalClausesBrowser({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] !max-w-[1600px] h-[90vh] overflow-hidden flex flex-col">
         {viewMode === 'browse' ? (
-          <>
+          <div className="flex flex-col flex-1 overflow-hidden">
             <DialogHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -95,7 +104,7 @@ export function OptionalClausesBrowser({
               </div>
             </DialogHeader>
 
-            <Tabs defaultValue="all" className="mt-4">
+            <Tabs defaultValue="all" className="mt-4 flex flex-col flex-1 overflow-hidden">
               <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="all">
                   All ({OPTIONAL_CLAUSES.length})
@@ -107,19 +116,85 @@ export function OptionalClausesBrowser({
                 ))}
               </TabsList>
 
-              <TabsContent value="all" className="space-y-4 mt-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {OPTIONAL_CLAUSES.map((clause) => (
-                    <ClauseCard
-                      key={clause.type}
-                      clause={clause}
-                      isSelected={isClauseSelected(clause.type)}
-                      isCompleted={isClauseCompleted(clause.type)}
-                      onToggle={() => handleToggle(clause.type)}
-                      onViewDetails={() => handleViewDetails(clause)}
-                    />
-                  ))}
-                </div>
+              <TabsContent value="all" className="mt-4 overflow-auto flex-1 h-full min-h-0">
+                <Table>
+                  <TableHeader className="sticky top-0 bg-background z-10">
+                    <TableRow>
+                      <TableHead className="w-[25%]">Clause</TableHead>
+                      <TableHead className="w-[45%]">Description</TableHead>
+                      <TableHead className="w-[10%]">Status</TableHead>
+                      <TableHead className="w-[20%] text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {OPTIONAL_CLAUSES.map((clause) => {
+                      const isSelected = isClauseSelected(clause.type);
+                      const isCompleted = isClauseCompleted(clause.type);
+
+                      return (
+                        <TableRow
+                          key={clause.type}
+                          className="cursor-pointer hover:bg-muted/50 transition-colors"
+                          onClick={() => handleViewDetails(clause)}
+                        >
+                          <TableCell className="font-medium">
+                            <div className="line-clamp-2">{clause.title}</div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                              {clause.description}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {isSelected && (
+                              <Badge variant={isCompleted ? 'default' : 'secondary'} className="text-xs">
+                                {isCompleted ? (
+                                  <>
+                                    <Check className="h-3 w-3 mr-1" />
+                                    Added
+                                  </>
+                                ) : (
+                                  'Incomplete'
+                                )}
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <Button
+                                variant={isSelected ? 'outline' : 'default'}
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleToggle(clause.type);
+                                }}
+                              >
+                                {isSelected ? (
+                                  <>Remove</>
+                                ) : (
+                                  <>
+                                    <Plus className="h-4 w-4 mr-1" />
+                                    Add
+                                  </>
+                                )}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleViewDetails(clause);
+                                }}
+                              >
+                                Details
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
               </TabsContent>
 
               {categories.map((cat) => {
@@ -128,25 +203,91 @@ export function OptionalClausesBrowser({
                   <TabsContent
                     key={cat.category}
                     value={cat.category}
-                    className="space-y-4 mt-4"
+                    className="mt-4 overflow-auto flex-1 h-full min-h-0"
                   >
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {clauses.map((clause) => (
-                        <ClauseCard
-                          key={clause.type}
-                          clause={clause}
-                          isSelected={isClauseSelected(clause.type)}
-                          isCompleted={isClauseCompleted(clause.type)}
-                          onToggle={() => handleToggle(clause.type)}
-                          onViewDetails={() => handleViewDetails(clause)}
-                        />
-                      ))}
-                    </div>
+                    <Table>
+                      <TableHeader className="sticky top-0 bg-background z-10">
+                        <TableRow>
+                          <TableHead className="w-[25%]">Clause</TableHead>
+                          <TableHead className="w-[45%]">Description</TableHead>
+                          <TableHead className="w-[10%]">Status</TableHead>
+                          <TableHead className="w-[20%] text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {clauses.map((clause) => {
+                          const isSelected = isClauseSelected(clause.type);
+                          const isCompleted = isClauseCompleted(clause.type);
+
+                          return (
+                            <TableRow
+                              key={clause.type}
+                              className="cursor-pointer hover:bg-muted/50 transition-colors"
+                              onClick={() => handleViewDetails(clause)}
+                            >
+                              <TableCell className="font-medium">
+                                <div className="line-clamp-2">{clause.title}</div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                                  {clause.description}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                {isSelected && (
+                                  <Badge variant={isCompleted ? 'default' : 'secondary'} className="text-xs">
+                                    {isCompleted ? (
+                                      <>
+                                        <Check className="h-3 w-3 mr-1" />
+                                        Added
+                                      </>
+                                    ) : (
+                                      'Incomplete'
+                                    )}
+                                  </Badge>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex items-center justify-end gap-2">
+                                  <Button
+                                    variant={isSelected ? 'outline' : 'default'}
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleToggle(clause.type);
+                                    }}
+                                  >
+                                    {isSelected ? (
+                                      <>Remove</>
+                                    ) : (
+                                      <>
+                                        <Plus className="h-4 w-4 mr-1" />
+                                        Add
+                                      </>
+                                    )}
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleViewDetails(clause);
+                                    }}
+                                  >
+                                    Details
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
                   </TabsContent>
                 );
               })}
             </Tabs>
-          </>
+          </div>
         ) : (
           <>
             {selectedClause && (
