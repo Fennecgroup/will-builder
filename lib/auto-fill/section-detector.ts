@@ -90,6 +90,15 @@ const ARTICLE_PATTERNS: Record<WillArticle, RegExp[]> = {
     /COLLATION\s+EXCLUSION/i,
     /PRINCIPLE\s+OF\s+COLLATION/i,
   ],
+  LIVING_WILL: [
+    /ARTICLE\s+XIII\s*[-:]?\s*LIVING\s+WILL/i,
+    /ARTICLE\s+13\s*[-:]?\s*LIVING\s+WILL/i,
+    /ARTICLE\s+XIV\s*[-:]?\s*LIVING\s+WILL/i,
+    /ARTICLE\s+14\s*[-:]?\s*LIVING\s+WILL/i,
+    /LIVING\s+WILL/i,
+    /MEDICAL\s+DIRECTIVES/i,
+    /ADVANCE\s+DIRECTIVE/i,
+  ],
   ATTESTATION: [
     /ATTESTATION/i,
     /ATTESTATION\s+AND\s+SIGNATURES/i,

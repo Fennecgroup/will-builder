@@ -78,6 +78,18 @@ const SECTION_TOKEN_ESTIMATES: Record<keyof WillContent, (content: any, willCont
   dateExecuted: () => 10,  // Execution date
 
   placeExecuted: () => 10,  // Execution place
+
+  optionalClauses: (clauses: any[]) => {
+    return clauses?.length ? 60 + (clauses.length * 30) : 0;  // Base + per clause
+  },
+
+  livingWillDirectives: () => 200,  // Living will directives
+
+  petCareProvision: () => 150,  // Pet care provision
+
+  extendedBurialInstructions: () => 180,  // Extended burial instructions
+
+  noContestClauseData: () => 100,  // No contest clause data
 };
 
 /**

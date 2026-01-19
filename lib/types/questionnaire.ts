@@ -3,6 +3,7 @@
 
 import { Address } from './will';
 import { Child, Beneficiary, Executor, Guardian } from './will';
+import { LivingWillDirectives } from './optional-clauses';
 
 /**
  * Types of questions that can be asked
@@ -44,7 +45,7 @@ export interface QuestionnaireAnswer {
   questionId: string;
   questionType: QuestionType;
   timestamp: Date;
-  data: GuardianAnswer | TrusteeAnswer | SamePersonAnswer | ExecutorAnswer;
+  data: GuardianAnswer | TrusteeAnswer | SamePersonAnswer | ExecutorAnswer | LivingWillAnswer;
 }
 
 /**
@@ -96,6 +97,13 @@ export interface SamePersonAnswer {
 export interface ExecutorAnswer {
   executor: Omit<Executor, 'id'>;
   alternateExecutor?: Omit<Executor, 'id'>;
+}
+
+/**
+ * Answer for living will directives question
+ */
+export interface LivingWillAnswer {
+  directives: LivingWillDirectives;
 }
 
 /**

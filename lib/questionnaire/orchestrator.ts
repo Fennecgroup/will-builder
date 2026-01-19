@@ -9,6 +9,7 @@ import {
   TrusteeAnswer,
   SamePersonAnswer,
   ExecutorAnswer,
+  LivingWillAnswer,
 } from '@/lib/types/questionnaire';
 
 /**
@@ -278,10 +279,10 @@ export class QuestionnaireOrchestrator {
           break;
 
         case 'living-will-directives':
-          const livingWillAnswer = answer.data as import('@/lib/types/optional-clauses').LivingWillDirectives;
+          const livingWillAnswer = answer.data as LivingWillAnswer;
 
           // Update living will directives
-          updates.livingWillDirectives = livingWillAnswer;
+          updates.livingWillDirectives = livingWillAnswer.directives;
 
           // Mark the Living Will clause as completed
           const existingClauses = currentWillContent.optionalClauses || [];
@@ -290,7 +291,7 @@ export class QuestionnaireOrchestrator {
               return {
                 ...clause,
                 questionnaireCompleted: true,
-                data: livingWillAnswer,
+                data: livingWillAnswer.directives,
               };
             }
             return clause;
