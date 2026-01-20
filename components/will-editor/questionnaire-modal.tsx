@@ -44,7 +44,7 @@ export function QuestionnaireModal({
   // Handle answer submission
   const handleAnswer = async (data: any) => {
     if (!orchestrator || !currentQuestion) return;
-    debugger
+
     try {
       orchestrator.answerQuestion(currentQuestion.id, data);
 

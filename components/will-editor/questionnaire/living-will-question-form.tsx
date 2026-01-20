@@ -6,14 +6,14 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
-import { QuestionnaireQuestion } from '@/lib/types/questionnaire';
+import { QuestionnaireQuestion, LivingWillAnswer } from '@/lib/types/questionnaire';
 import { LivingWillDirectives } from '@/lib/types/optional-clauses';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Info } from 'lucide-react';
 
 interface LivingWillQuestionFormProps {
   question: QuestionnaireQuestion;
-  onSubmit: (data: LivingWillDirectives) => void;
+  onSubmit: (data: LivingWillAnswer) => void;
 }
 
 export function LivingWillQuestionForm({ question, onSubmit }: LivingWillQuestionFormProps) {
@@ -27,7 +27,8 @@ export function LivingWillQuestionForm({ question, onSubmit }: LivingWillQuestio
   });
 
   const handleSubmit = () => {
-    onSubmit(directives);
+    // Wrap directives in LivingWillAnswer structure
+    onSubmit({ directives });
   };
 
   return (

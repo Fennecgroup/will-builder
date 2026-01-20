@@ -279,6 +279,7 @@ export function WillEditor({ will }: WillEditorProps) {
         ...willContent,
         ...updates,
       }
+
       setWillContent(updatedContent)
       setHasUnsavedChanges(true)
 
@@ -287,22 +288,33 @@ export function WillEditor({ will }: WillEditorProps) {
         content: updatedContent,
       })
 
-      toast.success('Information added successfully')
-
-      // Trigger auto-fill regeneration
+      // Trigger auto-fill regeneration with the updated content
       const orchestrator = new AutoFillOrchestrator(updatedContent, editorValue)
 
-      // Auto-apply safe suggestions (guardians/trustees on new documents)
+      // Get all suggestions (should include Living Will if questionnaire was completed)
+      const suggestions = orchestrator.getSuggestions()
+
+      // Auto-apply all safe suggestions (including new sections like Living Will)
       const newEditorValue = orchestrator.applyAllSuggestions()
 
       // Update editor if any suggestions were applied
       if (newEditorValue !== editorValue) {
         setEditorValue(newEditorValue)
-        toast.success('Guardian and trustee clauses added to document')
+
+        // Show specific success message based on what was added
+        const addedSections = suggestions.filter(s => s.canAutoApply).map(s => s.section.article)
+
+        if (addedSections.includes('LIVING_WILL')) {
+          toast.success('Living Will clause added to document')
+        } else if (addedSections.length > 0) {
+          toast.success('Will sections added to document')
+        }
+      } else {
+        toast.success('Information saved successfully')
       }
 
-      // Update suggestions list (will be empty if all were auto-applied)
-      const remainingSuggestions = orchestrator.getSuggestions()
+      // Update suggestions list (remove those that were auto-applied)
+      const remainingSuggestions = suggestions.filter(s => !s.canAutoApply)
       setAutoFillSuggestions(remainingSuggestions)
     } catch (error) {
       toast.error('Failed to save information')

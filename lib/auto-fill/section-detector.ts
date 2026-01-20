@@ -312,6 +312,7 @@ export function findInsertionPoint(
     'RIGHT_OF_REPUDIATION',    // Article XI
     'JOINT_ASSET_CLAUSE',      // Article XII
     'COLLATION_EXCLUSION',     // Article XIII
+    'LIVING_WILL',             // Article XIV
     'ATTESTATION',
   ];
 
