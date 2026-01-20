@@ -132,7 +132,7 @@ export default async function DashboardPage() {
           </Card>
         ) : (
           <Card className="divide-y divide-neutral-200 dark:divide-neutral-800">
-            {recentWills.map((will) => (
+            {recentWills.map((will: any) => (
               <Link
                 key={will.id}
                 href={`/dashboard/wills/${will.id}`}
