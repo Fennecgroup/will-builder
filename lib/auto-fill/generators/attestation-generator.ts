@@ -89,6 +89,31 @@ export class AttestationGenerator extends BaseGenerator {
     content.push(this.createEmptyParagraph());
     content.push(this.createParagraph(`Date: ${dateExecuted || '__________________'}`));
 
+    // Add Commissioner of Oath section if clause is selected
+    const commissionerClause = this.context.willContent.optionalClauses?.find(
+      (c) => c.clauseType === 'commissioner-of-oath-attestation' && c.isSelected
+    );
+
+    if (commissionerClause) {
+      content.push(this.createEmptyParagraph());
+      content.push(this.createEmptyParagraph());
+      content.push(this.createParagraph('COMMISSIONER OF OATHS CERTIFICATION'));
+      content.push(this.createEmptyParagraph());
+      content.push(this.createParagraph('I, _________________________, Registration Number _________________, a Commissioner of Oaths duly appointed in the Republic of South Africa, do hereby certify that this Last Will and Testament was signed by the testator in my presence and in the presence of the witnesses named above.'));
+      content.push(this.createEmptyParagraph());
+      content.push(this.createParagraph('I further certify that the testator appeared to be of sound mind and under no undue influence or coercion, and that all signatures were affixed in the presence of all parties.'));
+      content.push(this.createEmptyParagraph());
+      content.push(this.createEmptyParagraph());
+      content.push(this.createParagraph('_____________________________'));
+      content.push(this.createParagraph('Commissioner of Oaths Signature'));
+      content.push(this.createEmptyParagraph());
+      content.push(this.createParagraph('Name: _____________________________'));
+      content.push(this.createParagraph('ID Number: _____________________________'));
+      content.push(this.createParagraph('Registration Number: _____________________________'));
+      content.push(this.createParagraph('Date: _____________________________'));
+      content.push(this.createParagraph('Place: _____________________________'));
+    }
+
     return content;
   }
 }

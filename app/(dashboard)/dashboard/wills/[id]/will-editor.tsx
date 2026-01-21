@@ -334,7 +334,8 @@ export function WillEditor({ will }: WillEditorProps) {
           {
             clauseType,
             isSelected: true,
-            questionnaireCompleted: false,
+            // Commissioner clause is immediately complete (no form needed)
+            questionnaireCompleted: clauseType === 'commissioner-of-oath-attestation' ? true : false,
             addedAt: new Date(),
           },
         ]
@@ -368,11 +369,25 @@ export function WillEditor({ will }: WillEditorProps) {
           }
         }
 
+        // If commissioner clause, trigger auto-fill to add blank fields
+        if (clauseType === 'commissioner-of-oath-attestation') {
+          const orchestrator = new AutoFillOrchestrator(updatedContent, editorValue)
+          const newEditorValue = orchestrator.applyAllSuggestions()
+
+          if (newEditorValue !== editorValue) {
+            setEditorValue(newEditorValue)
+            toast.success('Commissioner section added to document')
+          }
+
+          const suggestions = orchestrator.getSuggestions()
+          setAutoFillSuggestions(suggestions.filter(s => !s.canAutoApply))
+        }
+
       } else {
         // Remove the clause
         const updatedClauses = existingClauses.filter(c => c.clauseType !== clauseType)
 
-        const updatedContent = {
+        const updatedContent: WillContent = {
           ...willContent,
           optionalClauses: updatedClauses,
         }
@@ -386,6 +401,20 @@ export function WillEditor({ will }: WillEditorProps) {
         })
 
         toast.success('Optional clause removed')
+
+        // If commissioner clause was removed, trigger auto-fill to remove blank fields
+        if (clauseType === 'commissioner-of-oath-attestation') {
+          const orchestrator = new AutoFillOrchestrator(updatedContent, editorValue)
+          const newEditorValue = orchestrator.applyAllSuggestions()
+
+          if (newEditorValue !== editorValue) {
+            setEditorValue(newEditorValue)
+            toast.success('Commissioner section removed from document')
+          }
+
+          const suggestions = orchestrator.getSuggestions()
+          setAutoFillSuggestions(suggestions.filter(s => !s.canAutoApply))
+        }
       }
     } catch (error) {
       toast.error('Failed to update optional clause')

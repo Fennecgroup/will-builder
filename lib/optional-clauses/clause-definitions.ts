@@ -90,6 +90,29 @@ Note: South African courts will still review challenges based on mental capacity
     article: 'LIVING_WILL', // Will be changed when no-contest generator is created
     priority: 4,
   },
+  {
+    type: 'commissioner-of-oath-attestation',
+    title: 'Commissioner of Oath Attestation',
+    description: 'Add signature spaces for a Commissioner of Oaths to complete',
+    legalDescription: `This adds a certification section to your will that a Commissioner of Oaths can complete and sign when you execute your will. While not legally required under South African law, this optional safeguard:
+
+• Provides additional authentication of the will signing
+• Offers professional verification that all parties were present
+• May help prevent disputes about will validity
+• Is common practice for high-value or complex estates
+
+A Commissioner of Oaths is a person authorized by law to witness signatures, administer oaths, and certify documents.
+
+When you select this clause, blank fields will be added to your printed will for the Commissioner to fill in and sign manually. The Commissioner will complete their details (name, ID, registration number, date, and place) when they witness the signing ceremony.
+
+Note: This is an optional enhancement. South African law only requires the testator's signature and two witnesses.`,
+    category: 'legal-protection',
+    icon: 'ShieldCheck',
+    requiresQuestionnaire: false,
+    jurisdictionSupport: ['ZA'],
+    article: 'ATTESTATION',
+    priority: 5,
+  },
 ];
 
 /**

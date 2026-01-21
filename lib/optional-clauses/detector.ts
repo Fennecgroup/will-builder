@@ -62,10 +62,15 @@ export class OptionalClausesDetector {
   analyze(
     selectedClauses: OptionalClauseSelection[] = []
   ): MissingInfoContext | null {
-    // Filter for selected but incomplete clauses
-    const incompleteClauses = selectedClauses.filter(
-      (clause) => clause.isSelected && !clause.questionnaireCompleted
-    );
+    // Filter for selected but incomplete clauses that REQUIRE questionnaires
+    const incompleteClauses = selectedClauses.filter((clause) => {
+      if (!clause.isSelected || clause.questionnaireCompleted) {
+        return false;
+      }
+      const clauseDefinition = getClauseDefinition(clause.clauseType);
+      // Only include clauses that require questionnaires
+      return clauseDefinition?.requiresQuestionnaire ?? false;
+    });
 
     if (incompleteClauses.length === 0) {
       return null;
@@ -136,13 +141,18 @@ export class OptionalClausesDetector {
   }
 
   /**
-   * Get all incomplete clauses (selected but not completed)
+   * Get all incomplete clauses (selected but not completed, and require questionnaires)
    */
   getIncompleteClauses(
     selectedClauses: OptionalClauseSelection[] = []
   ): OptionalClauseSelection[] {
-    return selectedClauses.filter(
-      (clause) => clause.isSelected && !clause.questionnaireCompleted
-    );
+    return selectedClauses.filter((clause) => {
+      if (!clause.isSelected || clause.questionnaireCompleted) {
+        return false;
+      }
+      const clauseDefinition = getClauseDefinition(clause.clauseType);
+      // Only include clauses that require questionnaires
+      return clauseDefinition?.requiresQuestionnaire ?? false;
+    });
   }
 }

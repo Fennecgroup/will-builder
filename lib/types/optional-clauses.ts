@@ -7,7 +7,8 @@ export type OptionalClauseType =
   | 'living-will'
   | 'pet-care-provision'
   | 'extended-burial-instructions'
-  | 'no-contest-clause';
+  | 'no-contest-clause'
+  | 'commissioner-of-oath-attestation';
   // Extensible for future clauses
 
 /**
