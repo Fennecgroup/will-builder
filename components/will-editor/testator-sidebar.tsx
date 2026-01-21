@@ -18,6 +18,7 @@ import {
   Mail,
   Calendar,
   Hash,
+  Key,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -176,9 +177,14 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
                 <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                   Total Value: {formatCurrency(totalAssetValue)}
                 </div>
-                {assets?.map((asset) => {
-                  const hasAllocations = asset.beneficiaryAllocations && asset.beneficiaryAllocations.length > 0;
-                  return (
+                {/* Create beneficiaries map for efficient ID-to-name lookups */}
+                {(() => {
+                  const beneficiariesMap = new Map(
+                    beneficiaries?.map(b => [b.id, b]) || []
+                  );
+                  return assets?.map((asset) => {
+                    const hasAllocations = asset.beneficiaryAllocations && asset.beneficiaryAllocations.length > 0;
+                    return (
                     <div key={asset.id} className="border-l-2 border-neutral-200 pl-3 dark:border-neutral-700">
                       <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                         {asset.description}
@@ -195,7 +201,7 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
                       {hasAllocations ? (
                         <div className="mt-2 space-y-1">
                           {asset.beneficiaryAllocations?.map((allocation, idx) => {
-                            const beneficiary = beneficiaries?.find(b => b.id === allocation.beneficiaryId);
+                            const beneficiary = beneficiariesMap.get(allocation.beneficiaryId);
                             return beneficiary ? (
                               <div key={idx} className="flex items-center gap-2 text-xs">
                                 <Badge variant="outline" className="text-xs">
@@ -208,14 +214,49 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
                             ) : null;
                           })}
                         </div>
+                      ) : asset.usufruct ? (
+                        <div className="mt-2 space-y-2">
+                          <Badge variant="outline" className="text-xs border-purple-400 text-purple-700 dark:border-purple-500 dark:text-purple-400">
+                            Usufruct
+                          </Badge>
+                          <div className="space-y-1.5">
+                            {/* Usufructuary */}
+                            <div className="flex items-start gap-2 text-xs">
+                              <UserCheck className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-teal-600 dark:text-teal-400" />
+                              <div className="flex-1">
+                                <span className="text-neutral-500">Usufructuary:</span>
+                                <span className="ml-1 text-neutral-900 dark:text-neutral-100 font-medium">
+                                  {beneficiariesMap.get(asset.usufruct.usufructuaryId)?.fullName || 'Unknown'}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Bare Dominium Owner */}
+                            <div className="flex items-start gap-2 text-xs">
+                              <Key className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+                              <div className="flex-1">
+                                <span className="text-neutral-500">Bare Owner:</span>
+                                <span className="ml-1 text-neutral-900 dark:text-neutral-100 font-medium">
+                                  {beneficiariesMap.get(asset.usufruct.bareDominiumOwnerId)?.fullName || 'Unknown'}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Termination info */}
+                            <div className="text-xs text-neutral-400 italic pl-5">
+                              Full ownership vests upon usufructuary's death
+                            </div>
+                          </div>
+                        </div>
                       ) : (
                         <Badge variant="secondary" className="mt-2 text-xs">
                           Unassigned
                         </Badge>
                       )}
                     </div>
-                  );
-                })}
+                    );
+                  });
+                })()}
               </div>
             </AccordionContent>
           </AccordionItem>
