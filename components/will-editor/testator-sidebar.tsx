@@ -80,6 +80,9 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
   const totalAssetValue = assets?.reduce((sum, asset) => sum + (asset.estimatedValue || 0), 0) || 0;
   const totalLiabilities = liabilities?.reduce((sum, liability) => sum + liability.amount, 0) || 0;
 
+  // Determine primary currency from assets (first asset's currency or default to ZAR)
+  const primaryCurrency = assets?.find(a => a.currency)?.currency || liabilities?.find(l => l.currency)?.currency || 'ZAR';
+
   return (
     <ScrollArea className="h-full">
       <div className="p-4">
@@ -175,7 +178,7 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
             <AccordionContent>
               <div className="space-y-3 pl-6">
                 <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                  Total Value: {formatCurrency(totalAssetValue)}
+                  Total Value: {formatCurrency(totalAssetValue, primaryCurrency)}
                 </div>
                 {/* Create beneficiaries map for efficient ID-to-name lookups */}
                 {(() => {
@@ -505,7 +508,7 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
             <AccordionContent>
               <div className="space-y-3 pl-6">
                 <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                  Total: {formatCurrency(totalLiabilities)}
+                  Total: {formatCurrency(totalLiabilities, primaryCurrency)}
                 </div>
                 {liabilities?.map((liability) => (
                   <div key={liability.id} className="border-l-2 border-neutral-200 pl-3 dark:border-neutral-700">
@@ -614,13 +617,13 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
             <div className="flex justify-between">
               <span className="text-neutral-500">Total Assets:</span>
               <span className="font-medium text-green-600 dark:text-green-400">
-                {formatCurrency(totalAssetValue)}
+                {formatCurrency(totalAssetValue, primaryCurrency)}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-neutral-500">Total Liabilities:</span>
               <span className="font-medium text-red-600 dark:text-red-400">
-                {formatCurrency(totalLiabilities)}
+                {formatCurrency(totalLiabilities, primaryCurrency)}
               </span>
             </div>
             <div className="border-t border-neutral-200 pt-1 dark:border-neutral-700">
@@ -629,7 +632,7 @@ export function TestatorSidebar({ willContent }: TestatorSidebarProps) {
                   Net Estate:
                 </span>
                 <span className="font-bold text-neutral-900 dark:text-neutral-100">
-                  {formatCurrency(totalAssetValue - totalLiabilities)}
+                  {formatCurrency(totalAssetValue - totalLiabilities, primaryCurrency)}
                 </span>
               </div>
             </div>
