@@ -1,7 +1,7 @@
 // Attestation Generator
 // Generates attestation and signature clause
 
-import { WillArticle, WillSection, PlateNode } from '../types';
+import { WillArticle, WillSection, PlateNode, ARTICLE_TITLES } from '../types';
 import { BaseGenerator } from './base-generator';
 import { formatAttestationClause } from '../legal-templates/south-african';
 
@@ -58,7 +58,7 @@ export class AttestationGenerator extends BaseGenerator {
     content.push(this.createEmptyParagraph());
 
     // Attestation heading
-    content.push(this.createHeading(2, 'ATTESTATION AND SIGNATURES'));
+    content.push(this.createHeading(2, ARTICLE_TITLES[this.getArticle()]));
     content.push(this.createEmptyParagraph());
 
     // Convert witnesses to expected format

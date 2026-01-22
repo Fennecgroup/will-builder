@@ -17,7 +17,7 @@ export type {
   ValidationResult,
 } from './types';
 
-export { ARTICLE_TITLES, ARTICLE_ORDER } from './types';
+export { ARTICLE_TITLES, ARTICLE_TITLES_EDITOR, ARTICLE_ORDER } from './types';
 
 // Orchestrator
 export { AutoFillOrchestrator } from './orchestrator';

@@ -1,5 +1,6 @@
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import { WillContent } from '@/lib/types/will'
+import { getPresentArticles, createPdfArticleTitles } from '@/lib/auto-fill/pdf-utils'
 
 const styles = StyleSheet.create({
   page: {
@@ -88,6 +89,10 @@ interface WillPDFTemplateProps {
 }
 
 export function WillPDFTemplate({ title, content, createdAt }: WillPDFTemplateProps) {
+  // Calculate which articles are present and generate dynamic numbering
+  const presentArticles = getPresentArticles(content)
+  const articleTitles = createPdfArticleTitles(presentArticles)
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -108,18 +113,18 @@ export function WillPDFTemplate({ title, content, createdAt }: WillPDFTemplatePr
           </Text>
         </View>
 
-        {/* Article I - Revocation */}
+        {/* Revocation */}
         {content.revocationClause && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>ARTICLE I - REVOCATION</Text>
+            <Text style={styles.sectionTitle}>{articleTitles.REVOCATION}</Text>
             <Text style={styles.text}>{content.revocationClause}</Text>
           </View>
         )}
 
-        {/* Article II - Declaration */}
+        {/* Declaration */}
         {content.testator && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>ARTICLE II - DECLARATION</Text>
+            <Text style={styles.sectionTitle}>{articleTitles.DECLARATION}</Text>
             <Text style={styles.text}>
               I, <Text style={styles.bold}>{content.testator.fullName}</Text>, Identity Number{' '}
               <Text style={styles.bold}>{content.testator.idNumber}</Text>, of{' '}
@@ -130,10 +135,10 @@ export function WillPDFTemplate({ title, content, createdAt }: WillPDFTemplatePr
           </View>
         )}
 
-        {/* Article III - Family Information */}
+        {/* Family Information */}
         {content.marriage && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>ARTICLE III - FAMILY INFORMATION</Text>
+            <Text style={styles.sectionTitle}>{articleTitles.FAMILY_INFO}</Text>
             <Text style={styles.text}>
               Marital Status: <Text style={styles.bold}>{content.marriage.status}</Text>
             </Text>
@@ -170,10 +175,10 @@ export function WillPDFTemplate({ title, content, createdAt }: WillPDFTemplatePr
           </View>
         )}
 
-        {/* Article IV - Appointment of Executor */}
+        {/* Appointment of Executor */}
         {content.executors && content.executors.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>ARTICLE IV - APPOINTMENT OF EXECUTOR</Text>
+            <Text style={styles.sectionTitle}>{articleTitles.EXECUTORS}</Text>
             {content.executors
               .filter((e) => !e.isAlternate)
               .map((executor, index) => (
@@ -200,10 +205,10 @@ export function WillPDFTemplate({ title, content, createdAt }: WillPDFTemplatePr
           </View>
         )}
 
-        {/* Article V - Guardianship */}
+        {/* Guardianship */}
         {content.guardians && content.guardians.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>ARTICLE V - GUARDIANSHIP OF MINOR CHILDREN</Text>
+            <Text style={styles.sectionTitle}>{articleTitles.GUARDIANS}</Text>
             {content.guardians
               .filter((g) => !g.isAlternate)
               .map((guardian, index) => (
@@ -230,18 +235,18 @@ export function WillPDFTemplate({ title, content, createdAt }: WillPDFTemplatePr
           </View>
         )}
 
-        {/* Article VI - Minor Beneficiary Provisions */}
+        {/* Minor Beneficiary Provisions */}
         {content.minorBeneficiaryProvisions && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>ARTICLE VI - MINOR BENEFICIARY PROVISIONS</Text>
+            <Text style={styles.sectionTitle}>{articleTitles.MINOR_PROVISIONS}</Text>
             <Text style={styles.text}>{content.minorBeneficiaryProvisions.instructions}</Text>
           </View>
         )}
 
-        {/* Article VII - Specific Bequests */}
+        {/* Specific Bequests */}
         {content.specificBequests && content.specificBequests.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>ARTICLE VII - SPECIFIC BEQUESTS</Text>
+            <Text style={styles.sectionTitle}>{articleTitles.SPECIFIC_BEQUESTS}</Text>
             <Text style={styles.text}>I give, devise, and bequeath the following specific items:</Text>
             {content.specificBequests.map((bequest, index) => {
               const beneficiary = content.beneficiaries.find((b) => b.id === bequest.beneficiaryId)
@@ -306,10 +311,10 @@ export function WillPDFTemplate({ title, content, createdAt }: WillPDFTemplatePr
           </View>
         )}
 
-        {/* Article XI - Residuary Estate */}
+        {/* Residuary Estate */}
         {content.residuaryClause && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>ARTICLE XI - RESIDUARY ESTATE</Text>
+            <Text style={styles.sectionTitle}>{articleTitles.RESIDUARY_ESTATE}</Text>
             <Text style={styles.text}>{content.residuaryClause}</Text>
           </View>
         )}
@@ -342,7 +347,7 @@ export function WillPDFTemplate({ title, content, createdAt }: WillPDFTemplatePr
 
         {/* Attestation Clause */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>ATTESTATION</Text>
+          <Text style={styles.sectionTitle}>{articleTitles.ATTESTATION}</Text>
           <Text style={styles.text}>
             {content.attestationClause ||
               `SIGNED at ${content.placeExecuted || '[City]'} on this ${content.dateExecuted || '[Date]'}, in the presence of the undersigned witnesses, who attest and bear witness to the signing hereof by me and by each other in the presence of me and of each other, all being present together at the same time.`}

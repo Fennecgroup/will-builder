@@ -1,7 +1,7 @@
 // Minor Provisions Generator (Article VI)
 // Generates provisions for minor beneficiaries
 
-import { WillArticle, WillSection, PlateNode } from '../types';
+import { WillArticle, WillSection, PlateNode, ARTICLE_TITLES } from '../types';
 import { BaseGenerator } from './base-generator';
 import { formatMinorProvisionsClause } from '../legal-templates/south-african';
 
@@ -68,7 +68,7 @@ export class MinorProvisionsGenerator extends BaseGenerator {
     const guardians = this.context.willContent.guardians || [];
 
     // Article heading
-    content.push(this.createHeading(2, 'ARTICLE VI - MINOR BENEFICIARY PROVISIONS'));
+    content.push(this.createHeading(2, ARTICLE_TITLES[this.getArticle()]));
     content.push(this.createEmptyParagraph());
 
     // Get primary guardian name if available (not alternate)

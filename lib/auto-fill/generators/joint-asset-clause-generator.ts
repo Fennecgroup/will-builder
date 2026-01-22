@@ -1,7 +1,7 @@
 // Joint Asset Clause Generator
 // Generates universal joint asset division clause for multiple beneficiaries
 
-import { WillArticle, WillSection, PlateNode } from '../types';
+import { WillArticle, WillSection, PlateNode, ARTICLE_TITLES } from '../types';
 import { BaseGenerator } from './base-generator';
 import { formatJointAssetClause } from '../legal-templates/south-african';
 
@@ -62,7 +62,7 @@ export class JointAssetClauseGenerator extends BaseGenerator {
 
     // Section heading
     content.push(this.createEmptyParagraph());
-    content.push(this.createHeading(2, 'ARTICLE XI - JOINT ASSET CLAUSE'));
+    content.push(this.createHeading(2, ARTICLE_TITLES[this.getArticle()]));
     content.push(this.createEmptyParagraph());
 
     // Universal joint asset clause (applies to all jointly bequeathed assets)

@@ -1,7 +1,7 @@
 // Inheritance Exclusions Generator
 // Generates general protection clause for all beneficiaries
 
-import { WillArticle, WillSection, PlateNode } from '../types';
+import { WillArticle, WillSection, PlateNode, ARTICLE_TITLES } from '../types';
 import { BaseGenerator } from './base-generator';
 import { formatGeneralInheritanceExclusionClause } from '../legal-templates/south-african';
 
@@ -65,7 +65,7 @@ export class InheritanceExclusionsGenerator extends BaseGenerator {
 
     // Section heading
     content.push(this.createEmptyParagraph());
-    content.push(this.createHeading(2, 'ARTICLE IX - INHERITANCE EXCLUSIONS'));
+    content.push(this.createHeading(2, ARTICLE_TITLES[this.getArticle()]));
     content.push(this.createEmptyParagraph());
 
     // General protection clause (applies to all beneficiaries)

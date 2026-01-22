@@ -2,7 +2,7 @@
 // Generates specific bequest clauses from asset allocations
 
 import { Asset, Beneficiary } from '@/lib/types/will';
-import { WillArticle, WillSection, BeneficiaryAllocation } from '../types';
+import { WillArticle, WillSection, BeneficiaryAllocation, PlateNode, ARTICLE_TITLES } from '../types';
 import { BaseGenerator } from './base-generator';
 import {
   formatSpecificBequest,
@@ -118,7 +118,7 @@ export class SpecificBequestsGenerator extends BaseGenerator {
     const content = [];
 
     // Article heading
-    content.push(this.createHeading(2, 'ARTICLE VII - SPECIFIC BEQUESTS'));
+    content.push(this.createHeading(2, ARTICLE_TITLES[this.getArticle()]));
     content.push(this.createEmptyParagraph());
 
     // Intro paragraph

@@ -19,85 +19,113 @@ const ARTICLE_PATTERNS: Record<WillArticle, RegExp[]> = {
     /TESTATOR\s*[:]/i,
   ],
   REVOCATION: [
-    /ARTICLE\s+I\s*[-:]?\s*REVOCATION/i,
-    /ARTICLE\s+1\s*[-:]?\s*REVOCATION/i,
-    /REVOCATION\s+OF\s+PREVIOUS\s+WILLS/i,
+    /ARTICLE\s+I\s*[-:]?\s*REVOCATION/i,          // Legacy: "ARTICLE I - REVOCATION"
+    /ARTICLE\s+1\s*[-:]?\s*REVOCATION/i,          // Legacy: "ARTICLE 1 - REVOCATION"
+    /^REVOCATION\s*$/i,                            // New: "REVOCATION"
+    /REVOCATION\s+OF\s+PREVIOUS\s+WILLS/i,        // Alternative
   ],
   DECLARATION: [
-    /ARTICLE\s+II\s*[-:]?\s*DECLARATION/i,
-    /ARTICLE\s+2\s*[-:]?\s*DECLARATION/i,
+    /ARTICLE\s+II\s*[-:]?\s*DECLARATION/i,        // Legacy: "ARTICLE II - DECLARATION"
+    /ARTICLE\s+2\s*[-:]?\s*DECLARATION/i,         // Legacy: "ARTICLE 2 - DECLARATION"
+    /^DECLARATION\s*$/i,                           // New: "DECLARATION"
   ],
   FAMILY_INFO: [
-    /ARTICLE\s+III\s*[-:]?\s*FAMILY/i,
-    /ARTICLE\s+3\s*[-:]?\s*FAMILY/i,
-    /FAMILY\s+INFORMATION/i,
+    /ARTICLE\s+III\s*[-:]?\s*FAMILY/i,            // Legacy
+    /ARTICLE\s+3\s*[-:]?\s*FAMILY/i,              // Legacy
+    /^FAMILY\s+INFORMATION\s*$/i,                  // New: "FAMILY INFORMATION"
+    /FAMILY\s+INFORMATION/i,                       // General match
   ],
   EXECUTORS: [
-    /ARTICLE\s+IV\s*[-:]?\s*EXECUTOR/i,
-    /ARTICLE\s+4\s*[-:]?\s*EXECUTOR/i,
-    /APPOINTMENT\s+OF\s+EXECUTOR/i,
+    /ARTICLE\s+IV\s*[-:]?\s*EXECUTOR/i,           // Legacy
+    /ARTICLE\s+4\s*[-:]?\s*EXECUTOR/i,            // Legacy
+    /^APPOINTMENT\s+OF\s+EXECUTOR\s*$/i,           // New: "APPOINTMENT OF EXECUTOR"
+    /APPOINTMENT\s+OF\s+EXECUTOR/i,                // General match
   ],
   GUARDIANS: [
-    /ARTICLE\s+V\s*[-:]?\s*GUARDIAN/i,
-    /ARTICLE\s+5\s*[-:]?\s*GUARDIAN/i,
-    /GUARDIANSHIP/i,
+    /ARTICLE\s+V\s*[-:]?\s*GUARDIAN/i,            // Legacy
+    /ARTICLE\s+5\s*[-:]?\s*GUARDIAN/i,            // Legacy
+    /^GUARDIANSHIP\s*$/i,                          // New: "GUARDIANSHIP"
+    /GUARDIANSHIP/i,                               // General match
   ],
   MINOR_PROVISIONS: [
-    /ARTICLE\s+VI\s*[-:]?\s*MINOR/i,
-    /ARTICLE\s+6\s*[-:]?\s*MINOR/i,
-    /MINOR\s+BENEFICIARY\s+PROVISIONS/i,
+    /ARTICLE\s+VI\s*[-:]?\s*MINOR/i,              // Legacy
+    /ARTICLE\s+6\s*[-:]?\s*MINOR/i,               // Legacy
+    /^MINOR\s+BENEFICIARY\s+PROVISIONS\s*$/i,      // New: "MINOR BENEFICIARY PROVISIONS"
+    /MINOR\s+BENEFICIARY\s+PROVISIONS/i,           // General match
   ],
   USUFRUCT_BEQUESTS: [
-    /ARTICLE\s+VII\s*[-:]?\s*USUFRUCT/i,
-    /ARTICLE\s+7\s*[-:]?\s*USUFRUCT/i,
-    /USUFRUCT\s+BEQUESTS/i,
-    /USUFRUCT\s+ARRANGEMENTS/i,
+    /ARTICLE\s+VII\s*[-:]?\s*USUFRUCT/i,          // Legacy
+    /ARTICLE\s+7\s*[-:]?\s*USUFRUCT/i,            // Legacy
+    /^USUFRUCT\s+BEQUESTS\s*$/i,                   // New: "USUFRUCT BEQUESTS"
+    /USUFRUCT\s+BEQUESTS/i,                        // General match
+    /USUFRUCT\s+ARRANGEMENTS/i,                    // Alternative
   ],
   SPECIFIC_BEQUESTS: [
-    /ARTICLE\s+VII\s*[-:]?\s*SPECIFIC/i,
-    /ARTICLE\s+7\s*[-:]?\s*SPECIFIC/i,
-    /SPECIFIC\s+BEQUESTS/i,
-    /SPECIFIC\s+LEGACIES/i,
+    /ARTICLE\s+VIII\s*[-:]?\s*SPECIFIC/i,         // Legacy (Article VIII)
+    /ARTICLE\s+VII\s*[-:]?\s*SPECIFIC/i,          // Legacy (Article VII - old numbering)
+    /ARTICLE\s+8\s*[-:]?\s*SPECIFIC/i,            // Legacy
+    /ARTICLE\s+7\s*[-:]?\s*SPECIFIC/i,            // Legacy
+    /^SPECIFIC\s+BEQUESTS\s*$/i,                   // New: "SPECIFIC BEQUESTS"
+    /SPECIFIC\s+BEQUESTS/i,                        // General match
+    /SPECIFIC\s+LEGACIES/i,                        // Alternative
   ],
   RESIDUARY_ESTATE: [
-    /ARTICLE\s+VIII\s*[-:]?\s*RESIDUARY/i,
-    /ARTICLE\s+8\s*[-:]?\s*RESIDUARY/i,
-    /RESIDUARY\s+ESTATE/i,
-    /RESIDUE\s+OF\s+ESTATE/i,
+    /ARTICLE\s+IX\s*[-:]?\s*RESIDUARY/i,          // Legacy (Article IX)
+    /ARTICLE\s+VIII\s*[-:]?\s*RESIDUARY/i,        // Legacy (Article VIII - old numbering)
+    /ARTICLE\s+XI\s*[-:]?\s*RESIDUARY/i,          // Legacy (current PDF uses Article XI)
+    /ARTICLE\s+9\s*[-:]?\s*RESIDUARY/i,           // Legacy
+    /ARTICLE\s+8\s*[-:]?\s*RESIDUARY/i,           // Legacy
+    /ARTICLE\s+11\s*[-:]?\s*RESIDUARY/i,          // Legacy
+    /^RESIDUARY\s+ESTATE\s*$/i,                    // New: "RESIDUARY ESTATE"
+    /RESIDUARY\s+ESTATE/i,                         // General match
+    /RESIDUE\s+OF\s+ESTATE/i,                      // Alternative
   ],
   INHERITANCE_EXCLUSIONS: [
-    /ARTICLE\s+IX\s*[-:]?\s*INHERITANCE/i,
-    /ARTICLE\s+9\s*[-:]?\s*INHERITANCE/i,
-    /INHERITANCE\s+EXCLUSIONS/i,
-    /COMMUNITY\s+OF\s+PROPERTY\s+EXCLUSION/i,
+    /ARTICLE\s+X\s*[-:]?\s*INHERITANCE/i,         // Legacy
+    /ARTICLE\s+IX\s*[-:]?\s*INHERITANCE/i,        // Legacy (old numbering)
+    /ARTICLE\s+10\s*[-:]?\s*INHERITANCE/i,        // Legacy
+    /ARTICLE\s+9\s*[-:]?\s*INHERITANCE/i,         // Legacy
+    /^INHERITANCE\s+EXCLUSIONS\s*$/i,              // New: "INHERITANCE EXCLUSIONS"
+    /INHERITANCE\s+EXCLUSIONS/i,                   // General match
+    /COMMUNITY\s+OF\s+PROPERTY\s+EXCLUSION/i,      // Alternative
   ],
   RIGHT_OF_REPUDIATION: [
-    /ARTICLE\s+X\s*[-:]?\s*RIGHT\s+OF\s+REPUDIATION/i,
-    /ARTICLE\s+10\s*[-:]?\s*RIGHT\s+OF\s+REPUDIATION/i,
-    /RIGHT\s+OF\s+REPUDIATION/i,
-    /REPUDIATION/i,
+    /ARTICLE\s+XI\s*[-:]?\s*RIGHT\s+OF\s+REPUDIATION/i,  // Legacy
+    /ARTICLE\s+X\s*[-:]?\s*RIGHT\s+OF\s+REPUDIATION/i,   // Legacy (old numbering)
+    /ARTICLE\s+11\s*[-:]?\s*RIGHT\s+OF\s+REPUDIATION/i,  // Legacy
+    /ARTICLE\s+10\s*[-:]?\s*RIGHT\s+OF\s+REPUDIATION/i,  // Legacy
+    /^RIGHT\s+OF\s+REPUDIATION\s*$/i,              // New: "RIGHT OF REPUDIATION"
+    /RIGHT\s+OF\s+REPUDIATION/i,                   // General match
+    /REPUDIATION/i,                                // Alternative
   ],
   JOINT_ASSET_CLAUSE: [
-    /ARTICLE\s+XI\s*[-:]?\s*JOINT\s+ASSET/i,
-    /ARTICLE\s+11\s*[-:]?\s*JOINT\s+ASSET/i,
-    /JOINT\s+ASSET\s+CLAUSE/i,
-    /JOINT\s+ASSET\s+DIVISION/i,
-    /BENEFICIARIES\s+TO\s+AGREE\s+AMONGST\s+THEMSELVES/i,
+    /ARTICLE\s+XII\s*[-:]?\s*JOINT\s+ASSET/i,     // Legacy
+    /ARTICLE\s+XI\s*[-:]?\s*JOINT\s+ASSET/i,      // Legacy (old numbering)
+    /ARTICLE\s+12\s*[-:]?\s*JOINT\s+ASSET/i,      // Legacy
+    /ARTICLE\s+11\s*[-:]?\s*JOINT\s+ASSET/i,      // Legacy
+    /^JOINT\s+ASSET\s+CLAUSE\s*$/i,                // New: "JOINT ASSET CLAUSE"
+    /JOINT\s+ASSET\s+CLAUSE/i,                     // General match
+    /JOINT\s+ASSET\s+DIVISION/i,                   // Alternative
+    /BENEFICIARIES\s+TO\s+AGREE\s+AMONGST\s+THEMSELVES/i,  // Alternative
   ],
   COLLATION_EXCLUSION: [
-    /ARTICLE\s+XII\s*[-:]?\s*COLLATION/i,
-    /ARTICLE\s+12\s*[-:]?\s*COLLATION/i,
-    /COLLATION\s+EXCLUSION/i,
-    /PRINCIPLE\s+OF\s+COLLATION/i,
+    /ARTICLE\s+XIII\s*[-:]?\s*COLLATION/i,        // Legacy
+    /ARTICLE\s+XII\s*[-:]?\s*COLLATION/i,         // Legacy (old numbering)
+    /ARTICLE\s+13\s*[-:]?\s*COLLATION/i,          // Legacy
+    /ARTICLE\s+12\s*[-:]?\s*COLLATION/i,          // Legacy
+    /^COLLATION\s+EXCLUSION\s*$/i,                 // New: "COLLATION EXCLUSION"
+    /COLLATION\s+EXCLUSION/i,                      // General match
+    /PRINCIPLE\s+OF\s+COLLATION/i,                 // Alternative
   ],
   LIVING_WILL: [
-    /ARTICLE\s+XIII\s*[-:]?\s*LIVING\s+WILL/i,
-    /ARTICLE\s+13\s*[-:]?\s*LIVING\s+WILL/i,
-    /ARTICLE\s+XIV\s*[-:]?\s*LIVING\s+WILL/i,
-    /ARTICLE\s+14\s*[-:]?\s*LIVING\s+WILL/i,
-    /LIVING\s+WILL/i,
-    /MEDICAL\s+DIRECTIVES/i,
-    /ADVANCE\s+DIRECTIVE/i,
+    /ARTICLE\s+XIV\s*[-:]?\s*LIVING\s+WILL/i,     // Legacy
+    /ARTICLE\s+XIII\s*[-:]?\s*LIVING\s+WILL/i,    // Legacy (old numbering)
+    /ARTICLE\s+14\s*[-:]?\s*LIVING\s+WILL/i,      // Legacy
+    /ARTICLE\s+13\s*[-:]?\s*LIVING\s+WILL/i,      // Legacy
+    /^LIVING\s+WILL\s*$/i,                         // New: "LIVING WILL"
+    /LIVING\s+WILL/i,                              // General match
+    /MEDICAL\s+DIRECTIVES/i,                       // Alternative
+    /ADVANCE\s+DIRECTIVE/i,                        // Alternative
   ],
   ATTESTATION: [
     /ATTESTATION/i,

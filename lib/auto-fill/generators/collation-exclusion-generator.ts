@@ -1,7 +1,7 @@
 // Collation Exclusion Generator
 // Generates universal collation exclusion clause for all beneficiaries
 
-import { WillArticle, WillSection, PlateNode } from '../types';
+import { WillArticle, WillSection, PlateNode, ARTICLE_TITLES } from '../types';
 import { BaseGenerator } from './base-generator';
 import { formatCollationExclusionClause } from '../legal-templates/south-african';
 
@@ -68,7 +68,7 @@ export class CollationExclusionGenerator extends BaseGenerator {
 
     // Section heading
     content.push(this.createEmptyParagraph());
-    content.push(this.createHeading(2, 'ARTICLE XII - COLLATION EXCLUSION'));
+    content.push(this.createHeading(2, ARTICLE_TITLES[this.getArticle()]));
     content.push(this.createEmptyParagraph());
 
     // Universal collation exclusion clause (applies to all beneficiaries)

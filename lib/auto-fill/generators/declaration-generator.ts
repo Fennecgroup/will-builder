@@ -1,7 +1,7 @@
 // Declaration Generator (Article II)
 // Generates declaration clause with testator information
 
-import { WillArticle, WillSection, PlateNode } from '../types';
+import { WillArticle, WillSection, PlateNode, ARTICLE_TITLES } from '../types';
 import { BaseGenerator } from './base-generator';
 import { formatDeclarationClause } from '../legal-templates/south-african';
 
@@ -65,7 +65,7 @@ export class DeclarationGenerator extends BaseGenerator {
     }
 
     // Article heading
-    content.push(this.createHeading(2, 'ARTICLE II - DECLARATION'));
+    content.push(this.createHeading(2, ARTICLE_TITLES[this.getArticle()]));
     content.push(this.createEmptyParagraph());
 
     // Declaration clause with testator info

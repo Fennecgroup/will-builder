@@ -2,7 +2,7 @@
 // Generates trustee appointment clause for minor beneficiaries
 // Creates Article VI - Minor Beneficiary Provisions with trustee details
 
-import { WillArticle, WillSection, PlateNode } from '../types';
+import { WillArticle, WillSection, PlateNode, ARTICLE_TITLES } from '../types';
 import { BaseGenerator } from './base-generator';
 import { formatTrusteeAppointment } from '../legal-templates/south-african';
 
@@ -99,7 +99,7 @@ export class TrusteesGenerator extends BaseGenerator {
     const ageOfInheritance = this.context.willContent.minorBeneficiaryProvisions?.ageOfInheritance;
 
     // Article heading
-    content.push(this.createHeading(2, 'ARTICLE VI - TRUSTEE APPOINTMENT'));
+    content.push(this.createHeading(2, ARTICLE_TITLES[this.getArticle()]));
     content.push(this.createEmptyParagraph());
 
     // Generate trustee appointment text with age parameter

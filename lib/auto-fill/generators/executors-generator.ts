@@ -1,7 +1,7 @@
 // Executors Generator (Article IV)
 // Generates executor appointment clause
 
-import { WillArticle, WillSection, PlateNode } from '../types';
+import { WillArticle, WillSection, PlateNode, ARTICLE_TITLES } from '../types';
 import { BaseGenerator } from './base-generator';
 import { formatExecutorAppointment } from '../legal-templates/south-african';
 
@@ -89,7 +89,7 @@ export class ExecutorsGenerator extends BaseGenerator {
     let executors = this.context.willContent.executors || [];
 
     // Article heading
-    content.push(this.createHeading(2, 'ARTICLE IV - APPOINTMENT OF EXECUTOR'));
+    content.push(this.createHeading(2, ARTICLE_TITLES[this.getArticle()]));
     content.push(this.createEmptyParagraph());
 
     // Auto-generate surviving spouse executor for mutual wills

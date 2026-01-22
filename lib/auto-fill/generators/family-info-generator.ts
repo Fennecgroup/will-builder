@@ -1,7 +1,7 @@
 // Family Info Generator (Article III)
 // Generates family information section
 
-import { WillArticle, WillSection, PlateNode } from '../types';
+import { WillArticle, WillSection, PlateNode, ARTICLE_TITLES } from '../types';
 import { BaseGenerator } from './base-generator';
 import { formatFamilyInfoSection } from '../legal-templates/south-african';
 
@@ -85,7 +85,7 @@ export class FamilyInfoGenerator extends BaseGenerator {
     const children = this.context.willContent.children;
 
     // Article heading
-    content.push(this.createHeading(2, 'ARTICLE III - FAMILY INFORMATION'));
+    content.push(this.createHeading(2, ARTICLE_TITLES[this.getArticle()]));
     content.push(this.createEmptyParagraph());
 
     // Family info text

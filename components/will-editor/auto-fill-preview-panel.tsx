@@ -14,7 +14,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { AutoFillSuggestion, WillArticle, ARTICLE_TITLES } from '@/lib/auto-fill';
+import { AutoFillSuggestion, WillArticle, ARTICLE_TITLES, ARTICLE_TITLES_EDITOR } from '@/lib/auto-fill';
 
 interface AutoFillPreviewPanelProps {
   suggestions: AutoFillSuggestion[];
@@ -90,9 +90,7 @@ export function AutoFillPreviewPanel({
                   value={suggestion.section.article}
                   className="text-xs"
                 >
-                  {suggestion.section.article === 'SPECIFIC_BEQUESTS'
-                    ? 'Article VII'
-                    : 'Article VIII'}
+                  {ARTICLE_TITLES_EDITOR[suggestion.section.article]}
                 </TabsTrigger>
               ))}
             </TabsList>

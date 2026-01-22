@@ -2,7 +2,7 @@
 // Generates usufruct clauses from assets with usufruct configuration
 
 import { Asset, Beneficiary } from '@/lib/types/will';
-import { WillArticle, WillSection } from '../types';
+import { WillArticle, WillSection, PlateNode, ARTICLE_TITLES } from '../types';
 import { BaseGenerator } from './base-generator';
 import {
   formatUsufructBequest,
@@ -96,7 +96,7 @@ export class UsufructBequestsGenerator extends BaseGenerator {
     const content = [];
 
     // Article heading
-    content.push(this.createHeading(2, 'ARTICLE VII - USUFRUCT BEQUESTS'));
+    content.push(this.createHeading(2, ARTICLE_TITLES[this.getArticle()]));
     content.push(this.createEmptyParagraph());
 
     // Intro paragraph

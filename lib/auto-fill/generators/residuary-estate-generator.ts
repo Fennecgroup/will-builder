@@ -2,7 +2,7 @@
 // Generates residuary estate clause from beneficiary allocation percentages
 
 import { Asset, Beneficiary } from '@/lib/types/will';
-import { WillArticle, WillSection } from '../types';
+import { WillArticle, WillSection, PlateNode, ARTICLE_TITLES } from '../types';
 import { BaseGenerator } from './base-generator';
 import {
   formatResiduaryClause,
@@ -100,7 +100,7 @@ export class ResiduaryEstateGenerator extends BaseGenerator {
     const content = [];
 
     // Article heading
-    content.push(this.createHeading(2, 'ARTICLE VIII - RESIDUARY ESTATE'));
+    content.push(this.createHeading(2, ARTICLE_TITLES[this.getArticle()]));
     content.push(this.createEmptyParagraph());
 
     // Residuary clause

@@ -1,7 +1,7 @@
 // Guardians Generator (Article V)
 // Generates guardian appointment clause for minor children
 
-import { WillArticle, WillSection, PlateNode } from '../types';
+import { WillArticle, WillSection, PlateNode, ARTICLE_TITLES } from '../types';
 import { BaseGenerator } from './base-generator';
 import { formatGuardianAppointment } from '../legal-templates/south-african';
 
@@ -85,7 +85,7 @@ export class GuardiansGenerator extends BaseGenerator {
     const children = this.context.willContent.children || [];
 
     // Article heading
-    content.push(this.createHeading(2, 'ARTICLE V - GUARDIANSHIP'));
+    content.push(this.createHeading(2, ARTICLE_TITLES[this.getArticle()]));
     content.push(this.createEmptyParagraph());
 
     // Guardian appointment text

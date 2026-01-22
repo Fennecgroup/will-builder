@@ -1,7 +1,7 @@
 // Living Will Generator (Article XIV)
 // Generates Living Will clause with medical directives
 
-import { WillArticle, WillSection, PlateNode } from '../types';
+import { WillArticle, WillSection, PlateNode, ARTICLE_TITLES } from '../types';
 import { BaseGenerator } from './base-generator';
 import {
   formatLivingWillDirectives,
@@ -85,7 +85,7 @@ export class LivingWillGenerator extends BaseGenerator {
     }
 
     // Article heading
-    content.push(this.createHeading(2, 'ARTICLE XIV - LIVING WILL'));
+    content.push(this.createHeading(2, ARTICLE_TITLES[this.getArticle()]));
     content.push(this.createEmptyParagraph());
 
     // Introduction
