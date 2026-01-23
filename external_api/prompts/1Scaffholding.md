@@ -1,0 +1,2 @@
+The will builder needs to accepts external testator information hence I would like to create an api in python using fast api.
+Let's start by creating the scaffholding for this in main.py in external api which will be it's main entry point

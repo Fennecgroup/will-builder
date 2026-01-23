@@ -1,0 +1,26 @@
+# FastAPI and ASGI server
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+
+# Pydantic for data validation
+pydantic==2.10.5
+pydantic-settings==2.7.1
+
+# Python environment variables
+python-dotenv==1.0.1
+
+# Database drivers (uncomment as needed)
+# sqlalchemy==2.0.36
+# psycopg2-binary==2.9.10  # PostgreSQL
+# pymongo==4.10.1  # MongoDB
+
+# HTTP client (for external API calls if needed)
+httpx==0.28.1
+
+# Security and authentication
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.20
+
+# Utilities
+email-validator==2.2.0
