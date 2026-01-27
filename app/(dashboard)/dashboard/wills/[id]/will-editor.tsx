@@ -253,6 +253,16 @@ export function WillEditor({ will }: WillEditorProps) {
     toast.success('Text inserted into editor');
   }, []);
 
+  // Handle AI agent edits
+  const handleAgentEdit = useCallback((newEditorValue: Value, changes: any[]) => {
+    setEditorValue(newEditorValue);
+    setHasUnsavedChanges(true);
+
+    toast.success('AI updated your document', {
+      description: `${changes.length} change${changes.length === 1 ? '' : 's'} applied`,
+    });
+  }, []);
+
   // Handle auto-fill apply
   const handleApplyAutoFill = useCallback((article: WillArticle, mode: 'replace' | 'merge') => {
     try {
@@ -535,18 +545,24 @@ export function WillEditor({ will }: WillEditorProps) {
               )}
             </div>
             <div className="flex items-center gap-2 text-sm text-neutral-500">
-              <Select value={status} onValueChange={handleStatusChange}>
-                <SelectTrigger className="h-6 w-auto border-0 p-0 focus:ring-0">
-                  <Badge className={getStatusColor(status)} variant="secondary">
-                    <SelectValue />
-                  </Badge>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="finalized">Finalized</SelectItem>
-                </SelectContent>
-              </Select>
+              {mounted ? (
+                <Select value={status} onValueChange={handleStatusChange}>
+                  <SelectTrigger className="h-6 w-auto border-0 p-0 focus:ring-0">
+                    <Badge className={getStatusColor(status)} variant="secondary">
+                      <SelectValue />
+                    </Badge>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="finalized">Finalized</SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Badge className={getStatusColor(status)} variant="secondary">
+                  {status}
+                </Badge>
+              )}
               <span className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
                 {isSaving ? (
@@ -641,7 +657,9 @@ export function WillEditor({ will }: WillEditorProps) {
         <aside className="w-[400px] h-full overflow-hidden">
           <AIChat
             onInsert={handleInsertFromChat}
+            onAgentEdit={handleAgentEdit}
             willContent={willContent}
+            editorValue={editorValue}
           />
         </aside>
       </div>

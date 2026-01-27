@@ -5,7 +5,7 @@ Configuration settings for the FastAPI application
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List
 from functools import lru_cache
-
+import os
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables"""
@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # Database settings (uncomment and configure as needed)
-    # DATABASE_URL: str = "postgresql://user:password@localhost:5432/will_builder"
+    DATABASE_URL: str = os.getenv("DATABASE_URL")
     # DATABASE_ECHO: bool = False
     # DATABASE_POOL_SIZE: int = 5
     # DATABASE_MAX_OVERFLOW: int = 10

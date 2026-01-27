@@ -71,6 +71,8 @@ class Address(BaseModel):
 class PersonalInfo(BaseModel):
     """Testator's personal information"""
     full_name: str = Field(..., min_length=2, max_length=200)
+    first_name: str = Field(..., min_length=1, max_length=100)
+    last_name: str = Field(..., min_length=1, max_length=100)
     id_number: str = Field(..., min_length=1, max_length=50, description="National ID or passport number")
     date_of_birth: date
     gender: Gender
@@ -96,6 +98,8 @@ class PersonalInfo(BaseModel):
 class Beneficiary(BaseModel):
     """Beneficiary information"""
     full_name: str = Field(..., min_length=2, max_length=200)
+    first_name: str = Field(..., min_length=1, max_length=100)
+    last_name: str = Field(..., min_length=1, max_length=100)
     id_number: Optional[str] = Field(None, max_length=50)
     relationship: RelationshipType
     email: Optional[EmailStr] = None
@@ -166,7 +170,7 @@ class SpecialProvision(BaseModel):
 class TestatorInfo(BaseModel):
     """Complete testator information for will creation"""
     personal_info: PersonalInfo
-    beneficiaries: List[Beneficiary] = Field(..., min_length=1)
+    beneficiaries: Optional[List[Beneficiary]] = Field(default=None)
     distributions: List[Distribution] = Field(..., min_length=1)
     assets: Optional[List[Asset]] = Field(default=None)
     executors: List[Executor] = Field(..., min_length=1, max_length=3)
