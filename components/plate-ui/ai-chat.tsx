@@ -41,6 +41,40 @@ interface AIChatProps {
   className?: string;
 }
 
+/**
+ * Recursively deanonymize all text content in a Plate editor value
+ */
+function deAnonymizeEditorValue(value: any, tokenMap: Record<string, string>): any {
+  if (!value) return value;
+
+  // Handle arrays (like the top-level editor value)
+  if (Array.isArray(value)) {
+    return value.map(item => deAnonymizeEditorValue(item, tokenMap));
+  }
+
+  // Handle objects (editor nodes)
+  if (typeof value === 'object') {
+    const result: any = { ...value };
+
+    // Deanonymize text content if present
+    if (typeof result.text === 'string') {
+      result.text = deAnonymizeText(result.text, tokenMap);
+    }
+
+    // Recursively process children
+    if (Array.isArray(result.children)) {
+      result.children = result.children.map((child: any) =>
+        deAnonymizeEditorValue(child, tokenMap)
+      );
+    }
+
+    return result;
+  }
+
+  // Return primitive values as-is
+  return value;
+}
+
 export function AIChat({ onInsert, onAgentEdit, willContent, editorValue, className }: AIChatProps) {
   const [mode, setMode] = React.useState<'ask' | 'agent'>(() => {
     if (typeof window !== 'undefined') {
@@ -159,7 +193,7 @@ Format your responses in a clear, readable way.`,
 
     const agentResponse: AgentResponse = await response.json();
 
-    console.log('Agent response:', agentResponse);
+    console.log('Agent response (before deanonymization):', agentResponse);
 
     // Validate response structure
     if (!agentResponse.explanation || !agentResponse.changes || !agentResponse.modifiedDocument) {
@@ -170,9 +204,25 @@ Format your responses in a clear, readable way.`,
       agentResponse.explanation = 'Changes applied successfully.';
     }
 
-    const displayExplanation = context
-      ? deAnonymizeText(agentResponse.explanation, Object.fromEntries(context.tokenMap))
-      : agentResponse.explanation;
+    // Deanonymize all text content if context is available
+    if (context) {
+      const tokenMap = Object.fromEntries(context.tokenMap);
+
+      // Deanonymize explanation
+      agentResponse.explanation = deAnonymizeText(agentResponse.explanation, tokenMap);
+
+      // Deanonymize changes array (location and content fields)
+      agentResponse.changes = agentResponse.changes.map(change => ({
+        ...change,
+        location: deAnonymizeText(change.location, tokenMap),
+        content: change.content ? deAnonymizeText(change.content, tokenMap) : change.content,
+      }));
+
+      // Deanonymize modifiedDocument (deep traversal of Plate editor nodes)
+      agentResponse.modifiedDocument = deAnonymizeEditorValue(agentResponse.modifiedDocument, tokenMap);
+
+      console.log('Agent response (after deanonymization):', agentResponse);
+    }
 
     const destructiveChanges = agentResponse.changes.filter(c =>
       c.type === 'delete' && c.confirmationRequired
@@ -197,7 +247,7 @@ Format your responses in a clear, readable way.`,
     const assistantMessage: Message = {
       id: (Date.now() + 1).toString(),
       role: 'assistant',
-      content: displayExplanation,
+      content: agentResponse.explanation,
       mode: 'agent',
       changes: agentResponse.changes,
     };
