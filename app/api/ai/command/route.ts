@@ -19,7 +19,7 @@ CAPABILITIES:
 - You have full access to the current document state and testator information
 
 RESPONSE FORMAT:
-You MUST respond with ONLY a valid JSON object (no markdown, no code blocks, just raw JSON):
+You MUST respond with a valid JSON object with the following structure:
 {
   "explanation": "Brief explanation of what changes you made and why",
   "changes": [
@@ -27,7 +27,7 @@ You MUST respond with ONLY a valid JSON object (no markdown, no code blocks, jus
       "type": "insert" | "replace" | "delete",
       "location": "Human-readable description of where the change was made (e.g., 'Added executor clause after Article 2', 'Replaced beneficiary section in Article 4')",
       "content": "The new/modified content (omit for delete)",
-      "confirmationRequired": true | false  // Set to true for destructive deletions
+      "confirmationRequired": true | false
     }
   ],
   "modifiedDocument": [/* Full updated Plate editor value array */]
@@ -41,24 +41,36 @@ RULES:
 5. Explain your reasoning in the "explanation" field
 6. Ensure "modifiedDocument" is valid Plate editor format (array of paragraph/heading blocks)
 7. Use tokens like [TESTATOR], [SPOUSE], [CHILD-1] when referencing people from context
+8. All JSON must be properly formatted with matching braces, brackets, and commas
+9. Ensure all strings are properly escaped and quoted
 
-IMPORTANT: Return ONLY the JSON object. Do NOT wrap it in markdown code blocks.`;
+CRITICAL: Return a complete, valid JSON object. Ensure all arrays and objects are properly closed.`;
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, system, messages, testatorContext, mode, editorContent } = await req.json();
+    const { prompt, system, messages, testatorContext, mode, editorContent, documentContext, fullEditorValue } = await req.json();
 
     // Choose behavior based on mode
     if (mode === 'agent') {
       // AGENT MODE: Return structured JSON
+      // Use optimized document context if provided, otherwise fall back to full document
+      const documentContextSection = documentContext
+        ? `\n${documentContext}`
+        : (editorContent ? `\nCURRENT DOCUMENT STATE:\n${JSON.stringify(editorContent, null, 2)}` : '');
+
       const enhancedSystem = testatorContext
         ? `${agentSystemPrompt}
 
 TESTATOR CONTEXT:
-${testatorContext}
+${testatorContext}${documentContextSection}
 
-CURRENT DOCUMENT STATE:
-${JSON.stringify(editorContent, null, 2)}`
+IMPORTANT: You have access to:
+- Active section (full detail) where the user is editing
+- Related sections (summaries) for context
+- Document outline showing all articles
+${fullEditorValue ? '- Full document provided as reference when needed' : ''}
+
+Use the context provided to make precise, informed edits.${fullEditorValue ? '\n\nFULL DOCUMENT (reference):\n' + JSON.stringify(fullEditorValue, null, 2) : ''}`
         : agentSystemPrompt;
 
       const result = await streamText({
@@ -71,6 +83,12 @@ ${JSON.stringify(editorContent, null, 2)}`
             content: prompt,
           },
         ],
+        // Enable JSON mode to ensure valid JSON output
+        experimental_providerMetadata: {
+          openai: {
+            response_format: { type: 'json_object' }
+          }
+        }
       });
 
       // Collect full response
@@ -87,8 +105,8 @@ ${JSON.stringify(editorContent, null, 2)}`
         cleanedResponse = cleanedResponse.replace(/^```\n/, '').replace(/\n```$/, '');
       }
 
-      console.log('Agent mode raw response:', fullResponse);
-      console.log('Agent mode cleaned response:', cleanedResponse);
+      console.log('Agent mode response length:', fullResponse.length);
+      console.log('Agent mode cleaned response preview:', cleanedResponse.substring(0, 500) + '...');
 
       let agentResponse;
       try {
@@ -100,8 +118,21 @@ ${JSON.stringify(editorContent, null, 2)}`
         }
       } catch (parseError) {
         console.error('JSON parse error:', parseError);
-        console.error('Failed response:', cleanedResponse);
-        throw new Error(`Failed to parse AI response: ${(parseError as Error).message}`);
+        console.error('Response length:', cleanedResponse.length);
+        console.error('First 1000 chars:', cleanedResponse.substring(0, 1000));
+        console.error('Last 1000 chars:', cleanedResponse.substring(Math.max(0, cleanedResponse.length - 1000)));
+
+        // Try to identify the error location
+        const errorMatch = (parseError as Error).message.match(/position (\d+)/);
+        if (errorMatch) {
+          const position = parseInt(errorMatch[1]);
+          const contextStart = Math.max(0, position - 200);
+          const contextEnd = Math.min(cleanedResponse.length, position + 200);
+          console.error('Error context:', cleanedResponse.substring(contextStart, contextEnd));
+          console.error('Error position marker:', ' '.repeat(Math.min(200, position - contextStart)) + '^');
+        }
+
+        throw new Error(`Failed to parse AI response: ${(parseError as Error).message}. Response may be truncated or malformed.`);
       }
 
       // Return JSON response

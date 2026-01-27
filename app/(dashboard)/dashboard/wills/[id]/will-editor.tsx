@@ -91,6 +91,9 @@ export function WillEditor({ will }: WillEditorProps) {
   // Optional clauses state
   const [showOptionalClausesBrowser, setShowOptionalClausesBrowser] = useState(false)
 
+  // Track active selection index for document context
+  const [activeSelectionIndex, setActiveSelectionIndex] = useState<number>(0)
+
   // Track mount state to avoid hydration mismatch
   useEffect(() => {
     setMounted(true)
@@ -660,6 +663,7 @@ export function WillEditor({ will }: WillEditorProps) {
             onAgentEdit={handleAgentEdit}
             willContent={willContent}
             editorValue={editorValue}
+            activeSelectionIndex={activeSelectionIndex}
           />
         </aside>
       </div>

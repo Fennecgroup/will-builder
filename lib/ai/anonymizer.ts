@@ -92,6 +92,12 @@ export class Anonymizer {
    * De-anonymize text by replacing tokens with actual values
    */
   deAnonymize(text: string, tokenMap: Map<string, string>): string {
+    // Safety check: ensure text is actually a string
+    if (typeof text !== 'string') {
+      console.error('[Anonymizer] deAnonymize called with non-string:', typeof text, text);
+      return String(text || '');
+    }
+
     let result = text;
 
     // Sort tokens by length (longest first) to avoid partial replacements

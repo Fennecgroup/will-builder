@@ -114,3 +114,11 @@ export const CONTEXT_RULES: Record<string, ContextRule> = {
     maxTokens: 400,
   },
 };
+
+/**
+ * Feature flags for AI functionality
+ */
+export const AI_FEATURES = {
+  useOptimizedDocumentContext: true,
+  fallbackToFullDocument: true,
+};

@@ -10,6 +10,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import type { WillContent } from '@/lib/types/will';
 import { buildTestatorContext, deAnonymizeText } from '@/lib/ai/context-builder';
+import { buildDocumentContext } from '@/lib/ai/document-context-builder';
+import { AI_FEATURES } from '@/lib/ai/types';
 import type { Value } from '@udecode/plate';
 
 interface AgentChange {
@@ -38,6 +40,7 @@ interface AIChatProps {
   onAgentEdit?: (editorValue: Value, changes: AgentChange[]) => void;
   willContent?: WillContent;
   editorValue?: Value;
+  activeSelectionIndex?: number;
   className?: string;
 }
 
@@ -75,7 +78,7 @@ function deAnonymizeEditorValue(value: any, tokenMap: Record<string, string>): a
   return value;
 }
 
-export function AIChat({ onInsert, onAgentEdit, willContent, editorValue, className }: AIChatProps) {
+export function AIChat({ onInsert, onAgentEdit, willContent, editorValue, activeSelectionIndex, className }: AIChatProps) {
   const [mode, setMode] = React.useState<'ask' | 'agent'>(() => {
     if (typeof window !== 'undefined') {
       return (localStorage.getItem('ai-chat-mode') as 'ask' | 'agent') || 'ask';
@@ -177,15 +180,51 @@ Format your responses in a clear, readable way.`,
   const handleAgentMode = React.useCallback(async (userInput: string, context: any) => {
     console.log('Agent mode request:', { userInput, context: context?.contextData });
 
+    // Build optimized document context if feature is enabled
+    let documentContext = null;
+    let requestBody: any = {
+      prompt: userInput,
+      mode: 'agent',
+      testatorContext: context?.contextData,
+    };
+
+    if (AI_FEATURES.useOptimizedDocumentContext && editorValue) {
+      try {
+        const docContext = buildDocumentContext({
+          editorValue,
+          userCommand: userInput,
+          activeSelectionIndex,
+          tokenBudget: 1700, // 85% of command budget (2000 tokens)
+        });
+
+        documentContext = docContext.formattedContext;
+
+        console.log('[AIChat] Document context built:', {
+          estimatedTokens: docContext.estimatedTokens,
+          activeSectionArticle: docContext.activeSectionArticle,
+          relatedSectionsCount: docContext.relatedSectionsSummaries.length,
+        });
+
+        requestBody.documentContext = documentContext;
+        requestBody.fullEditorValue = editorValue; // Keep for response reconstruction
+      } catch (error) {
+        console.error('[AIChat] Failed to build document context:', error);
+
+        // Fallback to full document if enabled
+        if (AI_FEATURES.fallbackToFullDocument) {
+          console.warn('[AIChat] Using fallback: sending full document');
+          requestBody.editorContent = editorValue;
+        }
+      }
+    } else {
+      // Feature disabled, use full document
+      requestBody.editorContent = editorValue;
+    }
+
     const response = await fetch('/api/ai/command', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt: userInput,
-        mode: 'agent',
-        editorContent: editorValue,
-        testatorContext: context?.contextData,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) throw new Error('Failed to get AI response');
@@ -208,13 +247,19 @@ Format your responses in a clear, readable way.`,
       const tokenMap = Object.fromEntries(context.tokenMap);
 
       // Deanonymize explanation
-      agentResponse.explanation = deAnonymizeText(agentResponse.explanation, tokenMap);
+      agentResponse.explanation = typeof agentResponse.explanation === 'string'
+        ? deAnonymizeText(agentResponse.explanation, tokenMap)
+        : agentResponse.explanation;
 
       // Deanonymize changes array (location and content fields)
       agentResponse.changes = agentResponse.changes.map(change => ({
         ...change,
-        location: deAnonymizeText(change.location, tokenMap),
-        content: change.content ? deAnonymizeText(change.content, tokenMap) : change.content,
+        location: typeof change.location === 'string'
+          ? deAnonymizeText(change.location, tokenMap)
+          : change.location,
+        content: change.content && typeof change.content === 'string'
+          ? deAnonymizeText(change.content, tokenMap)
+          : change.content,
       }));
 
       // Deanonymize modifiedDocument (deep traversal of Plate editor nodes)
@@ -252,7 +297,7 @@ Format your responses in a clear, readable way.`,
     };
 
     setMessages((prev) => [...prev, assistantMessage]);
-  }, [editorValue, onAgentEdit]);
+  }, [editorValue, activeSelectionIndex, onAgentEdit]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
