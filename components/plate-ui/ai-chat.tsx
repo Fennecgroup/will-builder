@@ -92,17 +92,16 @@ export function AIChat({ onInsert, onAgentEdit, willContent, editorValue, classN
   ]);
   const [input, setInput] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
-  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     localStorage.setItem('ai-chat-mode', mode);
   }, [mode]);
 
+  // Auto-scroll to bottom when messages change
   React.useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isLoading]);
 
   const handleAskMode = React.useCallback(async (userInput: string, context: any) => {
     console.log('Ask mode request:', { userInput, context: context?.contextData });
@@ -325,7 +324,7 @@ Format your responses in a clear, readable way.`,
       </div>
 
       {/* Messages - Scrollable */}
-      <ScrollArea className="flex-1 min-h-0 px-4" ref={scrollRef}>
+      <ScrollArea className="flex-1 min-h-0 px-4">
         <div className="space-y-4 py-4">
           {messages.map((message) => (
             <div
@@ -414,6 +413,8 @@ Format your responses in a clear, readable way.`,
               </div>
             </div>
           )}
+          {/* Sentinel div for auto-scrolling */}
+          <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
 
