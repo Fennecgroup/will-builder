@@ -14,7 +14,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontWeight: 'bold',
     marginBottom: 8,
   },
   subtitle: {
@@ -32,7 +31,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 14,
-    fontWeight: 'bold',
     marginBottom: 10,
     color: '#000',
     textDecoration: 'underline',

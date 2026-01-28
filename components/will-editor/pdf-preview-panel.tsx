@@ -1,4 +1,5 @@
 import type { Value } from '@udecode/plate'
+import type { WillContent } from '@/lib/types/will'
 import { FileDown, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,6 +19,7 @@ interface PDFPreviewPanelProps {
   editorContent: Value
   createdAt: Date
   onExport?: () => void
+  willContent?: WillContent
 }
 
 export function PDFPreviewPanel({
@@ -27,6 +29,7 @@ export function PDFPreviewPanel({
   editorContent,
   createdAt,
   onExport,
+  willContent,
 }: PDFPreviewPanelProps) {
   // Check if content is empty
   const hasContent = editorContent && editorContent.length > 0
@@ -47,6 +50,7 @@ export function PDFPreviewPanel({
               title={title}
               editorContent={editorContent}
               createdAt={createdAt}
+              willContent={willContent}
             />
           ) : (
             <div className="flex items-center justify-center h-full text-neutral-500">

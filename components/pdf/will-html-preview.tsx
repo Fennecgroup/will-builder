@@ -1,9 +1,11 @@
 import type { Value } from '@udecode/plate'
+import type { WillContent } from '@/lib/types/will'
 
 interface WillHTMLPreviewProps {
   title: string
   editorContent: Value
   createdAt: Date
+  willContent?: WillContent
 }
 
 // Helper type guards
@@ -20,7 +22,7 @@ const isEmptyParagraph = (node: any): boolean => {
   return false
 }
 
-export function WillHTMLPreview({ title, editorContent, createdAt }: WillHTMLPreviewProps) {
+export function WillHTMLPreview({ title, editorContent, createdAt, willContent }: WillHTMLPreviewProps) {
   // Render text with formatting
   const renderText = (textNode: any) => {
     if (!isTextNode(textNode)) return null
@@ -57,15 +59,15 @@ export function WillHTMLPreview({ title, editorContent, createdAt }: WillHTMLPre
   const renderList = (node: any, isOrdered: boolean) => {
     const ListTag = isOrdered ? 'ol' : 'ul'
     const listClassName = isOrdered
-      ? 'mb-3 ml-4 list-decimal space-y-1'
-      : 'mb-3 ml-4 list-disc space-y-1'
+      ? 'mb-4 ml-6 list-decimal [&>li]:mt-2'
+      : 'mb-4 ml-6 list-disc [&>li]:mt-2'
 
     return (
       <ListTag className={listClassName}>
         {node.children?.map((child: any, index: number) => {
           if (child.type === 'li') {
             return (
-              <li key={index} className="ml-2">
+              <li key={index} className="mb-2">
                 {renderInlineChildren(child.children)}
               </li>
             )
@@ -86,7 +88,7 @@ export function WillHTMLPreview({ title, editorContent, createdAt }: WillHTMLPre
     // Heading 1
     if (node.type === 'h1') {
       return (
-        <h1 key={index} className="text-2xl font-bold mb-3 mt-4">
+        <h1 key={index} className="mb-4 mt-6 text-3xl tracking-tight">
           {renderInlineChildren(node.children)}
         </h1>
       )
@@ -95,7 +97,7 @@ export function WillHTMLPreview({ title, editorContent, createdAt }: WillHTMLPre
     // Heading 2
     if (node.type === 'h2') {
       return (
-        <h2 key={index} className="text-xl font-semibold mb-2 mt-3.5">
+        <h2 key={index} className="mb-3 mt-5 text-2xl tracking-tight">
           {renderInlineChildren(node.children)}
         </h2>
       )
@@ -104,7 +106,7 @@ export function WillHTMLPreview({ title, editorContent, createdAt }: WillHTMLPre
     // Heading 3
     if (node.type === 'h3') {
       return (
-        <h3 key={index} className="text-base font-semibold mb-1.5 mt-2.5">
+        <h3 key={index} className="mb-2 mt-4 text-xl tracking-tight">
           {renderInlineChildren(node.children)}
         </h3>
       )
@@ -113,7 +115,7 @@ export function WillHTMLPreview({ title, editorContent, createdAt }: WillHTMLPre
     // Paragraph
     if (node.type === 'p') {
       return (
-        <p key={index} className="mb-3 leading-[1.75]">
+        <p key={index} className="mb-4 leading-7">
           {renderInlineChildren(node.children)}
         </p>
       )
@@ -134,7 +136,7 @@ export function WillHTMLPreview({ title, editorContent, createdAt }: WillHTMLPre
       return (
         <blockquote
           key={index}
-          className="mb-3 border-l-4 border-neutral-300 pl-3 italic text-neutral-600"
+          className="mb-4 border-l-4 border-muted-foreground/30 pl-4 italic"
         >
           {renderInlineChildren(node.children)}
         </blockquote>
@@ -156,6 +158,26 @@ export function WillHTMLPreview({ title, editorContent, createdAt }: WillHTMLPre
     <div className="flex justify-center bg-neutral-100 p-8">
       <div className="a4-page">
         <div className="a4-content">
+          {/* Testator Information Header */}
+          {willContent?.testator && (
+            <div className="mb-8 border-b pb-4">
+              <h1 className="text-center text-2xl mb-4">LAST WILL AND TESTAMENT</h1>
+              <div className="text-center text-sm space-y-1">
+                <p className="font-semibold">{willContent.testator.fullName}</p>
+                <p>ID Number: {willContent.testator.idNumber}</p>
+                {willContent.testator.address && (
+                  <p>
+                    {willContent.testator.address.street}
+                    {willContent.testator.address.city && `, ${willContent.testator.address.city}`}
+                    {willContent.testator.address.state && `, ${willContent.testator.address.state}`}
+                    {willContent.testator.address.postalCode && ` ${willContent.testator.address.postalCode}`}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Editor Content */}
           {editorContent.map((node: any, index: number) => renderNode(node, index))}
         </div>
         <div className="a4-footer">

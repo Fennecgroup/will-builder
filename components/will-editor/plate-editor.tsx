@@ -78,7 +78,7 @@ function H1Element({ children, attributes, ...props }: any) {
       {...props}
       attributes={attributes}
       as="h1"
-      className="mb-4 mt-6 text-3xl font-bold tracking-tight"
+      className="mb-4 mt-6 text-3xl tracking-tight"
     >
       {children}
     </PlateElement>
@@ -91,7 +91,7 @@ function H2Element({ children, attributes, ...props }: any) {
       {...props}
       attributes={attributes}
       as="h2"
-      className="mb-3 mt-5 text-2xl font-semibold tracking-tight"
+      className="mb-3 mt-5 text-2xl tracking-tight"
     >
       {children}
     </PlateElement>
@@ -104,7 +104,7 @@ function H3Element({ children, attributes, ...props }: any) {
       {...props}
       attributes={attributes}
       as="h3"
-      className="mb-2 mt-4 text-xl font-semibold tracking-tight"
+      className="mb-2 mt-4 text-xl tracking-tight"
     >
       {children}
     </PlateElement>
