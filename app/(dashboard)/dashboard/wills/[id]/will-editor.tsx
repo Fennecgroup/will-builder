@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Save, FileDown, Clock, Trash2, CheckCircle2, Pencil, AlertCircle, ListPlus } from 'lucide-react'
+import { ArrowLeft, Save, FileDown, Clock, Trash2, CheckCircle2, Pencil, AlertCircle, ListPlus, Eye } from 'lucide-react'
 import type { Value } from '@udecode/plate'
 import { Will } from '@prisma/client'
 import { Button } from '@/components/ui/button'
@@ -20,6 +20,7 @@ import { TestatorSidebar } from '@/components/will-editor/testator-sidebar'
 import { AIChat } from '@/components/plate-ui/ai-chat'
 import { AutoFillNotification } from '@/components/will-editor/auto-fill-notification'
 import { AutoFillPreviewPanel } from '@/components/will-editor/auto-fill-preview-panel'
+import { PDFPreviewPanel } from '@/components/will-editor/pdf-preview-panel'
 import { QuestionnaireModal } from '@/components/will-editor/questionnaire-modal'
 import { OptionalClausesBrowser } from '@/components/will-editor/optional-clauses/optional-clauses-browser'
 import { MissingInfoDetector } from '@/lib/questionnaire/missing-info-detector'
@@ -83,6 +84,9 @@ export function WillEditor({ will }: WillEditorProps) {
   // Auto-fill state
   const [autoFillSuggestions, setAutoFillSuggestions] = useState<AutoFillSuggestion[]>([])
   const [showAutoFillPreview, setShowAutoFillPreview] = useState(false)
+
+  // PDF preview state
+  const [showPDFPreview, setShowPDFPreview] = useState(false)
 
   // Questionnaire state
   const [questionnaireContext, setQuestionnaireContext] = useState<MissingInfoContext | null>(null)
@@ -467,6 +471,15 @@ export function WillEditor({ will }: WillEditorProps) {
     }
   }
 
+  // Handle opening PDF preview
+  const handleOpenPreview = useCallback(() => {
+    if (!editorValue || editorValue.length === 0) {
+      toast.error('No content to preview')
+      return
+    }
+    setShowPDFPreview(true)
+  }, [editorValue])
+
   // Handle export to PDF
   const handleExport = async () => {
     try {
@@ -617,6 +630,15 @@ export function WillEditor({ will }: WillEditorProps) {
             <Trash2 className="mr-2 h-4 w-4" />
             Delete
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleOpenPreview}
+            disabled={!editorValue || editorValue.length === 0}
+          >
+            <Eye className="mr-2 h-4 w-4" />
+            Preview PDF
+          </Button>
           <Button variant="outline" size="sm" onClick={handleExport}>
             <FileDown className="mr-2 h-4 w-4" />
             Export PDF
@@ -702,6 +724,16 @@ export function WillEditor({ will }: WillEditorProps) {
         onOpenChange={setShowOptionalClausesBrowser}
         selectedClauses={willContent.optionalClauses || []}
         onClauseToggle={handleOptionalClauseToggle}
+      />
+
+      {/* PDF Preview Panel */}
+      <PDFPreviewPanel
+        open={showPDFPreview}
+        onOpenChange={setShowPDFPreview}
+        title={title}
+        editorContent={editorValue}
+        createdAt={will.createdAt}
+        onExport={handleExport}
       />
     </div>
   )
