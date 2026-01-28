@@ -55,6 +55,30 @@ export function WillHTMLPreview({ title, editorContent, createdAt, willContent }
     })
   }
 
+  // Render list item content (handles both inline text and nested blocks)
+  const renderListItemContent = (children: any[]) => {
+    if (!children || children.length === 0) return null
+
+    return children.map((child, index) => {
+      // If it's a text node, render it as text
+      if (isTextNode(child)) {
+        return <span key={index}>{renderText(child)}</span>
+      }
+
+      // If it's a paragraph inside a list item, render its children inline
+      if (child.type === 'p') {
+        return <span key={index}>{renderInlineChildren(child.children)}</span>
+      }
+
+      // For other block types, render them normally (without extra margins)
+      if (child.type === 'ul' || child.type === 'ol') {
+        return renderList(child, child.type === 'ol')
+      }
+
+      return null
+    })
+  }
+
   // Render list items recursively
   const renderList = (node: any, isOrdered: boolean) => {
     const ListTag = isOrdered ? 'ol' : 'ul'
@@ -68,7 +92,7 @@ export function WillHTMLPreview({ title, editorContent, createdAt, willContent }
           if (child.type === 'li') {
             return (
               <li key={index} className="mb-2">
-                {renderInlineChildren(child.children)}
+                {renderListItemContent(child.children)}
               </li>
             )
           }

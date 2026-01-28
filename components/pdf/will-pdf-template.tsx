@@ -122,6 +122,31 @@ export function WillPDFTemplate({ title, editorContent, willContent, createdAt }
     })
   }
 
+  // Render list item content (handles both inline text and nested blocks)
+  const renderListItemContent = (children: any[]) => {
+    if (!children || children.length === 0) return null
+
+    // Collect all text content from nested structures
+    const textParts: any[] = []
+
+    children.forEach((child, index) => {
+      // If it's a text node, add it directly
+      if (isTextNode(child)) {
+        textParts.push(renderText(child, index))
+      }
+      // If it's a paragraph inside a list item, render its children
+      else if (child.type === 'p' && child.children) {
+        child.children.forEach((innerChild: any, innerIndex: number) => {
+          if (isTextNode(innerChild)) {
+            textParts.push(renderText(innerChild, `${index}-${innerIndex}`))
+          }
+        })
+      }
+    })
+
+    return textParts
+  }
+
   // Render list items recursively
   const renderList = (node: any, isOrdered: boolean, key: number) => {
     return (
@@ -132,7 +157,7 @@ export function WillPDFTemplate({ title, editorContent, willContent, createdAt }
               <View key={index} style={styles.li}>
                 <Text>
                   {isOrdered ? `${index + 1}. ` : '• '}
-                  {renderInlineChildren(child.children)}
+                  {renderListItemContent(child.children)}
                 </Text>
               </View>
             )
