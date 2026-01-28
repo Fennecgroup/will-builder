@@ -4,6 +4,7 @@ import { auth } from '@clerk/nextjs/server'
 import { getWillById } from '@/lib/actions/wills'
 import { WillPDFTemplate } from '@/components/pdf/will-pdf-template'
 import { WillContent } from '@/lib/types/will'
+import type { Value } from '@udecode/plate'
 
 export async function GET(
   request: NextRequest,
@@ -23,7 +24,8 @@ export async function GET(
     const stream = await renderToStream(
       WillPDFTemplate({
         title: will.title,
-        content: (will.content as unknown as WillContent) || ({} as WillContent),
+        editorContent: (will.editorContent as unknown as Value) || [],
+        willContent: (will.content as unknown as WillContent) || ({} as WillContent),
         createdAt: will.createdAt,
       })
     )
