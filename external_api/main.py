@@ -10,8 +10,8 @@ import logging
 from datetime import datetime
 
 from models import (
-    TestatorInfo,
-    TestatorResponse,
+    WillContent,
+    WillContentResponse,
     HealthCheckResponse,
 )
 from config import settings
@@ -65,39 +65,45 @@ async def health_check():
 
 @app.post(
     "/api/v1/testator",
-    response_model=TestatorResponse,
+    response_model=WillContentResponse,
     status_code=status.HTTP_201_CREATED,
 )
-async def create_testator(testator: TestatorInfo):
+async def create_will(will_content: WillContent):
     """
-    Accept external testator information for will creation.
+    Accept complete will content for will creation.
 
-    This endpoint receives testator details including personal information,
-    beneficiaries, assets, and will preferences.
+    This endpoint receives comprehensive will information including:
+    - Testator personal information
+    - Marital status and spouse details
+    - Children information
+    - Assets and liabilities
+    - Beneficiaries with allocations
+    - Executors, guardians, trustees, and witnesses
+    - Funeral wishes and digital assets
+    - Special instructions and legal clauses
 
     Args:
-        testator: TestatorInfo object containing all testator details
+        will_content: WillContent object containing all will details
 
     Returns:
-        TestatorResponse with confirmation and generated testator ID
+        WillContentResponse with confirmation and generated will ID
 
     Raises:
         HTTPException: If validation fails or processing error occurs
     """
     try:
-        logger.info(f"Received testator information for: {testator.personal_info.full_name}")
+        logger.info(f"Received will content for: {will_content.testator.fullName}")
 
         # TODO: Implement database storage
-        # TODO: Implement validation logic
         # TODO: Integrate with will generation service
 
         # For now, return a mock response
-        testator_id = f"TEST-{datetime.utcnow().timestamp()}"
+        will_id = f"WILL-{datetime.utcnow().timestamp()}"
 
-        return TestatorResponse(
+        return WillContentResponse(
             success=True,
-            testator_id=testator_id,
-            message="Testator information received successfully",
+            will_id=will_id,
+            message="Will content received and validated successfully",
             timestamp=datetime.utcnow(),
         )
 
