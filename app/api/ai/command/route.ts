@@ -80,7 +80,7 @@ Use the context provided to make precise, informed edits.${fullEditorValue ? '\n
         : agentSystemPrompt;
 
       const result = await streamText({
-        model: openai('gpt-4o-mini'),
+        model: openai(process.env.OPENAI_MODEL || 'gpt-4o-mini'),
         system: enhancedSystem,
         messages: [
           ...(messages || []),
@@ -163,7 +163,7 @@ IMPORTANT: When referencing people or details from the context, use the exact to
         : (system || defaultSystemPrompt);
 
       const result = streamText({
-        model: openai('gpt-4o-mini'),
+        model: openai(process.env.OPENAI_MODEL || 'gpt-4o-mini'),
         system: enhancedSystem,
         messages: [
           ...(messages || []),

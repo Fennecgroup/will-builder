@@ -26,7 +26,7 @@ ${minimalContext}`
       : (system || defaultSystemPrompt);
 
     const result = streamText({
-      model: openai('gpt-4o-mini'),
+      model: openai(process.env.OPENAI_MODEL || 'gpt-4o-mini'),
       maxOutputTokens: 50,
       system: enhancedSystem,
       messages: [
