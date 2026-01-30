@@ -12,6 +12,11 @@ You should:
 
 const agentSystemPrompt = `You are an AI agent helping to edit legal will documents directly.
 
+CRITICAL OUTPUT REQUIREMENT:
+You MUST respond with ONLY a valid JSON object. NO explanatory text, NO markdown formatting, NO code blocks.
+DO NOT start with phrases like "Here's the", "I've made", or any other natural language.
+Your ENTIRE response must be parseable JSON starting with { and ending with }.
+
 CAPABILITIES:
 - You can add new content to the document
 - You can modify existing sections
@@ -19,7 +24,7 @@ CAPABILITIES:
 - You have full access to the current document state and testator information
 
 RESPONSE FORMAT:
-You MUST respond with a valid JSON object with the following structure:
+Return ONLY this JSON structure:
 {
   "explanation": "Brief explanation of what changes you made and why",
   "changes": [
@@ -43,8 +48,9 @@ RULES:
 7. Use tokens like [TESTATOR], [SPOUSE], [CHILD-1] when referencing people from context
 8. All JSON must be properly formatted with matching braces, brackets, and commas
 9. Ensure all strings are properly escaped and quoted
+10. NEVER include explanatory text outside the JSON object
 
-CRITICAL: Return a complete, valid JSON object. Ensure all arrays and objects are properly closed.`;
+CRITICAL: Your response must be PURE JSON. Start with { and end with }. Nothing else.`;
 
 export async function POST(req: NextRequest) {
   try {
@@ -82,13 +88,7 @@ Use the context provided to make precise, informed edits.${fullEditorValue ? '\n
             role: 'user',
             content: prompt,
           },
-        ],
-        // Enable JSON mode to ensure valid JSON output
-        experimental_providerMetadata: {
-          openai: {
-            response_format: { type: 'json_object' }
-          }
-        }
+        ]
       });
 
       // Collect full response
@@ -97,12 +97,22 @@ Use the context provided to make precise, informed edits.${fullEditorValue ? '\n
         fullResponse += chunk;
       }
 
-      // Parse JSON (strip markdown code blocks if present)
+      // Parse JSON (strip markdown code blocks and any preamble text)
       let cleanedResponse = fullResponse.trim();
+
+      // Remove markdown code blocks
       if (cleanedResponse.startsWith('```json')) {
         cleanedResponse = cleanedResponse.replace(/^```json\n/, '').replace(/\n```$/, '');
       } else if (cleanedResponse.startsWith('```')) {
         cleanedResponse = cleanedResponse.replace(/^```\n/, '').replace(/\n```$/, '');
+      }
+
+      // Find the first { and last } to extract just the JSON object
+      const firstBrace = cleanedResponse.indexOf('{');
+      const lastBrace = cleanedResponse.lastIndexOf('}');
+
+      if (firstBrace !== -1 && lastBrace !== -1 && firstBrace < lastBrace) {
+        cleanedResponse = cleanedResponse.substring(firstBrace, lastBrace + 1);
       }
 
       console.log('Agent mode response length:', fullResponse.length);

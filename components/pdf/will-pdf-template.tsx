@@ -95,7 +95,7 @@ const isEmptyParagraph = (node: any): boolean => {
 
 export function WillPDFTemplate({ title, editorContent, willContent, createdAt }: WillPDFTemplateProps) {
   // Render text with formatting
-  const renderText = (textNode: any, key: number) => {
+  const renderText = (textNode: any, key: number | string) => {
     if (!isTextNode(textNode)) return null
 
     const textStyle: any = {}
