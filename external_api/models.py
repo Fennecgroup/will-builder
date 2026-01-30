@@ -360,6 +360,9 @@ class Guardian(BaseModel):
     forChildren: List[str] = Field(..., description="IDs of children under guardianship")
     isAlternate: Optional[bool] = Field(False)
 
+class User(BaseModel):
+    """Will builder user"""
+    
 
 # ============================================
 # ROOT MODEL
@@ -367,6 +370,7 @@ class Guardian(BaseModel):
 
 class WillContent(BaseModel):
     """Complete will content structure"""
+    user_id: str = Optional[Field(..., min_length=1, max_length=50, description="National ID number")]
     willType: Optional[WillType] = Field(None, description="Type of will")
     testator: TestatorInfo = Field(..., description="Testator information")
     maritalStatus: MaritalStatus = Field(..., description="Marital status")

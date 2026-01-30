@@ -734,7 +734,6 @@ export function WillEditor({ will }: WillEditorProps) {
         editorContent={editorValue}
         createdAt={will.createdAt}
         onExport={handleExport}
-        willContent={willContent}
       />
     </div>
   )

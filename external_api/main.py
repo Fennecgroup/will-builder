@@ -94,6 +94,7 @@ async def create_will(will_content: WillContent):
     try:
         logger.info(f"Received will content for: {will_content.testator.fullName}")
 
+        # TODO: check if the user_id exsists in the database. If not create a new clerk user and a normal user
         # TODO: Implement database storage
         # TODO: Integrate with will generation service
 
