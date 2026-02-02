@@ -1,6 +1,6 @@
-import { openai } from '@ai-sdk/openai';
 import { streamText } from 'ai';
 import { NextRequest } from 'next/server';
+import { getModel } from '@/lib/ai/llm-provider';
 
 const defaultSystemPrompt = `You are an AI autocomplete assistant for legal document writing.
 Your task is to complete the user's sentence or thought with appropriate legal language.
@@ -26,7 +26,7 @@ ${minimalContext}`
       : (system || defaultSystemPrompt);
 
     const result = streamText({
-      model: openai(process.env.OPENAI_MODEL || 'gpt-4o-mini'),
+      model: getModel(),
       maxOutputTokens: 50,
       system: enhancedSystem,
       messages: [

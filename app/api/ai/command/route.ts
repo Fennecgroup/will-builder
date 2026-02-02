@@ -1,6 +1,6 @@
-import { openai } from '@ai-sdk/openai';
 import { streamText } from 'ai';
 import { NextRequest } from 'next/server';
+import { getModel } from '@/lib/ai/llm-provider';
 
 const defaultSystemPrompt = `You are an AI writing assistant helping to create and edit legal documents, specifically wills.
 You should:
@@ -80,7 +80,7 @@ Use the context provided to make precise, informed edits.${fullEditorValue ? '\n
         : agentSystemPrompt;
 
       const result = await streamText({
-        model: openai(process.env.OPENAI_MODEL || 'gpt-4o-mini'),
+        model: getModel(),
         system: enhancedSystem,
         messages: [
           ...(messages || []),
@@ -163,7 +163,7 @@ IMPORTANT: When referencing people or details from the context, use the exact to
         : (system || defaultSystemPrompt);
 
       const result = streamText({
-        model: openai(process.env.OPENAI_MODEL || 'gpt-4o-mini'),
+        model: getModel(),
         system: enhancedSystem,
         messages: [
           ...(messages || []),
