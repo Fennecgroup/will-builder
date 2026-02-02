@@ -2,6 +2,11 @@
 
 This directory contains AI-related utilities for the Fennec Will Builder application.
 
+## Requirements
+
+- **Vercel AI SDK v6.0+** - This project uses AI SDK v6 which supports the latest model specifications from all providers.
+- The `ai` package and provider packages (`@ai-sdk/anthropic`, `@ai-sdk/openai`) must be on compatible versions.
+
 ## LLM Provider Module
 
 The `llm-provider.ts` module provides a flexible abstraction layer for switching between different AI providers (OpenAI, Anthropic/Claude, etc.) via environment configuration.
