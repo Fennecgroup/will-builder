@@ -14,6 +14,19 @@ import { buildDocumentContext } from '@/lib/ai/document-context-builder';
 import { AI_FEATURES, type AgentChange, type AgentResponse } from '@/lib/ai/types';
 import type { Value } from '@udecode/plate';
 
+const QUICK_PROMPTS = [
+  {
+    id: 'translate-afrikaans',
+    label: 'Translate to Afrikaans',
+    prompt: 'Translate the entire document to Afrikaans while maintaining all legal formatting and structure'
+  },
+  {
+    id: 'bold-headings',
+    label: 'Make all headings bold',
+    prompt: 'Make all heading text in the document bold'
+  },
+] as const;
+
 interface Message {
   id: string;
   role: 'user' | 'assistant';
@@ -1001,6 +1014,51 @@ Format your responses in a clear, readable way.`,
     editorSnapshot.current = null;
   }, [onAgentEdit]);
 
+  const handleQuickPrompt = React.useCallback((promptText: string) => {
+    // Create user message
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: promptText,
+      mode: 'agent',
+    };
+
+    // Update state
+    setMessages((prev) => [...prev, userMessage]);
+    setInput('');
+    setMode('agent'); // Switch to agent mode
+    setIsLoading(true);
+
+    // Build context
+    const context = willContent
+      ? buildTestatorContext({
+          action: 'chat',
+          selectedText: promptText,
+          willContent,
+          interactionType: 'command',
+          conversationHistory: messages.map(msg => ({
+            role: msg.role,
+            content: msg.content,
+          })),
+        })
+      : null;
+
+    // Execute agent mode
+    handleAgentMode(promptText, context)
+      .catch((error) => {
+        console.error('Quick prompt error:', error);
+        setMessages((prev) => [...prev, {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: 'Sorry, I encountered an error. Please try again.',
+          mode: 'agent',
+        }]);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [willContent, messages, handleAgentMode, setMode, setInput, setMessages, setIsLoading]);
+
   return (
     <div
       className={cn(
@@ -1016,6 +1074,32 @@ Format your responses in a clear, readable way.`,
         <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
           AI Writing Assistant
         </h2>
+      </div>
+
+      {/* Quick Prompts Bar */}
+      <div className="border-b border-neutral-200 dark:border-neutral-800 px-4 py-2 flex-shrink-0 bg-neutral-50 dark:bg-neutral-900/50">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mb-1">
+          {QUICK_PROMPTS.map((quickPrompt) => (
+            <Button
+              key={quickPrompt.id}
+              variant="outline"
+              size="sm"
+              onClick={() => handleQuickPrompt(quickPrompt.prompt)}
+              disabled={isLoading}
+              className={cn(
+                "flex-shrink-0 h-7 text-xs",
+                "bg-white dark:bg-neutral-800",
+                "border-emerald-200 dark:border-emerald-800",
+                "text-emerald-700 dark:text-emerald-300",
+                "hover:bg-emerald-50 dark:hover:bg-emerald-900/30",
+                "hover:border-emerald-300 dark:hover:border-emerald-700",
+                "transition-colors"
+              )}
+            >
+              {quickPrompt.label}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {/* Messages - Scrollable */}
