@@ -35,6 +35,7 @@ import { WillContent } from '@/lib/types/will'
 import { AutoFillOrchestrator, AutoFillSuggestion, WillArticle } from '@/lib/auto-fill'
 import { InitialDocumentGenerator } from '@/lib/will/initial-document-generator'
 import { toast } from 'sonner'
+import type { AgentChange } from '@/lib/ai/types'
 
 interface WillEditorProps {
   will: Will
@@ -260,15 +261,62 @@ export function WillEditor({ will }: WillEditorProps) {
     toast.success('Text inserted into editor');
   }, []);
 
-  // Handle AI agent edits
-  const handleAgentEdit = useCallback((newEditorValue: Value, changes: any[]) => {
-    setEditorValue(newEditorValue);
-    setHasUnsavedChanges(true);
+  // Helper function to apply or remove AI marks to/from editor value
+  const applyAIMarks = useCallback((value: Value, isPending: boolean, removeMarks: boolean = false): Value => {
+    // Recursively traverse editor nodes and add/remove AI marks
+    const markNodes = (nodes: any[]): any[] => {
+      return nodes.map(node => {
+        if ('text' in node) {
+          if (removeMarks) {
+            // Remove AI marks completely
+            const { ai, pending, ...rest } = node;
+            return rest;
+          } else {
+            // Add AI marks
+            return {
+              ...node,
+              ai: true,
+              pending: isPending,
+            };
+          }
+        }
+        if ('children' in node && Array.isArray(node.children)) {
+          // Element node with children - recurse
+          return {
+            ...node,
+            children: markNodes(node.children),
+          };
+        }
+        return node;
+      });
+    };
 
-    toast.success('AI updated your document', {
-      description: `${changes.length} change${changes.length === 1 ? '' : 's'} applied`,
-    });
+    return markNodes(value) as Value;
   }, []);
+
+  // Handle AI agent edits with pending state support
+  const handleAgentEdit = useCallback((
+    newEditorValue: Value,
+    changes: AgentChange[],
+    options?: { isPending: boolean }
+  ) => {
+    const isPending = options?.isPending ?? false;
+
+    // Apply marks based on pending state
+    const markedDocument = applyAIMarks(newEditorValue, isPending);
+
+    // Update editor value
+    setEditorValue(markedDocument);
+
+    if (!isPending) {
+      // Only mark as unsaved and save when confirmed
+      setHasUnsavedChanges(true);
+
+      toast.success('AI updated your document', {
+        description: `${changes.length} change${changes.length === 1 ? '' : 's'} applied`,
+      });
+    }
+  }, [applyAIMarks]);
 
   // Handle auto-fill apply
   const handleApplyAutoFill = useCallback((article: WillArticle, mode: 'replace' | 'merge') => {

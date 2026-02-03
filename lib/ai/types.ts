@@ -1,6 +1,7 @@
 // AI Context - TypeScript Type Definitions
 
 import { WillContent } from '@/lib/types/will';
+import { z } from 'zod';
 
 /**
  * Mapping between anonymization tokens and actual values
@@ -11,6 +12,29 @@ export interface TokenMapping {
   actualValue: string;  // e.g., "Thabo Johannes Molefe"
   type: 'name' | 'id' | 'address' | 'phone' | 'email' | 'account';
 }
+
+/**
+ * Zod schemas for agent streaming responses
+ */
+export const agentChangeSchema = z.object({
+  type: z.enum(['insert', 'replace', 'delete']),
+  location: z.string(),
+  content: z.string().optional(),
+  description: z.string().optional(),
+  confirmationRequired: z.boolean().optional(),
+});
+
+// Note: We use z.any() for modifiedDocument to avoid circular reference issues
+// The AI will return valid Plate editor format based on the system prompt
+// We can validate the structure on the client side if needed
+export const agentResponseSchema = z.object({
+  explanation: z.string(),
+  changes: z.array(agentChangeSchema),
+  modifiedDocument: z.array(z.any()), // Array of Plate editor nodes (validated client-side)
+});
+
+export type AgentChange = z.infer<typeof agentChangeSchema>;
+export type AgentResponse = z.infer<typeof agentResponseSchema>;
 
 /**
  * Built context containing anonymized testator data and token mappings
@@ -117,8 +141,12 @@ export const CONTEXT_RULES: Record<string, ContextRule> = {
 
 /**
  * Feature flags for AI functionality
+ *
+ * TROUBLESHOOTING: If the AI is losing content, try setting useOptimizedDocumentContext to false.
+ * This will send ONLY the full document without the "relevant sections" summary,
+ * which may help the AI avoid confusion.
  */
 export const AI_FEATURES = {
-  useOptimizedDocumentContext: true,
+  useOptimizedDocumentContext: false, // Set to false if AI is losing content
   fallbackToFullDocument: true,
 };

@@ -1,6 +1,7 @@
-import { streamText } from 'ai';
+import { streamText, streamObject } from 'ai';
 import { NextRequest } from 'next/server';
 import { getModel } from '@/lib/ai/llm-provider';
+import { agentResponseSchema } from '@/lib/ai/types';
 
 const defaultSystemPrompt = `You are an AI writing assistant helping to create and edit legal documents, specifically wills.
 You should:
@@ -11,6 +12,9 @@ You should:
 - Never provide actual legal advice, only assist with document formatting and wording`;
 
 const agentSystemPrompt = `You are an AI agent helping to edit legal will documents directly.
+
+CRITICAL: You will ALWAYS receive the FULL document in the system prompt.
+Your job is to make TARGETED changes while PRESERVING all existing content.
 
 CRITICAL OUTPUT REQUIREMENT:
 You MUST respond with ONLY a valid JSON object. NO explanatory text, NO markdown formatting, NO code blocks.
@@ -38,17 +42,22 @@ Return ONLY this JSON structure:
   "modifiedDocument": [/* Full updated Plate editor value array */]
 }
 
-RULES:
-1. Make precise, targeted changes based on user intent
-2. Preserve existing document structure and formatting
-3. Maintain legal document formality and accuracy
-4. For deletions that remove substantial content, set confirmationRequired: true
-5. Explain your reasoning in the "explanation" field
-6. Ensure "modifiedDocument" is valid Plate editor format (array of paragraph/heading blocks)
-7. Use tokens like [TESTATOR], [SPOUSE], [CHILD-1] when referencing people from context
-8. All JSON must be properly formatted with matching braces, brackets, and commas
-9. Ensure all strings are properly escaped and quoted
-10. NEVER include explanatory text outside the JSON object
+DOCUMENT MODIFICATION RULES:
+1. You will receive the FULL current document state
+2. You MUST return the FULL modified document with ALL original content preserved
+3. Only modify the specific parts relevant to the user's request
+4. Do NOT remove or omit any existing content unless explicitly asked to delete it
+5. When making changes like "make headers bold", apply the change to headers but keep ALL other content intact
+6. Make precise, targeted changes based on user intent
+7. Preserve existing document structure and formatting
+8. Maintain legal document formality and accuracy
+9. For deletions that remove substantial content, set confirmationRequired: true
+10. Explain your reasoning in the "explanation" field
+11. Ensure "modifiedDocument" is valid Plate editor format (array of paragraph/heading blocks)
+12. Use tokens like [TESTATOR], [SPOUSE], [CHILD-1] when referencing people from context
+13. All JSON must be properly formatted with matching braces, brackets, and commas
+14. Ensure all strings are properly escaped and quoted
+15. NEVER include explanatory text outside the JSON object
 
 CRITICAL: Your response must be PURE JSON. Start with { and end with }. Nothing else.`;
 
@@ -56,100 +65,82 @@ export async function POST(req: NextRequest) {
   try {
     const { prompt, system, messages, testatorContext, mode, editorContent, documentContext, fullEditorValue } = await req.json();
 
+    console.log('[API] Received request - mode:', mode, 'prompt length:', prompt?.length);
+    console.log('[API] Has fullEditorValue:', !!fullEditorValue);
+    console.log('[API] Has editorContent:', !!editorContent);
+    console.log('[API] Has documentContext:', !!documentContext);
+
     // Choose behavior based on mode
     if (mode === 'agent') {
       // AGENT MODE: Return structured JSON
-      // Use optimized document context if provided, otherwise fall back to full document
+      // Always send full document for agent mode to prevent content loss
+      const documentToUse = fullEditorValue || editorContent;
+
+      if (!documentToUse) {
+        console.error('[API] No document provided!');
+      } else {
+        console.log('[API] Document structure:', {
+          isArray: Array.isArray(documentToUse),
+          length: Array.isArray(documentToUse) ? documentToUse.length : 'N/A',
+          firstItem: Array.isArray(documentToUse) && documentToUse[0] ? documentToUse[0].type : 'N/A'
+        });
+      }
+
+      const fullDocumentSection = documentToUse
+        ? `\n\nFULL CURRENT DOCUMENT (you MUST preserve all of this content):\n${JSON.stringify(documentToUse, null, 2)}`
+        : '';
+
+      // Optimized context is provided as GUIDANCE, not as the source of truth
       const documentContextSection = documentContext
-        ? `\n${documentContext}`
-        : (editorContent ? `\nCURRENT DOCUMENT STATE:\n${JSON.stringify(editorContent, null, 2)}` : '');
+        ? `\n\nRELEVANT SECTIONS (for context, to help you understand what to change):\n${documentContext}`
+        : '';
 
       const enhancedSystem = testatorContext
         ? `${agentSystemPrompt}
+${fullDocumentSection}
+
+CRITICAL INSTRUCTIONS - READ CAREFULLY:
+1. The FULL CURRENT DOCUMENT above is the COMPLETE document - return ALL of it with your changes
+2. Your "modifiedDocument" field must contain EVERY element from the document above
+3. Only modify the specific parts the user requests - keep everything else EXACTLY as-is
+4. DO NOT omit paragraphs, headers, or any other content
+5. Count: if the input has 10 blocks, output should have ~10 blocks (or more if adding content)
 
 TESTATOR CONTEXT:
 ${testatorContext}${documentContextSection}
 
-IMPORTANT: You have access to:
-- Active section (full detail) where the user is editing
-- Related sections (summaries) for context
-- Document outline showing all articles
-${fullEditorValue ? '- Full document provided as reference when needed' : ''}
+NOTE: The "RELEVANT SECTIONS" above (if present) are just HINTS about where to focus your attention.
+They are NOT the full document. Use them to understand context, but make your changes to the FULL DOCUMENT.`
+        : agentSystemPrompt + fullDocumentSection + `
 
-Use the context provided to make precise, informed edits.${fullEditorValue ? '\n\nFULL DOCUMENT (reference):\n' + JSON.stringify(fullEditorValue, null, 2) : ''}`
-        : agentSystemPrompt;
+CRITICAL: The FULL CURRENT DOCUMENT above is the COMPLETE document.
+Your "modifiedDocument" response must include ALL elements from that document.`;
 
-      const result = await streamText({
-        model: getModel(),
-        system: enhancedSystem,
-        messages: [
-          ...(messages || []),
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ]
-      });
+      console.log('[Agent Mode] Starting streamText with JSON output (workaround)');
+      console.log('[Agent Mode] System prompt length:', enhancedSystem.length);
+      console.log('[Agent Mode] User prompt:', prompt);
 
-      // Collect full response
-      let fullResponse = '';
-      for await (const chunk of result.textStream) {
-        fullResponse += chunk;
-      }
-
-      // Parse JSON (strip markdown code blocks and any preamble text)
-      let cleanedResponse = fullResponse.trim();
-
-      // Remove markdown code blocks
-      if (cleanedResponse.startsWith('```json')) {
-        cleanedResponse = cleanedResponse.replace(/^```json\n/, '').replace(/\n```$/, '');
-      } else if (cleanedResponse.startsWith('```')) {
-        cleanedResponse = cleanedResponse.replace(/^```\n/, '').replace(/\n```$/, '');
-      }
-
-      // Find the first { and last } to extract just the JSON object
-      const firstBrace = cleanedResponse.indexOf('{');
-      const lastBrace = cleanedResponse.lastIndexOf('}');
-
-      if (firstBrace !== -1 && lastBrace !== -1 && firstBrace < lastBrace) {
-        cleanedResponse = cleanedResponse.substring(firstBrace, lastBrace + 1);
-      }
-
-      console.log('Agent mode response length:', fullResponse.length);
-      console.log('Agent mode cleaned response preview:', cleanedResponse.substring(0, 500) + '...');
-
-      let agentResponse;
       try {
-        agentResponse = JSON.parse(cleanedResponse);
+        // TEMPORARY: Use streamText instead of streamObject as a workaround
+        const result = streamText({
+          model: getModel(),
+          system: enhancedSystem,
+          messages: [
+            ...(messages || []),
+            {
+              role: 'user',
+              content: prompt,
+            },
+          ],
+        });
 
-        // Validate required fields
-        if (!agentResponse.explanation || !agentResponse.changes || !agentResponse.modifiedDocument) {
-          throw new Error('Missing required fields in AI response');
-        }
-      } catch (parseError) {
-        console.error('JSON parse error:', parseError);
-        console.error('Response length:', cleanedResponse.length);
-        console.error('First 1000 chars:', cleanedResponse.substring(0, 1000));
-        console.error('Last 1000 chars:', cleanedResponse.substring(Math.max(0, cleanedResponse.length - 1000)));
+        console.log('[Agent Mode] streamText created, returning response');
 
-        // Try to identify the error location
-        const errorMatch = (parseError as Error).message.match(/position (\d+)/);
-        if (errorMatch) {
-          const position = parseInt(errorMatch[1]);
-          const contextStart = Math.max(0, position - 200);
-          const contextEnd = Math.min(cleanedResponse.length, position + 200);
-          console.error('Error context:', cleanedResponse.substring(contextStart, contextEnd));
-          console.error('Error position marker:', ' '.repeat(Math.min(200, position - contextStart)) + '^');
-        }
-
-        throw new Error(`Failed to parse AI response: ${(parseError as Error).message}. Response may be truncated or malformed.`);
+        return result.toTextStreamResponse();
+      } catch (streamError) {
+        console.error('[Agent Mode] Error during streamText:', streamError);
+        throw streamError;
       }
-
-      // Return JSON response
-      return new Response(JSON.stringify(agentResponse), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      });
 
     } else {
       // ASK MODE: Current streaming behavior
