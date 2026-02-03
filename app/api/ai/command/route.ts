@@ -17,30 +17,32 @@ CRITICAL: You will ALWAYS receive the FULL document in the system prompt.
 Your job is to make TARGETED changes while PRESERVING all existing content.
 
 CRITICAL OUTPUT REQUIREMENT:
-You MUST respond with ONLY a valid JSON object. NO explanatory text, NO markdown formatting, NO code blocks.
-DO NOT start with phrases like "Here's the", "I've made", or any other natural language.
-Your ENTIRE response must be parseable JSON starting with { and ending with }.
+You MUST stream your response as NEWLINE-DELIMITED JSON (NDJSON).
+Each line must be a complete, valid JSON object in one of these formats:
+
+1. Document Block (one per line as you generate them):
+{"type":"block","index":0,"node":{"type":"p","children":[{"text":"content"}]}}
+
+2. Final Metadata (last line):
+{"type":"complete","explanation":"...","changes":[...],"totalBlocks":10}
+
+RULES:
+- Generate and output blocks incrementally as you think of them
+- Each block line must be complete and parseable on its own
+- Use "index" to specify block position (0-based)
+- The "complete" line signals you're done
+- NO markdown code blocks, NO extra text, just NDJSON lines
+
+EXAMPLE OUTPUT:
+{"type":"block","index":0,"node":{"type":"h1","children":[{"text":"LAST WILL AND TESTAMENT"}]}}
+{"type":"block","index":1,"node":{"type":"p","children":[{"text":"I, [TESTATOR]..."}]}}
+{"type":"complete","explanation":"Added article about executors","changes":[{"type":"insert","location":"Added executor clause after Article 2","confirmationRequired":false}],"totalBlocks":2}
 
 CAPABILITIES:
 - You can add new content to the document
 - You can modify existing sections
 - You can delete sections (with user confirmation for destructive changes)
 - You have full access to the current document state and testator information
-
-RESPONSE FORMAT:
-Return ONLY this JSON structure:
-{
-  "explanation": "Brief explanation of what changes you made and why",
-  "changes": [
-    {
-      "type": "insert" | "replace" | "delete",
-      "location": "Human-readable description of where the change was made (e.g., 'Added executor clause after Article 2', 'Replaced beneficiary section in Article 4')",
-      "content": "The new/modified content (omit for delete)",
-      "confirmationRequired": true | false
-    }
-  ],
-  "modifiedDocument": [/* Full updated Plate editor value array */]
-}
 
 DOCUMENT MODIFICATION RULES:
 1. You will receive the FULL current document state
@@ -51,15 +53,13 @@ DOCUMENT MODIFICATION RULES:
 6. Make precise, targeted changes based on user intent
 7. Preserve existing document structure and formatting
 8. Maintain legal document formality and accuracy
-9. For deletions that remove substantial content, set confirmationRequired: true
-10. Explain your reasoning in the "explanation" field
-11. Ensure "modifiedDocument" is valid Plate editor format (array of paragraph/heading blocks)
-12. Use tokens like [TESTATOR], [SPOUSE], [CHILD-1] when referencing people from context
-13. All JSON must be properly formatted with matching braces, brackets, and commas
-14. Ensure all strings are properly escaped and quoted
-15. NEVER include explanatory text outside the JSON object
+9. For deletions that remove substantial content, set confirmationRequired: true in the changes array
+10. Explain your reasoning in the "explanation" field of the complete message
+11. Use tokens like [TESTATOR], [SPOUSE], [CHILD-1] when referencing people from context
+12. All JSON must be properly formatted with matching braces, brackets, and commas
+13. Ensure all strings are properly escaped and quoted
 
-CRITICAL: Your response must be PURE JSON. Start with { and end with }. Nothing else.`;
+CRITICAL: Your response must be PURE NDJSON. One JSON object per line. Nothing else.`;
 
 export async function POST(req: NextRequest) {
   try {

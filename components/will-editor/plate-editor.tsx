@@ -482,16 +482,12 @@ export function PlateEditor({ initialValue, onChange, className, willContent }: 
         console.log('Old value length:', currentValue.length);
         console.log('New value length:', initialValue.length);
 
-        // Remove all existing children (from end to beginning to avoid index issues)
-        const nodeCount = editor.children.length;
-        for (let i = nodeCount - 1; i >= 0; i--) {
-          editor.tf.removeNodes({ at: [i] });
-        }
+        // Replace the entire editor content at once
+        // This is more efficient and avoids index-out-of-bounds errors
+        editor.children = initialValue as any[];
 
-        // Insert all new nodes
-        (initialValue as any[]).forEach((node, index) => {
-          editor.tf.insertNodes(node, { at: [index] });
-        });
+        // Normalize the editor to ensure it's in a valid state
+        editor.normalize({ force: true });
 
         console.log('[PlateEditor] Editor updated successfully');
       }

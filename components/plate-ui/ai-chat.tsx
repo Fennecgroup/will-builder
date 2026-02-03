@@ -25,15 +25,92 @@ interface Message {
 
 interface AgentEditOptions {
   isPending: boolean;
+  isStreaming?: boolean;
 }
 
 interface AIChatProps {
   onInsert: (text: string) => void;
   onAgentEdit?: (editorValue: Value, changes: AgentChange[], options?: AgentEditOptions) => void;
+  onStreamingProgress?: (progress: { chars: number; status: string }) => void;
+  onStreamingText?: (text: string) => void;
   willContent?: WillContent;
   editorValue?: Value;
   activeSelectionIndex?: number;
   className?: string;
+}
+
+/**
+ * Unescape JSON string (handle \n, \", \\, etc.)
+ */
+function unescapeJsonString(str: string): string {
+  return str
+    .replace(/\\n/g, '\n')
+    .replace(/\\r/g, '\r')
+    .replace(/\\t/g, '\t')
+    .replace(/\\"/g, '"')
+    .replace(/\\\\/g, '\\');
+}
+
+/**
+ * Parse NDJSON stream incrementally
+ * Returns parsed objects line-by-line
+ */
+async function* parseNDJSON(reader: ReadableStreamDefaultReader<Uint8Array>) {
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+
+    if (done) {
+      // Parse any remaining data
+      const trimmedBuffer = buffer.trim();
+      if (trimmedBuffer && (trimmedBuffer.startsWith('{') || trimmedBuffer.startsWith('['))) {
+        try {
+          yield JSON.parse(trimmedBuffer);
+        } catch (e) {
+          console.error('[NDJSON] Failed to parse final buffer (length:', trimmedBuffer.length, '):',
+            trimmedBuffer.substring(0, 100), '...', e);
+        }
+      }
+      break;
+    }
+
+    // Decode chunk and add to buffer
+    const chunk = decoder.decode(value, { stream: true });
+    buffer += chunk;
+
+    // Process complete lines
+    const lines = buffer.split('\n');
+
+    // Keep the last incomplete line in buffer
+    buffer = lines.pop() || '';
+
+    // Parse and yield complete lines
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+
+      // Skip empty lines
+      if (!trimmedLine) continue;
+
+      // Skip lines that don't look like JSON objects
+      if (!trimmedLine.startsWith('{') && !trimmedLine.startsWith('[')) {
+        console.warn('[NDJSON] Skipping non-JSON line:', trimmedLine.substring(0, 50));
+        continue;
+      }
+
+      try {
+        const parsed = JSON.parse(trimmedLine);
+        yield parsed;
+      } catch (e) {
+        // Only log if the line looks like it should be JSON
+        if (trimmedLine.length > 10) {
+          console.error('[NDJSON] Failed to parse line (length:', trimmedLine.length, '):',
+            trimmedLine.substring(0, 100), '...', e);
+        }
+      }
+    }
+  }
 }
 
 /**
@@ -94,7 +171,7 @@ function deAnonymizeEditorValue(value: any, tokenMap: Record<string, string>): a
   return value;
 }
 
-export function AIChat({ onInsert, onAgentEdit, willContent, editorValue, activeSelectionIndex, className }: AIChatProps) {
+export function AIChat({ onInsert, onAgentEdit, onStreamingProgress, onStreamingText, willContent, editorValue, activeSelectionIndex, className }: AIChatProps) {
   const [mode, setMode] = React.useState<'ask' | 'agent'>(() => {
     if (typeof window !== 'undefined') {
       return (localStorage.getItem('ai-chat-mode') as 'ask' | 'agent') || 'ask';
@@ -281,113 +358,74 @@ Format your responses in a clear, readable way.`,
 
     setMessages((prev) => [...prev, assistantMessage]);
 
-    // Parse streaming response
+    // Parse NDJSON streaming response
     const reader = response.body?.getReader();
-    const decoder = new TextDecoder();
-    let textBuffer = '';
-    let partialObject: Partial<AgentResponse> = {};
+    let documentBlocks: any[] = [];
+    let metadata: any = null;
 
     if (reader) {
       try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) {
-            console.log('[AIChat] Stream ended. Text buffer:', textBuffer);
-            break;
-          }
+        // Parse NDJSON stream
+        for await (const item of parseNDJSON(reader)) {
+          console.log('[AIChat] Received NDJSON item:', item.type);
 
-          const chunk = decoder.decode(value, { stream: true });
-          console.log('[AIChat] Raw chunk received:', chunk);
-          textBuffer += chunk;
+          if (item.type === 'block') {
+            // Document block arrived
+            const { index, node } = item;
 
-          // Update message to show we're receiving data
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === messageId
-                ? {
-                    ...msg,
-                    content: 'Receiving response... (' + textBuffer.length + ' chars)',
-                  }
-                : msg
-            )
-          );
-        }
+            // De-anonymize the node if needed
+            const deAnonymizedNode = context
+              ? deAnonymizeEditorValue(node, Object.fromEntries(context.tokenMap))
+              : node;
 
-        // Try to parse the complete text as JSON
-        console.log('[AIChat] Attempting to parse complete response as JSON');
-        try {
-          // Try to extract JSON from the response (it might be wrapped in markdown)
-          let jsonText = textBuffer.trim();
+            // Insert block at specified index
+            documentBlocks[index] = deAnonymizedNode;
 
-          // Remove markdown code blocks if present
-          if (jsonText.startsWith('```json')) {
-            jsonText = jsonText.substring(7);
-          }
-          if (jsonText.startsWith('```')) {
-            jsonText = jsonText.substring(3);
-          }
-          if (jsonText.endsWith('```')) {
-            jsonText = jsonText.substring(0, jsonText.length - 3);
-          }
-          jsonText = jsonText.trim();
-
-          console.log('[AIChat] Cleaned JSON text:', jsonText);
-
-          partialObject = JSON.parse(jsonText);
-          console.log('[AIChat] Successfully parsed JSON:', partialObject);
-
-          // Deanonymize the parsed object
-          if (context) {
-            const tokenMap = Object.fromEntries(context.tokenMap);
-
-            if (partialObject.explanation) {
-              partialObject.explanation = deAnonymizeText(partialObject.explanation, tokenMap);
+            // Apply blocks to editor incrementally (with streaming marks)
+            if (onAgentEdit) {
+              onAgentEdit(documentBlocks, [], {
+                isPending: true,
+                isStreaming: true  // New flag
+              });
             }
 
-            if (partialObject.changes) {
-              partialObject.changes = partialObject.changes.map(change => ({
+            // Emit progress
+            onStreamingProgress?.({
+              chars: documentBlocks.length,
+              status: 'streaming'
+            });
+
+          } else if (item.type === 'complete') {
+            // Final metadata arrived
+            metadata = item;
+
+            // De-anonymize explanation and changes
+            if (context) {
+              const tokenMap = Object.fromEntries(context.tokenMap);
+              metadata.explanation = deAnonymizeText(metadata.explanation, tokenMap);
+              metadata.changes = metadata.changes?.map((change: any) => ({
                 ...change,
-                location: typeof change.location === 'string'
-                  ? deAnonymizeText(change.location, tokenMap)
-                  : change.location,
-                content: change.content && typeof change.content === 'string'
-                  ? deAnonymizeText(change.content, tokenMap)
-                  : change.content,
+                location: deAnonymizeText(change.location, tokenMap),
+                content: change.content ? deAnonymizeText(change.content, tokenMap) : undefined
               }));
             }
 
-            if (partialObject.modifiedDocument) {
-              partialObject.modifiedDocument = deAnonymizeEditorValue(
-                partialObject.modifiedDocument,
-                tokenMap
-              );
-            }
+            // Show explanation in UI
+            onStreamingText?.(metadata.explanation);
           }
-        } catch (parseError) {
-          console.error('[AIChat] Failed to parse JSON response:', parseError);
-          console.error('[AIChat] Raw text was:', textBuffer);
-
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === messageId
-                ? {
-                    ...msg,
-                    content: 'Error: AI returned invalid JSON format. Please try again.',
-                    isPending: false,
-                  }
-                : msg
-            )
-          );
-
-          setPendingChanges(null);
-          setStreamingMessageId(null);
-          return;
         }
 
-        // Final processing
-        console.log('[AIChat] Stream complete. Final object:', partialObject);
+        // Stream complete - validate and finalize
+        console.log('[AIChat] Stream complete. Blocks:', documentBlocks.length);
 
-        if (!partialObject.explanation && !partialObject.changes) {
+        // Emit parsing status
+        onStreamingProgress?.({
+          chars: documentBlocks.length,
+          status: 'parsing'
+        });
+
+        // Validate we received data
+        if (!metadata || documentBlocks.length === 0) {
           console.error('[AIChat] No data received from stream');
           setMessages((prev) =>
             prev.map((msg) =>
@@ -398,113 +436,141 @@ Format your responses in a clear, readable way.`,
           );
           setPendingChanges(null);
           setStreamingMessageId(null);
+
+          // Reset streaming progress and clear text
+          onStreamingProgress?.({
+            chars: 0,
+            status: 'idle'
+          });
+          onStreamingText?.('');
+
           return;
         }
 
-        if (partialObject.explanation && partialObject.changes && partialObject.modifiedDocument) {
-          // Validate that the AI didn't lose content (safety check)
-          const originalBlockCount = Array.isArray(editorValue) ? editorValue.length : 0;
-          const modifiedBlockCount = Array.isArray(partialObject.modifiedDocument)
-            ? partialObject.modifiedDocument.length
-            : 0;
+        // Content loss detection
+        const originalBlockCount = Array.isArray(editorValue) ? editorValue.length : 0;
+        const modifiedBlockCount = documentBlocks.length;
 
-          console.log('[AIChat] Content validation:', {
-            originalBlocks: originalBlockCount,
-            modifiedBlocks: modifiedBlockCount,
-            changeType: partialObject.changes.map(c => c.type).join(', '),
+        console.log('[AIChat] Content validation:', {
+          originalBlocks: originalBlockCount,
+          modifiedBlocks: modifiedBlockCount,
+          changeType: metadata?.changes?.map((c: any) => c.type).join(', '),
+        });
+
+        // If AI returned significantly fewer blocks and it's not a delete operation, warn user
+        const hasDeleteOperation = metadata?.changes?.some((c: any) => c.type === 'delete');
+        const significantLoss = modifiedBlockCount < originalBlockCount * 0.5; // Lost more than 50% of blocks
+
+        if (significantLoss && !hasDeleteOperation) {
+          console.error('[AIChat] Potential content loss detected!', {
+            original: originalBlockCount,
+            modified: modifiedBlockCount,
           });
 
-          // If AI returned significantly fewer blocks and it's not a delete operation, warn user
-          const hasDeleteOperation = partialObject.changes.some(c => c.type === 'delete');
-          const significantLoss = modifiedBlockCount < originalBlockCount * 0.5; // Lost more than 50% of blocks
-
-          if (significantLoss && !hasDeleteOperation) {
-            console.error('[AIChat] Potential content loss detected!', {
-              original: originalBlockCount,
-              modified: modifiedBlockCount,
-            });
-
-            const confirmed = confirm(
-              `⚠️ CONTENT LOSS DETECTED\n\n` +
-              `The AI response has ${modifiedBlockCount} blocks but your document has ${originalBlockCount} blocks.\n` +
-              `This suggests the AI may have accidentally removed content.\n\n` +
-              `Do you want to apply these changes anyway? (Not recommended)`
-            );
-
-            if (!confirmed) {
-              // User rejected, restore snapshot
-              if (editorSnapshot.current && onAgentEdit) {
-                onAgentEdit(editorSnapshot.current, [], { isPending: false });
-              }
-
-              setMessages((prev) =>
-                prev.map((msg) =>
-                  msg.id === messageId
-                    ? { ...msg, content: 'Changes cancelled due to potential content loss.', isPending: false }
-                    : msg
-                )
-              );
-
-              setPendingChanges(null);
-              setStreamingMessageId(null);
-              return;
-            }
-          }
-
-          // Check for destructive changes
-          const destructiveChanges = partialObject.changes.filter(
-            (c) => c.type === 'delete' && c.confirmationRequired
+          const confirmed = confirm(
+            `⚠️ CONTENT LOSS DETECTED\n\n` +
+            `The AI response has ${modifiedBlockCount} blocks but your document has ${originalBlockCount} blocks.\n` +
+            `This suggests the AI may have accidentally removed content.\n\n` +
+            `Do you want to apply these changes anyway? (Not recommended)`
           );
 
-          if (destructiveChanges.length > 0) {
-            const confirmed = confirm(
-              `The AI wants to delete content:\n${destructiveChanges
-                .map((c) => `• ${c.location}`)
-                .join('\n')}\n\nAllow these changes?`
+          if (!confirmed) {
+            // User rejected, restore snapshot
+            if (editorSnapshot.current && onAgentEdit) {
+              onAgentEdit(editorSnapshot.current, [], { isPending: false });
+            }
+
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === messageId
+                  ? { ...msg, content: 'Changes cancelled due to potential content loss.', isPending: false }
+                  : msg
+              )
             );
 
-            if (!confirmed) {
-              // User rejected, restore snapshot
-              if (editorSnapshot.current && onAgentEdit) {
-                onAgentEdit(editorSnapshot.current, [], { isPending: false });
-              }
+            setPendingChanges(null);
+            setStreamingMessageId(null);
 
-              setMessages((prev) =>
-                prev.map((msg) =>
-                  msg.id === messageId
-                    ? { ...msg, content: 'Changes cancelled by user.', isPending: false }
-                    : msg
-                )
-              );
-
-              setPendingChanges(null);
-              setStreamingMessageId(null);
-              return;
-            }
-          }
-
-          // Set pending changes for accept/reject
-          setPendingChanges({
-            modifiedDocument: partialObject.modifiedDocument,
-            changes: partialObject.changes,
-          });
-
-          // Apply changes to editor with pending marks (show yellow highlighting immediately)
-          if (onAgentEdit) {
-            onAgentEdit(partialObject.modifiedDocument, partialObject.changes, {
-              isPending: true,
+            // Reset streaming progress and clear text
+            onStreamingProgress?.({
+              chars: 0,
+              status: 'idle'
             });
-          }
+            onStreamingText?.('');
 
-          // Update message to not pending (but changes still pending in editor)
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === messageId
-                ? { ...msg, isPending: false }
-                : msg
-            )
-          );
+            return;
+          }
         }
+
+        // Check for destructive changes
+        const destructiveChanges = metadata?.changes?.filter(
+          (c: any) => c.type === 'delete' && c.confirmationRequired
+        ) || [];
+
+        if (destructiveChanges.length > 0) {
+          const confirmed = confirm(
+            `The AI wants to delete content:\n${destructiveChanges
+              .map((c: any) => `• ${c.location}`)
+              .join('\n')}\n\nAllow these changes?`
+          );
+
+          if (!confirmed) {
+            // User rejected, restore snapshot
+            if (editorSnapshot.current && onAgentEdit) {
+              onAgentEdit(editorSnapshot.current, [], { isPending: false });
+            }
+
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === messageId
+                  ? { ...msg, content: 'Changes cancelled by user.', isPending: false }
+                  : msg
+              )
+            );
+
+            setPendingChanges(null);
+            setStreamingMessageId(null);
+
+            // Reset streaming progress and clear text
+            onStreamingProgress?.({
+              chars: 0,
+              status: 'idle'
+            });
+            onStreamingText?.('');
+
+            return;
+          }
+        }
+
+        // Set pending changes for accept/reject
+        setPendingChanges({
+          modifiedDocument: documentBlocks,
+          changes: metadata?.changes || [],
+        });
+
+        // Final application (remove streaming marks, keep pending)
+        if (onAgentEdit) {
+          onAgentEdit(documentBlocks, metadata?.changes || [], {
+            isPending: true,
+            isStreaming: false
+          });
+        }
+
+        // Update message to not pending (but changes still pending in editor)
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === messageId
+              ? { ...msg, isPending: false }
+              : msg
+          )
+        );
+
+        // Reset streaming progress to idle and clear streaming text
+        onStreamingProgress?.({
+          chars: 0,
+          status: 'idle'
+        });
+        onStreamingText?.('');
       } catch (error) {
         console.error('Stream processing error:', error);
 
@@ -522,6 +588,13 @@ Format your responses in a clear, readable way.`,
         );
 
         setPendingChanges(null);
+
+        // Reset streaming progress and clear text
+        onStreamingProgress?.({
+          chars: 0,
+          status: 'idle'
+        });
+        onStreamingText?.('');
       } finally {
         setStreamingMessageId(null);
       }

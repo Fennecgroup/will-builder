@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Save, FileDown, Clock, Trash2, CheckCircle2, Pencil, AlertCircle, ListPlus, Eye } from 'lucide-react'
+import { ArrowLeft, Save, FileDown, Clock, Trash2, CheckCircle2, Pencil, AlertCircle, ListPlus, Eye, Loader2 } from 'lucide-react'
 import type { Value } from '@udecode/plate'
 import { Will } from '@prisma/client'
 import { Button } from '@/components/ui/button'
@@ -98,6 +98,15 @@ export function WillEditor({ will }: WillEditorProps) {
 
   // Track active selection index for document context
   const [activeSelectionIndex, setActiveSelectionIndex] = useState<number>(0)
+
+  // Streaming progress state for agent mode
+  const [streamingProgress, setStreamingProgress] = useState<{
+    chars: number;
+    status: 'streaming' | 'parsing' | 'idle';
+  }>({ chars: 0, status: 'idle' })
+
+  // Streaming text state for displaying in editor
+  const [streamingText, setStreamingText] = useState<string>('')
 
   // Track mount state to avoid hydration mismatch
   useEffect(() => {
@@ -262,14 +271,14 @@ export function WillEditor({ will }: WillEditorProps) {
   }, []);
 
   // Helper function to apply or remove AI marks to/from editor value
-  const applyAIMarks = useCallback((value: Value, isPending: boolean, removeMarks: boolean = false): Value => {
+  const applyAIMarks = useCallback((value: Value, isPending: boolean, isStreaming: boolean = false, removeMarks: boolean = false): Value => {
     // Recursively traverse editor nodes and add/remove AI marks
     const markNodes = (nodes: any[]): any[] => {
       return nodes.map(node => {
         if ('text' in node) {
           if (removeMarks) {
             // Remove AI marks completely
-            const { ai, pending, ...rest } = node;
+            const { ai, pending, streaming, ...rest } = node;
             return rest;
           } else {
             // Add AI marks
@@ -277,6 +286,7 @@ export function WillEditor({ will }: WillEditorProps) {
               ...node,
               ai: true,
               pending: isPending,
+              streaming: isStreaming,
             };
           }
         }
@@ -294,22 +304,42 @@ export function WillEditor({ will }: WillEditorProps) {
     return markNodes(value) as Value;
   }, []);
 
+  // Handle streaming progress updates from AI chat
+  const handleStreamingProgress = useCallback((progress: { chars: number; status: string }) => {
+    setStreamingProgress({
+      chars: progress.chars,
+      status: progress.status as 'streaming' | 'parsing' | 'idle'
+    });
+  }, []);
+
+  // Handle streaming text updates from AI chat
+  const handleStreamingText = useCallback((text: string) => {
+    setStreamingText(text);
+  }, []);
+
   // Handle AI agent edits with pending state support
   const handleAgentEdit = useCallback((
     newEditorValue: Value,
     changes: AgentChange[],
-    options?: { isPending: boolean }
+    options?: { isPending: boolean; isStreaming?: boolean }
   ) => {
     const isPending = options?.isPending ?? false;
+    const isStreaming = options?.isStreaming ?? false;
 
-    // Apply marks based on pending state
-    const markedDocument = applyAIMarks(newEditorValue, isPending);
+    // Apply marks based on pending and streaming state
+    const markedDocument = applyAIMarks(newEditorValue, isPending, isStreaming);
 
     // Update editor value
     setEditorValue(markedDocument);
 
-    if (!isPending) {
-      // Only mark as unsaved and save when confirmed
+    // Only reset streaming state when not streaming
+    if (!isStreaming) {
+      setStreamingProgress({ chars: 0, status: 'idle' });
+      setStreamingText('');
+    }
+
+    // Only mark as unsaved and show toast when finalized
+    if (!isPending && !isStreaming) {
       setHasUnsavedChanges(true);
 
       toast.success('AI updated your document', {
@@ -723,6 +753,18 @@ export function WillEditor({ will }: WillEditorProps) {
               willContent={willContent}
               className="h-full"
             />
+
+            {/* Streaming Text Display */}
+            {streamingText && (
+              <div className="mt-4 p-4 bg-emerald-50 dark:bg-emerald-900/10 border-l-4 border-emerald-500 rounded-r-lg animate-pulse">
+                <div className="flex items-start gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-emerald-600 mt-1 flex-shrink-0" />
+                  <p className="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap">
+                    {streamingText}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -731,6 +773,8 @@ export function WillEditor({ will }: WillEditorProps) {
           <AIChat
             onInsert={handleInsertFromChat}
             onAgentEdit={handleAgentEdit}
+            onStreamingProgress={handleStreamingProgress}
+            onStreamingText={handleStreamingText}
             willContent={willContent}
             editorValue={editorValue}
             activeSelectionIndex={activeSelectionIndex}
