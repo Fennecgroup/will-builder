@@ -54,10 +54,12 @@ function unescapeJsonString(str: string): string {
 /**
  * Parse NDJSON stream incrementally
  * Returns parsed objects line-by-line
+ * Also handles legacy single-JSON format
  */
 async function* parseNDJSON(reader: ReadableStreamDefaultReader<Uint8Array>) {
   const decoder = new TextDecoder();
   let buffer = '';
+  let isLegacyFormat = false;
 
   while (true) {
     const { done, value } = await reader.read();
@@ -67,10 +69,20 @@ async function* parseNDJSON(reader: ReadableStreamDefaultReader<Uint8Array>) {
       const trimmedBuffer = buffer.trim();
       if (trimmedBuffer && (trimmedBuffer.startsWith('{') || trimmedBuffer.startsWith('['))) {
         try {
-          yield JSON.parse(trimmedBuffer);
+          const parsed = JSON.parse(trimmedBuffer);
+
+          // Detect if this is legacy format (has modifiedDocument field)
+          if (parsed.modifiedDocument && !parsed.type) {
+            console.log('[NDJSON] Detected legacy JSON format');
+            isLegacyFormat = true;
+          }
+
+          yield parsed;
         } catch (e) {
-          console.error('[NDJSON] Failed to parse final buffer (length:', trimmedBuffer.length, '):',
-            trimmedBuffer.substring(0, 100), '...', e);
+          // Only log parse errors if we haven't detected legacy format
+          if (!isLegacyFormat) {
+            console.error('[NDJSON] Failed to parse final buffer:', e);
+          }
         }
       }
       break;
@@ -79,6 +91,13 @@ async function* parseNDJSON(reader: ReadableStreamDefaultReader<Uint8Array>) {
     // Decode chunk and add to buffer
     const chunk = decoder.decode(value, { stream: true });
     buffer += chunk;
+
+    // If buffer is getting large and doesn't contain newlines, likely legacy format
+    if (buffer.length > 500 && !buffer.includes('\n')) {
+      isLegacyFormat = true;
+      console.log('[NDJSON] Detected legacy format (no newlines in large buffer)');
+      continue; // Keep buffering until done
+    }
 
     // Process complete lines
     const lines = buffer.split('\n');
@@ -95,18 +114,30 @@ async function* parseNDJSON(reader: ReadableStreamDefaultReader<Uint8Array>) {
 
       // Skip lines that don't look like JSON objects
       if (!trimmedLine.startsWith('{') && !trimmedLine.startsWith('[')) {
-        console.warn('[NDJSON] Skipping non-JSON line:', trimmedLine.substring(0, 50));
+        // Only warn if not legacy format
+        if (!isLegacyFormat) {
+          console.warn('[NDJSON] Skipping non-JSON line:', trimmedLine.substring(0, 50));
+        }
         continue;
       }
 
       try {
         const parsed = JSON.parse(trimmedLine);
+
+        // Detect if this is legacy format
+        if (parsed.modifiedDocument && !parsed.type) {
+          console.log('[NDJSON] Detected legacy JSON format');
+          isLegacyFormat = true;
+        }
+
         yield parsed;
       } catch (e) {
-        // Only log if the line looks like it should be JSON
-        if (trimmedLine.length > 10) {
-          console.error('[NDJSON] Failed to parse line (length:', trimmedLine.length, '):',
-            trimmedLine.substring(0, 100), '...', e);
+        // Only log errors if:
+        // 1. Not legacy format
+        // 2. Line is substantial (> 10 chars)
+        // 3. Line doesn't look like partial JSON
+        if (!isLegacyFormat && trimmedLine.length > 10 && !trimmedLine.includes('...')) {
+          console.warn('[NDJSON] Parse error (will retry):', trimmedLine.substring(0, 50));
         }
       }
     }
@@ -362,6 +393,7 @@ Format your responses in a clear, readable way.`,
     const reader = response.body?.getReader();
     let documentBlocks: any[] = [];
     let metadata: any = null;
+    let receivedNDJSON = false;
 
     if (reader) {
       try {
@@ -369,9 +401,20 @@ Format your responses in a clear, readable way.`,
         for await (const item of parseNDJSON(reader)) {
           console.log('[AIChat] Received NDJSON item:', item.type);
 
+          // Check if this is NDJSON format (has 'type' field)
+          if (item.type === 'block' || item.type === 'complete') {
+            receivedNDJSON = true;
+          }
+
           if (item.type === 'block') {
             // Document block arrived
             const { index, node } = item;
+
+            // Validate node exists
+            if (!node) {
+              console.warn('[AIChat] Received block with no node at index', index);
+              continue;
+            }
 
             // De-anonymize the node if needed
             const deAnonymizedNode = context
@@ -381,9 +424,12 @@ Format your responses in a clear, readable way.`,
             // Insert block at specified index
             documentBlocks[index] = deAnonymizedNode;
 
+            // Filter out undefined blocks before passing to editor (in case of sparse array)
+            const validBlocks = documentBlocks.filter(block => block !== undefined && block !== null);
+
             // Apply blocks to editor incrementally (with streaming marks)
-            if (onAgentEdit) {
-              onAgentEdit(documentBlocks, [], {
+            if (onAgentEdit && validBlocks.length > 0) {
+              onAgentEdit(validBlocks, [], {
                 isPending: true,
                 isStreaming: true  // New flag
               });
@@ -391,7 +437,7 @@ Format your responses in a clear, readable way.`,
 
             // Emit progress
             onStreamingProgress?.({
-              chars: documentBlocks.length,
+              chars: validBlocks.length,
               status: 'streaming'
             });
 
@@ -412,11 +458,40 @@ Format your responses in a clear, readable way.`,
 
             // Show explanation in UI
             onStreamingText?.(metadata.explanation);
+          } else if (!item.type && item.modifiedDocument) {
+            // Legacy format detected - convert it
+            console.log('[AIChat] Detected legacy JSON format during parsing');
+            receivedNDJSON = false;
+
+            documentBlocks = item.modifiedDocument;
+            metadata = {
+              explanation: item.explanation,
+              changes: item.changes,
+              totalBlocks: documentBlocks.length
+            };
+
+            // Apply deanonymization if needed
+            if (context) {
+              const tokenMap = Object.fromEntries(context.tokenMap);
+              documentBlocks = deAnonymizeEditorValue(documentBlocks, tokenMap);
+              metadata.explanation = deAnonymizeText(metadata.explanation, tokenMap);
+              metadata.changes = metadata.changes?.map((change: any) => ({
+                ...change,
+                location: deAnonymizeText(change.location, tokenMap),
+                content: change.content ? deAnonymizeText(change.content, tokenMap) : undefined
+              }));
+            }
+
+            // Show explanation
+            onStreamingText?.(metadata.explanation);
+
+            // Break out of loop since we have everything
+            break;
           }
         }
 
         // Stream complete - validate and finalize
-        console.log('[AIChat] Stream complete. Blocks:', documentBlocks.length);
+        console.log('[AIChat] Stream complete. Blocks:', documentBlocks.length, 'NDJSON:', receivedNDJSON);
 
         // Emit parsing status
         onStreamingProgress?.({

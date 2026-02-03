@@ -275,6 +275,11 @@ export function WillEditor({ will }: WillEditorProps) {
     // Recursively traverse editor nodes and add/remove AI marks
     const markNodes = (nodes: any[]): any[] => {
       return nodes.map(node => {
+        // Safety check: skip undefined or null nodes
+        if (!node || typeof node !== 'object') {
+          return node;
+        }
+
         if ('text' in node) {
           if (removeMarks) {
             // Remove AI marks completely
