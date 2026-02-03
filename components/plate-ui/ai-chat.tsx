@@ -241,6 +241,68 @@ function deAnonymizeEditorValue(value: any, tokenMap: Record<string, string>): a
   return value;
 }
 
+/**
+ * Count total characters in editor value
+ */
+function getTotalCharacterCount(value: Value): number {
+  let count = 0;
+  const traverse = (nodes: any[]) => {
+    for (const node of nodes) {
+      if ('text' in node && typeof node.text === 'string') {
+        count += node.text.length;
+      }
+      if ('children' in node && Array.isArray(node.children)) {
+        traverse(node.children);
+      }
+    }
+  };
+  traverse(value);
+  return count;
+}
+
+/**
+ * Extract editor value up to a specific character count
+ * Returns a partial editor value with text truncated at the character limit
+ */
+function extractCharactersUpTo(value: Value, charLimit: number): Value {
+  let charCount = 0;
+
+  const extractNodes = (nodes: any[]): any[] => {
+    const result: any[] = [];
+
+    for (const node of nodes) {
+      if (charCount >= charLimit) break;
+
+      if ('text' in node && typeof node.text === 'string') {
+        const remainingChars = charLimit - charCount;
+        const textToInclude = node.text.slice(0, remainingChars);
+
+        result.push({
+          ...node,
+          text: textToInclude
+        });
+
+        charCount += textToInclude.length;
+      } else if ('children' in node && Array.isArray(node.children)) {
+        const extractedChildren = extractNodes(node.children);
+
+        if (extractedChildren.length > 0) {
+          result.push({
+            ...node,
+            children: extractedChildren
+          });
+        }
+      } else {
+        result.push(node);
+      }
+    }
+
+    return result;
+  };
+
+  return extractNodes(value) as Value;
+}
+
 export function AIChat({ onInsert, onAgentEdit, onStreamingProgress, onStreamingText, willContent, editorValue, activeSelectionIndex, className }: AIChatProps) {
   const [mode, setMode] = React.useState<'ask' | 'agent'>(() => {
     if (typeof window !== 'undefined') {
@@ -265,6 +327,11 @@ export function AIChat({ onInsert, onAgentEdit, onStreamingProgress, onStreaming
     changes: AgentChange[];
   } | null>(null);
   const [streamingMessageId, setStreamingMessageId] = React.useState<string | null>(null);
+  const [characterBuffer, setCharacterBuffer] = React.useState<Value>([]);
+  const characterBufferRef = React.useRef<Value>([]);
+  const [characterIndex, setCharacterIndex] = React.useState(0);
+  const animationFrameRef = React.useRef<number | null>(null);
+  const lastAnimatedCharCount = React.useRef<number>(0);
 
   React.useEffect(() => {
     localStorage.setItem('ai-chat-mode', mode);
@@ -287,6 +354,81 @@ export function AIChat({ onInsert, onAgentEdit, onStreamingProgress, onStreaming
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [pendingChanges]);
+
+  // Cleanup animation on unmount
+  React.useEffect(() => {
+    return () => {
+      if (animationFrameRef.current) {
+        clearTimeout(animationFrameRef.current);
+      }
+    };
+  }, []);
+
+  // Character animation effect - runs when buffer updates
+  React.useEffect(() => {
+    if (characterBuffer.length === 0) return;
+
+    // Update ref with latest buffer
+    characterBufferRef.current = characterBuffer;
+
+    const CHARS_PER_FRAME = 3;
+    const FRAME_DELAY = 4;
+
+    // If animation is already running, let it continue (it will pick up the new content from the ref)
+    if (animationFrameRef.current) {
+      return;
+    }
+
+    // Start animation from where we left off
+    let currentIndex = lastAnimatedCharCount.current;
+
+    const animate = () => {
+      // Read the latest buffer from ref
+      const currentBuffer = characterBufferRef.current;
+
+      // Safety check: if buffer was cleared, stop animation
+      if (!currentBuffer || currentBuffer.length === 0) {
+        animationFrameRef.current = null;
+        return;
+      }
+
+      const totalChars = getTotalCharacterCount(currentBuffer);
+
+      if (currentIndex >= totalChars) {
+        // Animation caught up with current buffer
+        animationFrameRef.current = null;
+        lastAnimatedCharCount.current = currentIndex;
+        return;
+      }
+
+      // Extract partial content up to currentIndex
+      const partialContent = extractCharactersUpTo(currentBuffer, currentIndex);
+
+      // Apply to editor with streaming marks
+      if (onAgentEdit && partialContent.length > 0) {
+        onAgentEdit(partialContent, [], {
+          isPending: true,
+          isStreaming: true
+        });
+      }
+
+      // Emit progress
+      onStreamingProgress?.({
+        chars: currentIndex,
+        status: 'streaming'
+      });
+
+      currentIndex += CHARS_PER_FRAME;
+      lastAnimatedCharCount.current = currentIndex;
+
+      // Schedule next frame
+      animationFrameRef.current = window.setTimeout(() => {
+        requestAnimationFrame(animate);
+      }, FRAME_DELAY);
+    };
+
+    requestAnimationFrame(animate);
+  }, [characterBuffer, onAgentEdit, onStreamingProgress]);
 
   const handleAskMode = React.useCallback(async (userInput: string, context: any) => {
     console.log('Ask mode request:', { userInput, context: context?.contextData });
@@ -366,6 +508,16 @@ Format your responses in a clear, readable way.`,
     if (editorValue) {
       editorSnapshot.current = JSON.parse(JSON.stringify(editorValue));
     }
+
+    // Clear any previous character buffer and animation
+    if (animationFrameRef.current) {
+      clearTimeout(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    setCharacterBuffer([]);
+    characterBufferRef.current = [];
+    setCharacterIndex(0);
+    lastAnimatedCharCount.current = 0;
 
     // Build request body - always include full document
     let requestBody: any = {
@@ -466,19 +618,9 @@ Format your responses in a clear, readable way.`,
             // Filter out undefined blocks and deeply validate structure
             const validBlocks = validateEditorValue(documentBlocks) || [];
 
-            // Apply blocks to editor incrementally (with streaming marks)
-            if (onAgentEdit && validBlocks.length > 0) {
-              onAgentEdit(validBlocks, [], {
-                isPending: true,
-                isStreaming: true  // New flag
-              });
-            }
-
-            // Emit progress
-            onStreamingProgress?.({
-              chars: validBlocks.length,
-              status: 'streaming'
-            });
+            // Buffer blocks for character-by-character rendering
+            // The animation will be triggered by the effect when buffer updates
+            setCharacterBuffer(validBlocks);
 
           } else if (item.type === 'complete') {
             // Final metadata arrived
@@ -549,6 +691,17 @@ Format your responses in a clear, readable way.`,
         // Validate we received data
         if (!metadata || documentBlocks.length === 0) {
           console.error('[AIChat] No data received from stream');
+
+          // Cancel animation and clear buffer
+          if (animationFrameRef.current) {
+            clearTimeout(animationFrameRef.current);
+            animationFrameRef.current = null;
+          }
+          setCharacterBuffer([]);
+          characterBufferRef.current = [];
+          setCharacterIndex(0);
+          lastAnimatedCharCount.current = 0;
+
           setMessages((prev) =>
             prev.map((msg) =>
               msg.id === messageId
@@ -597,6 +750,16 @@ Format your responses in a clear, readable way.`,
           );
 
           if (!confirmed) {
+            // Cancel animation and clear buffer
+            if (animationFrameRef.current) {
+              clearTimeout(animationFrameRef.current);
+              animationFrameRef.current = null;
+            }
+            setCharacterBuffer([]);
+            characterBufferRef.current = [];
+            setCharacterIndex(0);
+            lastAnimatedCharCount.current = 0;
+
             // User rejected, restore snapshot
             if (editorSnapshot.current && onAgentEdit) {
               onAgentEdit(editorSnapshot.current, [], { isPending: false });
@@ -637,6 +800,16 @@ Format your responses in a clear, readable way.`,
           );
 
           if (!confirmed) {
+            // Cancel animation and clear buffer
+            if (animationFrameRef.current) {
+              clearTimeout(animationFrameRef.current);
+              animationFrameRef.current = null;
+            }
+            setCharacterBuffer([]);
+            characterBufferRef.current = [];
+            setCharacterIndex(0);
+            lastAnimatedCharCount.current = 0;
+
             // User rejected, restore snapshot
             if (editorSnapshot.current && onAgentEdit) {
               onAgentEdit(editorSnapshot.current, [], { isPending: false });
@@ -663,6 +836,18 @@ Format your responses in a clear, readable way.`,
             return;
           }
         }
+
+        // Cancel any ongoing animation and clear buffer
+        if (animationFrameRef.current) {
+          clearTimeout(animationFrameRef.current);
+          animationFrameRef.current = null;
+        }
+
+        // Clear buffer but DON'T reset lastAnimatedCharCount
+        // This prevents restarting if effect somehow runs again
+        setCharacterBuffer([]);
+        characterBufferRef.current = [];
+        setCharacterIndex(0);
 
         // Validate and clean final document blocks
         const finalValidBlocks = validateEditorValue(documentBlocks) || [];
@@ -703,6 +888,16 @@ Format your responses in a clear, readable way.`,
         onStreamingText?.('');
       } catch (error) {
         console.error('Stream processing error:', error);
+
+        // Cancel animation and clear buffer
+        if (animationFrameRef.current) {
+          clearTimeout(animationFrameRef.current);
+          animationFrameRef.current = null;
+        }
+        setCharacterBuffer([]);
+        characterBufferRef.current = [];
+        setCharacterIndex(0);
+        lastAnimatedCharCount.current = 0;
 
         // Restore snapshot on error
         if (editorSnapshot.current && onAgentEdit) {
