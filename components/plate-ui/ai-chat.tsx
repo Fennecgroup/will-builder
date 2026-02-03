@@ -145,6 +145,45 @@ async function* parseNDJSON(reader: ReadableStreamDefaultReader<Uint8Array>) {
 }
 
 /**
+ * Recursively validate and clean editor value, removing any undefined nodes
+ */
+function validateEditorValue(value: any): any {
+  if (!value) return null;
+
+  // Handle arrays
+  if (Array.isArray(value)) {
+    return value
+      .filter(item => item !== undefined && item !== null)
+      .map(item => validateEditorValue(item))
+      .filter(item => item !== null);
+  }
+
+  // Handle objects (editor nodes)
+  if (typeof value === 'object') {
+    const result: any = { ...value };
+
+    // Recursively validate children
+    if (Array.isArray(result.children)) {
+      result.children = result.children
+        .filter((child: any) => child !== undefined && child !== null)
+        .map((child: any) => validateEditorValue(child))
+        .filter((child: any) => child !== null);
+
+      // If children array is empty and node has text, that's valid
+      // Otherwise, ensure we have at least one child
+      if (result.children.length === 0 && !('text' in result)) {
+        return null;
+      }
+    }
+
+    return result;
+  }
+
+  // Return primitive values as-is
+  return value;
+}
+
+/**
  * Recursively remove pending flag from AI marks
  */
 function removePendingMarks(value: Value): Value {
@@ -424,8 +463,8 @@ Format your responses in a clear, readable way.`,
             // Insert block at specified index
             documentBlocks[index] = deAnonymizedNode;
 
-            // Filter out undefined blocks before passing to editor (in case of sparse array)
-            const validBlocks = documentBlocks.filter(block => block !== undefined && block !== null);
+            // Filter out undefined blocks and deeply validate structure
+            const validBlocks = validateEditorValue(documentBlocks) || [];
 
             // Apply blocks to editor incrementally (with streaming marks)
             if (onAgentEdit && validBlocks.length > 0) {
@@ -463,17 +502,25 @@ Format your responses in a clear, readable way.`,
             console.log('[AIChat] Detected legacy JSON format during parsing');
             receivedNDJSON = false;
 
-            documentBlocks = item.modifiedDocument;
+            // Apply deanonymization if needed
+            let processedBlocks = item.modifiedDocument;
+            if (context) {
+              const tokenMap = Object.fromEntries(context.tokenMap);
+              processedBlocks = deAnonymizeEditorValue(processedBlocks, tokenMap);
+            }
+
+            // Validate and clean the blocks
+            documentBlocks = validateEditorValue(processedBlocks) || [];
+
             metadata = {
               explanation: item.explanation,
               changes: item.changes,
               totalBlocks: documentBlocks.length
             };
 
-            // Apply deanonymization if needed
+            // Deanonymize metadata
             if (context) {
               const tokenMap = Object.fromEntries(context.tokenMap);
-              documentBlocks = deAnonymizeEditorValue(documentBlocks, tokenMap);
               metadata.explanation = deAnonymizeText(metadata.explanation, tokenMap);
               metadata.changes = metadata.changes?.map((change: any) => ({
                 ...change,
@@ -617,15 +664,18 @@ Format your responses in a clear, readable way.`,
           }
         }
 
+        // Validate and clean final document blocks
+        const finalValidBlocks = validateEditorValue(documentBlocks) || [];
+
         // Set pending changes for accept/reject
         setPendingChanges({
-          modifiedDocument: documentBlocks,
+          modifiedDocument: finalValidBlocks,
           changes: metadata?.changes || [],
         });
 
         // Final application (remove streaming marks, keep pending)
         if (onAgentEdit) {
-          onAgentEdit(documentBlocks, metadata?.changes || [], {
+          onAgentEdit(finalValidBlocks, metadata?.changes || [], {
             isPending: true,
             isStreaming: false
           });
@@ -771,14 +821,16 @@ Format your responses in a clear, readable way.`,
       {/* Messages - Scrollable */}
       <ScrollArea className="flex-1 min-h-0 px-4">
         <div className="space-y-4 py-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={cn(
-                'flex gap-3 text-sm',
-                message.role === 'user' ? 'justify-end' : 'justify-start'
-              )}
-            >
+          {messages
+            .filter(message => message.content.trim() !== '') // Filter out empty messages
+            .map((message) => (
+              <div
+                key={message.id}
+                className={cn(
+                  'flex gap-3 text-sm',
+                  message.role === 'user' ? 'justify-end' : 'justify-start'
+                )}
+              >
               {message.role === 'assistant' && (
                 <div className={cn(
                   'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
