@@ -681,11 +681,16 @@ Format your responses in a clear, readable way.`,
           });
         }
 
-        // Update message to not pending (but changes still pending in editor)
+        // Update message with explanation and changes (but changes still pending in editor)
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === messageId
-              ? { ...msg, isPending: false }
+              ? {
+                  ...msg,
+                  content: metadata?.explanation || 'Document updated successfully.',
+                  changes: metadata?.changes || [],
+                  isPending: false
+                }
               : msg
           )
         );
@@ -822,7 +827,7 @@ Format your responses in a clear, readable way.`,
       <ScrollArea className="flex-1 min-h-0 px-4">
         <div className="space-y-4 py-4">
           {messages
-            .filter(message => message.content.trim() !== '') // Filter out empty messages
+            .filter(message => message.content.trim() !== '') // Only show messages with content
             .map((message) => (
               <div
                 key={message.id}
