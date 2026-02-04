@@ -79,6 +79,16 @@ export async function POST(req: NextRequest) {
     console.log('[API] Has editorContent:', !!editorContent);
     console.log('[API] Has documentContext:', !!documentContext);
 
+    // Log LLM provider info for debugging
+    try {
+      const model = getModel();
+      console.log('[API] Using LLM provider:', process.env.LLM_PROVIDER || 'auto');
+      console.log('[API] Model initialized successfully');
+    } catch (modelError) {
+      console.error('[API] Error getting model:', modelError);
+      throw new Error(`Failed to initialize LLM model: ${(modelError as Error).message}`);
+    }
+
     // Choose behavior based on mode
     if (mode === 'agent') {
       // AGENT MODE: Return structured JSON
@@ -131,8 +141,10 @@ Your "modifiedDocument" response must include ALL elements from that document.`;
 
       try {
         // TEMPORARY: Use streamText instead of streamObject as a workaround
+        const model = getModel();
+
         const result = streamText({
-          model: getModel(),
+          model,
           system: enhancedSystem,
           messages: [
             ...(messages || []),
@@ -148,11 +160,18 @@ Your "modifiedDocument" response must include ALL elements from that document.`;
         return result.toTextStreamResponse();
       } catch (streamError) {
         console.error('[Agent Mode] Error during streamText:', streamError);
+        console.error('[Agent Mode] Error details:', {
+          name: (streamError as Error).name,
+          message: (streamError as Error).message,
+          stack: (streamError as Error).stack
+        });
         throw streamError;
       }
 
     } else {
       // ASK MODE: Current streaming behavior
+      console.log('[Ask Mode] Starting streamText');
+
       const enhancedSystem = testatorContext
         ? `${system || defaultSystemPrompt}
 
@@ -162,19 +181,33 @@ ${testatorContext}
 IMPORTANT: When referencing people or details from the context, use the exact tokens provided (e.g., [TESTATOR], [SPOUSE], [CHILD-1]). These tokens will be automatically replaced with actual names in the output.`
         : (system || defaultSystemPrompt);
 
-      const result = streamText({
-        model: getModel(),
-        system: enhancedSystem,
-        messages: [
-          ...(messages || []),
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-      });
+      try {
+        const model = getModel();
 
-      return result.toTextStreamResponse();
+        const result = streamText({
+          model,
+          system: enhancedSystem,
+          messages: [
+            ...(messages || []),
+            {
+              role: 'user',
+              content: prompt,
+            },
+          ],
+        });
+
+        console.log('[Ask Mode] streamText created, returning response');
+
+        return result.toTextStreamResponse();
+      } catch (streamError) {
+        console.error('[Ask Mode] Error during streamText:', streamError);
+        console.error('[Ask Mode] Error details:', {
+          name: (streamError as Error).name,
+          message: (streamError as Error).message,
+          stack: (streamError as Error).stack
+        });
+        throw streamError;
+      }
     }
   } catch (error) {
     console.error('AI command error:', error);

@@ -1,18 +1,19 @@
 /**
  * LLM Provider Module
  *
- * Centralized abstraction layer for different AI providers (OpenAI, Anthropic/Claude, etc.)
+ * Centralized abstraction layer for different AI providers (OpenAI, Anthropic/Claude, Google/Gemini)
  * Allows easy switching between providers via environment configuration.
  */
 
 import { openai } from '@ai-sdk/openai';
 import { anthropic } from '@ai-sdk/anthropic';
+import { google } from '@ai-sdk/google';
 import type { LanguageModel } from 'ai';
 
 /**
  * Supported LLM providers
  */
-export type LLMProvider = 'openai' | 'anthropic' | 'auto';
+export type LLMProvider = 'openai' | 'anthropic' | 'google' | 'auto';
 
 /**
  * Provider configuration interface
@@ -29,6 +30,7 @@ interface ProviderConfig {
 const DEFAULT_MODELS: Record<Exclude<LLMProvider, 'auto'>, string> = {
   openai: process.env.OPENAI_MODEL || 'gpt-4o-mini',
   anthropic: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5-20250929',
+  google: process.env.GOOGLE_MODEL || 'gemini-2.5-flash',
 };
 
 /**
@@ -38,25 +40,33 @@ function validateApiKey(provider: Exclude<LLMProvider, 'auto'>): void {
   const apiKeyMap: Record<Exclude<LLMProvider, 'auto'>, string | undefined> = {
     openai: process.env.OPENAI_API_KEY,
     anthropic: process.env.ANTHROPIC_API_KEY,
+    google: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
   };
 
   const apiKey = apiKeyMap[provider];
 
   if (!apiKey) {
+    const envVarName = provider === 'google'
+      ? 'GOOGLE_GENERATIVE_AI_API_KEY'
+      : `${provider.toUpperCase()}_API_KEY`;
     throw new Error(
       `Missing API key for provider "${provider}". ` +
-      `Please set ${provider.toUpperCase()}_API_KEY in your environment variables.`
+      `Please set ${envVarName} in your environment variables.`
     );
   }
 }
 
 /**
  * Detect which provider to use based on available API keys
- * Priority: Anthropic > OpenAI
+ * Priority: Anthropic > Google > OpenAI
  */
 function detectProvider(): Exclude<LLMProvider, 'auto'> {
   if (process.env.ANTHROPIC_API_KEY) {
     return 'anthropic';
+  }
+
+  if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    return 'google';
   }
 
   if (process.env.OPENAI_API_KEY) {
@@ -65,7 +75,7 @@ function detectProvider(): Exclude<LLMProvider, 'auto'> {
 
   throw new Error(
     'No LLM provider API keys found. ' +
-    'Please set either ANTHROPIC_API_KEY or OPENAI_API_KEY in your environment variables.'
+    'Please set either ANTHROPIC_API_KEY, GOOGLE_GENERATIVE_AI_API_KEY, or OPENAI_API_KEY in your environment variables.'
   );
 }
 
@@ -94,6 +104,7 @@ function getModelName(provider: Exclude<LLMProvider, 'auto'>): string {
   const envModelMap: Record<Exclude<LLMProvider, 'auto'>, string | undefined> = {
     openai: process.env.OPENAI_MODEL,
     anthropic: process.env.ANTHROPIC_MODEL,
+    google: process.env.GOOGLE_MODEL,
   };
 
   const envModel = envModelMap[provider];
@@ -116,6 +127,9 @@ function createModelInstance(
 
     case 'anthropic':
       return anthropic(modelName);
+
+    case 'google':
+      return google(modelName);
 
     default:
       throw new Error(`Unsupported provider: ${provider}`);
@@ -155,7 +169,7 @@ export function getModel(): LanguageModel {
  * Useful when you want to explicitly use a specific provider
  * regardless of the default configuration.
  *
- * @param provider - The provider to use ('openai' or 'anthropic')
+ * @param provider - The provider to use ('openai', 'anthropic', or 'google')
  * @param modelName - Optional model name (uses default if not provided)
  * @returns Model instance for the specified provider
  * @throws Error if the provider's API key is not configured
@@ -164,6 +178,9 @@ export function getModel(): LanguageModel {
  * ```ts
  * // Use Claude Opus for complex legal reasoning
  * const model = getModelForProvider('anthropic', 'claude-opus-4-5-20251101');
+ *
+ * // Use Gemini for multimodal tasks
+ * const model = getModelForProvider('google', 'gemini-2.0-flash-exp');
  *
  * const result = await streamText({
  *   model,

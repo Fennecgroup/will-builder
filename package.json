@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.35",
+    "@ai-sdk/google": "^3.0.20",
     "@ai-sdk/openai": "^3.0.0",
     "@clerk/nextjs": "^6.35.2",
     "@platejs/floating": "^51.1.2",
