@@ -57,6 +57,8 @@ interface AIChatProps {
   onAgentEdit?: (editorValue: Value, changes: AgentChange[], options?: AgentEditOptions) => void;
   onStreamingProgress?: (progress: { chars: number; status: string }) => void;
   onStreamingText?: (text: string) => void;
+  onPendingChangesUpdate?: (hasPendingChanges: boolean) => void;
+  onAcceptChanges?: () => void;
   willContent?: WillContent;
   editorValue?: Value;
   activeSelectionIndex?: number;
@@ -327,7 +329,7 @@ function extractCharactersUpTo(value: Value, charLimit: number): Value {
   return extractNodes(value) as Value;
 }
 
-export function AIChat({ onInsert, onAgentEdit, onStreamingProgress, onStreamingText, willContent, editorValue, activeSelectionIndex, className }: AIChatProps) {
+export function AIChat({ onInsert, onAgentEdit, onStreamingProgress, onStreamingText, onPendingChangesUpdate, onAcceptChanges, willContent, editorValue, activeSelectionIndex, className }: AIChatProps) {
   const [mode, setMode] = React.useState<'ask' | 'agent'>(() => {
     if (typeof window !== 'undefined') {
       return (localStorage.getItem('ai-chat-mode') as 'ask' | 'agent') || 'ask';
@@ -387,6 +389,11 @@ export function AIChat({ onInsert, onAgentEdit, onStreamingProgress, onStreaming
       }
     };
   }, []);
+
+  // Notify parent when pending changes state changes
+  React.useEffect(() => {
+    onPendingChangesUpdate?.(pendingChanges !== null);
+  }, [pendingChanges, onPendingChangesUpdate]);
 
   // Character animation effect - runs when buffer updates
   React.useEffect(() => {
@@ -1013,7 +1020,10 @@ Format your responses in a clear, readable way.`,
 
     setPendingChanges(null);
     editorSnapshot.current = null;
-  }, [pendingChanges, onAgentEdit]);
+
+    // Notify parent to save the document
+    onAcceptChanges?.();
+  }, [pendingChanges, onAgentEdit, onAcceptChanges]);
 
   const handleRejectChanges = React.useCallback(() => {
     // Restore editor to pre-stream state

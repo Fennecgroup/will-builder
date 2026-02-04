@@ -486,9 +486,6 @@ export function PlateEditor({ initialValue, onChange, className, willContent }: 
         // This is more efficient and avoids index-out-of-bounds errors
         editor.children = initialValue as any[];
 
-        // Normalize the editor to ensure it's in a valid state
-        editor.normalize({ force: true });
-
         console.log('[PlateEditor] Editor updated successfully');
       }
     }

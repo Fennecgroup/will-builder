@@ -44,10 +44,40 @@ interface WillEditorProps {
 export function WillEditor({ will }: WillEditorProps) {
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
+
+  // Helper to strip AI marks from loaded content
+  const stripMarksFromValue = (value: Value): Value => {
+    const cleanNodes = (nodes: any[]): any[] => {
+      return nodes.map(node => {
+        if (!node || typeof node !== 'object') {
+          return node;
+        }
+
+        if ('text' in node) {
+          // Remove AI-related marks
+          const { ai, pending, streaming, ...rest } = node;
+          return rest;
+        }
+
+        if ('children' in node && Array.isArray(node.children)) {
+          return {
+            ...node,
+            children: cleanNodes(node.children),
+          };
+        }
+
+        return node;
+      });
+    };
+
+    return cleanNodes(value) as Value;
+  };
+
   const [editorValue, setEditorValue] = useState<Value>(() => {
     // If editorContent exists and has content, use it (preserve user edits)
     if (will.editorContent && Array.isArray(will.editorContent) && will.editorContent.length > 0) {
-      return will.editorContent as unknown as Value
+      // Strip any AI marks that might have been saved
+      return stripMarksFromValue(will.editorContent as unknown as Value);
     }
 
     // Generate dynamic content from willContent
@@ -108,6 +138,37 @@ export function WillEditor({ will }: WillEditorProps) {
   // Streaming text state for displaying in editor
   const [streamingText, setStreamingText] = useState<string>('')
 
+  // Track pending changes in agent mode
+  const [hasPendingChanges, setHasPendingChanges] = useState(false)
+
+  // Helper function to strip AI marks from editor value before saving
+  const stripAIMarks = useCallback((value: Value): Value => {
+    const cleanNodes = (nodes: any[]): any[] => {
+      return nodes.map(node => {
+        if (!node || typeof node !== 'object') {
+          return node;
+        }
+
+        if ('text' in node) {
+          // Remove AI-related marks
+          const { ai, pending, streaming, ...rest } = node;
+          return rest;
+        }
+
+        if ('children' in node && Array.isArray(node.children)) {
+          return {
+            ...node,
+            children: cleanNodes(node.children),
+          };
+        }
+
+        return node;
+      });
+    };
+
+    return cleanNodes(value) as Value;
+  }, []);
+
   // Track mount state to avoid hydration mismatch
   useEffect(() => {
     setMounted(true)
@@ -119,8 +180,11 @@ export function WillEditor({ will }: WillEditorProps) {
 
     setIsSaving(true)
     try {
+      // Strip AI marks before saving to database
+      const cleanEditorValue = stripAIMarks(editorValue);
+
       await updateWill(will.id, {
-        editorContent: editorValue,
+        editorContent: cleanEditorValue,
         content: willContent,
         status,
       })
@@ -133,22 +197,23 @@ export function WillEditor({ will }: WillEditorProps) {
     } finally {
       setIsSaving(false)
     }
-  }, [will.id, editorValue, willContent, status, hasUnsavedChanges])
+  }, [will.id, editorValue, willContent, status, hasUnsavedChanges, stripAIMarks])
 
   // useEffect(() => {
   //   setWillContent(sampleWillContent)
   // }, [])
 
   // Auto-save every 30 seconds if there are unsaved changes
+  // Skip auto-save when there are pending changes in agent mode
   useEffect(() => {
-    if (!hasUnsavedChanges) return
+    if (!hasUnsavedChanges || hasPendingChanges) return
 
     const autoSaveInterval = setInterval(() => {
       saveWill()
     }, 30000) // 30 seconds
 
     return () => clearInterval(autoSaveInterval)
-  }, [saveWill, hasUnsavedChanges])
+  }, [saveWill, hasUnsavedChanges, hasPendingChanges])
 
   // Auto-fill suggestions (debounced)
   useEffect(() => {
@@ -336,6 +401,22 @@ export function WillEditor({ will }: WillEditorProps) {
   const handleStreamingText = useCallback((text: string) => {
     setStreamingText(text);
   }, []);
+
+  // Handle pending changes state updates from AI chat
+  const handlePendingChangesUpdate = useCallback((isPending: boolean) => {
+    setHasPendingChanges(isPending);
+  }, []);
+
+  // Handle accept changes - remove marks and save the document immediately
+  const handleAcceptChanges = useCallback(async () => {
+    // Strip AI marks from the current editor value
+    const cleanValue = stripAIMarks(editorValue);
+    setEditorValue(cleanValue);
+
+    if (hasUnsavedChanges) {
+      await saveWill();
+    }
+  }, [hasUnsavedChanges, saveWill, stripAIMarks, editorValue]);
 
   // Handle AI agent edits with pending state support
   const handleAgentEdit = useCallback((
@@ -795,6 +876,8 @@ export function WillEditor({ will }: WillEditorProps) {
             onAgentEdit={handleAgentEdit}
             onStreamingProgress={handleStreamingProgress}
             onStreamingText={handleStreamingText}
+            onPendingChangesUpdate={handlePendingChangesUpdate}
+            onAcceptChanges={handleAcceptChanges}
             willContent={willContent}
             editorValue={editorValue}
             activeSelectionIndex={activeSelectionIndex}
