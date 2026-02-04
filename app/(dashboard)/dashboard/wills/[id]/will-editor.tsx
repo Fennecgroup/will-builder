@@ -271,14 +271,20 @@ export function WillEditor({ will }: WillEditorProps) {
   }, []);
 
   // Helper function to apply or remove AI marks to/from editor value
+  // Now only marks nodes that have changed compared to the previous value
   const applyAIMarks = useCallback((value: Value, isPending: boolean, isStreaming: boolean = false, removeMarks: boolean = false): Value => {
+    // Get the previous editor value for comparison
+    const previousValue = editorValue;
+
     // Recursively traverse editor nodes and add/remove AI marks
-    const markNodes = (nodes: any[]): any[] => {
-      return nodes.map(node => {
+    const markNodes = (nodes: any[], previousNodes: any[] = []): any[] => {
+      return nodes.map((node, index) => {
         // Safety check: skip undefined or null nodes
         if (!node || typeof node !== 'object') {
           return node;
         }
+
+        const previousNode = previousNodes[index];
 
         if ('text' in node) {
           if (removeMarks) {
@@ -286,28 +292,37 @@ export function WillEditor({ will }: WillEditorProps) {
             const { ai, pending, streaming, ...rest } = node;
             return rest;
           } else {
-            // Add AI marks
-            return {
-              ...node,
-              ai: true,
-              pending: isPending,
-              streaming: isStreaming,
-            };
+            // Only add AI marks if this text node changed or is new
+            const hasChanged = !previousNode ||
+                             previousNode.text !== node.text ||
+                             JSON.stringify(previousNode) !== JSON.stringify(node);
+
+            if (hasChanged) {
+              return {
+                ...node,
+                ai: true,
+                pending: isPending,
+                streaming: isStreaming,
+              };
+            }
+            // Return unchanged node without new marks
+            return node;
           }
         }
         if ('children' in node && Array.isArray(node.children)) {
           // Element node with children - recurse
+          const previousChildren = previousNode?.children || [];
           return {
             ...node,
-            children: markNodes(node.children),
+            children: markNodes(node.children, previousChildren),
           };
         }
         return node;
       });
     };
 
-    return markNodes(value) as Value;
-  }, []);
+    return markNodes(value, previousValue) as Value;
+  }, [editorValue]);
 
   // Handle streaming progress updates from AI chat
   const handleStreamingProgress = useCallback((progress: { chars: number; status: string }) => {
