@@ -25,6 +25,11 @@ const QUICK_PROMPTS = [
     label: 'Make all headings bold',
     prompt: 'Make all heading text in the document bold'
   },
+  {
+    id: 'number-sections',
+    label: 'Number all sections',
+    prompt: 'Number all sections in the document with numbers like 1.2.3. etc.'
+  }
 ] as const;
 
 interface Message {
