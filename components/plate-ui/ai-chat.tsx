@@ -5,9 +5,15 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Sparkles, Loader2, User, Bot, X, Check } from 'lucide-react';
+import { Send, Sparkles, Loader2, User, Bot, X, Check, ChevronDown } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import type { WillContent } from '@/lib/types/will';
 import { buildTestatorContext, deAnonymizeText } from '@/lib/ai/context-builder';
 import { buildDocumentContext } from '@/lib/ai/document-context-builder';
@@ -1081,29 +1087,62 @@ Format your responses in a clear, readable way.`,
         </h2>
       </div>
 
-      {/* Quick Prompts Bar */}
+      {/* Quick Prompts */}
       <div className="border-b border-neutral-200 dark:border-neutral-800 px-4 py-2 flex-shrink-0 bg-neutral-50 dark:bg-neutral-900/50">
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mb-1">
-          {QUICK_PROMPTS.map((quickPrompt) => (
-            <Button
-              key={quickPrompt.id}
-              variant="outline"
-              size="sm"
-              onClick={() => handleQuickPrompt(quickPrompt.prompt)}
-              disabled={isLoading}
-              className={cn(
-                "flex-shrink-0 h-7 text-xs",
-                "bg-white dark:bg-neutral-800",
-                "border-emerald-200 dark:border-emerald-800",
-                "text-emerald-700 dark:text-emerald-300",
-                "hover:bg-emerald-50 dark:hover:bg-emerald-900/30",
-                "hover:border-emerald-300 dark:hover:border-emerald-700",
-                "transition-colors"
-              )}
-            >
-              {quickPrompt.label}
-            </Button>
-          ))}
+        <div className="flex gap-2 items-center">
+          {/* Translate to Afrikaans - Primary action */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleQuickPrompt(QUICK_PROMPTS.find(p => p.id === 'translate-afrikaans')?.prompt || '')}
+            disabled={isLoading}
+            className={cn(
+              "h-7 text-xs",
+              "bg-white dark:bg-neutral-800",
+              "border-emerald-200 dark:border-emerald-800",
+              "text-emerald-700 dark:text-emerald-300",
+              "hover:bg-emerald-50 dark:hover:bg-emerald-900/30",
+              "hover:border-emerald-300 dark:hover:border-emerald-700",
+              "transition-colors"
+            )}
+          >
+            Translate to Afrikaans
+          </Button>
+
+          {/* More Quick Prompts Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={isLoading}
+                className={cn(
+                  "h-7 text-xs gap-1",
+                  "bg-white dark:bg-neutral-800",
+                  "border-emerald-200 dark:border-emerald-800",
+                  "text-emerald-700 dark:text-emerald-300",
+                  "hover:bg-emerald-50 dark:hover:bg-emerald-900/30",
+                  "hover:border-emerald-300 dark:hover:border-emerald-700",
+                  "transition-colors"
+                )}
+              >
+                More Prompts
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-64">
+              {QUICK_PROMPTS.filter(p => p.id !== 'translate-afrikaans').map((quickPrompt) => (
+                <DropdownMenuItem
+                  key={quickPrompt.id}
+                  onClick={() => handleQuickPrompt(quickPrompt.prompt)}
+                  disabled={isLoading}
+                  className="cursor-pointer"
+                >
+                  {quickPrompt.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
