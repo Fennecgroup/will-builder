@@ -402,8 +402,8 @@ export function AIChat({ onInsert, onAgentEdit, onStreamingProgress, onStreaming
     // Update ref with latest buffer
     characterBufferRef.current = characterBuffer;
 
-    const CHARS_PER_FRAME = 3;
-    const FRAME_DELAY = 4;
+    const CHARS_PER_FRAME = 5;  // Increased from 3 to reduce update frequency
+    const FRAME_DELAY = 1;      // Increased from 4ms to reduce update frequency
 
     // If animation is already running, let it continue (it will pick up the new content from the ref)
     if (animationFrameRef.current) {

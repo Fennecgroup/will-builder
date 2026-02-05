@@ -62,7 +62,11 @@ export function SlashInputElement({
   const handleSelect = React.useCallback(async (action: string) => {
     // Remove the slash command trigger first
     if (editor.selection) {
-      editor.tf.delete();
+      try {
+        editor.tf.delete();
+      } catch (e) {
+        console.warn('[SlashInput] Could not delete selection:', e);
+      }
     }
 
     // Handle formatting commands
@@ -102,7 +106,11 @@ export function SlashInputElement({
       e.preventDefault();
       // Close the menu by removing the slash input
       if (editor.selection) {
-        editor.tf.delete();
+        try {
+          editor.tf.delete();
+        } catch (e) {
+          console.warn('[SlashInput] Could not delete on Escape:', e);
+        }
       }
     }
   }, [filteredCommands, selectedIndex, handleSelect, editor]);

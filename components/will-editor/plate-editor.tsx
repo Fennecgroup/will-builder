@@ -11,6 +11,7 @@ import {
   useEditorRef,
   useEditorState,
 } from '@udecode/plate/react';
+import { Transforms, Editor } from 'slate';
 import type { Value } from '@udecode/plate';
 import {
   BoldPlugin,
@@ -481,6 +482,13 @@ export function PlateEditor({ initialValue, onChange, className, willContent }: 
         console.log('[PlateEditor] Updating editor with new value from prop');
         console.log('Old value length:', currentValue.length);
         console.log('New value length:', initialValue.length);
+
+        // CRITICAL FIX: Deselect before mutation to prevent path errors
+        try {
+          Transforms.deselect(editor);
+        } catch (e) {
+          console.warn('[PlateEditor] Could not deselect:', e);
+        }
 
         // Replace the entire editor content at once
         // This is more efficient and avoids index-out-of-bounds errors
