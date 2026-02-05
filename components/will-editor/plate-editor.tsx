@@ -485,7 +485,7 @@ export function PlateEditor({ initialValue, onChange, className, willContent }: 
 
         // CRITICAL FIX: Deselect before mutation to prevent path errors
         try {
-          Transforms.deselect(editor);
+          Transforms.deselect(editor as any);
         } catch (e) {
           console.warn('[PlateEditor] Could not deselect:', e);
         }
