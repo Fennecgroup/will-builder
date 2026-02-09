@@ -34,6 +34,10 @@ class Settings(BaseSettings):
     # DATABASE_POOL_SIZE: int = 5
     # DATABASE_MAX_OVERFLOW: int = 10
 
+    # Clerk settings
+    CLERK_SECRET_KEY: str = os.getenv("CLERK_SECRET_KEY", "")
+    CLERK_API_BASE_URL: str = "https://api.clerk.com/v1"
+
     # MongoDB settings (alternative)
     # MONGODB_URL: str = "mongodb://localhost:27017"
     # MONGODB_DATABASE: str = "will_builder"

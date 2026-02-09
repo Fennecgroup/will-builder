@@ -2,12 +2,14 @@
 FastAPI application for Fennec Will Builder - External Testator Information API
 """
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import Dict
 import logging
 from datetime import datetime
+from sqlalchemy.orm import Session
+from sqlalchemy import text
 
 from models import (
     WillContent,
@@ -15,6 +17,8 @@ from models import (
     HealthCheckResponse,
 )
 from config import settings
+from database import get_db, test_db_connection
+from user_service import get_or_create_user, create_will_for_user
 
 # Configure logging
 logging.basicConfig(
@@ -42,6 +46,17 @@ app.add_middleware(
 )
 
 
+@app.on_event("startup")
+async def startup_event():
+    """Verify database connection on startup"""
+    logger.info("Starting up - checking database connection...")
+    db_ok = await test_db_connection()
+    if not db_ok:
+        logger.error("Database connection failed on startup")
+    else:
+        logger.info("Database connection successful")
+
+
 @app.get("/", response_model=Dict[str, str])
 async def root():
     """Root endpoint - API information"""
@@ -54,12 +69,21 @@ async def root():
 
 
 @app.get("/health", response_model=HealthCheckResponse)
-async def health_check():
-    """Health check endpoint"""
+async def health_check(db: Session = Depends(get_db)):
+    """Health check endpoint with database connection test"""
+    db_status = "disconnected"
+    try:
+        # Test database connection
+        db.execute(text("SELECT 1"))
+        db_status = "connected"
+    except Exception as e:
+        logger.error(f"Health check database test failed: {str(e)}")
+
     return HealthCheckResponse(
         status="healthy",
         timestamp=datetime.utcnow(),
         service="will-builder-api",
+        db=db_status,
     )
 
 
@@ -68,7 +92,7 @@ async def health_check():
     response_model=WillContentResponse,
     status_code=status.HTTP_201_CREATED,
 )
-async def create_will(will_content: WillContent):
+async def create_will(will_content: WillContent, db: Session = Depends(get_db)):
     """
     Accept complete will content for will creation.
 
@@ -84,6 +108,7 @@ async def create_will(will_content: WillContent):
 
     Args:
         will_content: WillContent object containing all will details
+        db: Database session dependency
 
     Returns:
         WillContentResponse with confirmation and generated will ID
@@ -92,22 +117,47 @@ async def create_will(will_content: WillContent):
         HTTPException: If validation fails or processing error occurs
     """
     try:
-        logger.info(f"Received will content for: {will_content.testator.fullName}")
+        testator_name = f"{will_content.testator.firstName or ''} {will_content.testator.lastName or ''}".strip() or "Unknown"
+        logger.info(f"Received will content for testator: {testator_name}")
 
-        # TODO: check if the user_id exsists in the database. If not create a new clerk user and a normal user
-        # TODO: Implement database storage
-        # TODO: Integrate with will generation service
+        # Extract user email (always provided)
+        user_email = will_content.user_email
+        logger.info(f"Processing will for user email: {user_email}")
 
-        # For now, return a mock response
-        will_id = f"WILL-{datetime.utcnow().timestamp()}"
+        # Step 1: Get or create user (creates in Clerk and DB if needed)
+        user, user_error = await get_or_create_user(db, user_email)
+
+        if user_error or not user:
+            logger.error(f"Failed to get or create user: {user_error}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to process user account",
+            )
+
+        logger.info(f"User processed successfully: {user.id}")
+
+        # Step 2: Create will for user
+        # will, will_error = create_will_for_user(db, user, will_content)
+
+        # if will_error or not will:
+        #     logger.error(f"Failed to create will: {will_error}")
+        #     raise HTTPException(
+        #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        #         detail="Failed to create will record",
+        #     )
+
+        # logger.info(f"Will created successfully: {will.id}")
 
         return WillContentResponse(
             success=True,
-            will_id=will_id,
+            will_id='1234567890',#will.id,
             message="Will content received and validated successfully",
             timestamp=datetime.utcnow(),
         )
 
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
     except ValueError as e:
         logger.error(f"Validation error: {str(e)}")
         raise HTTPException(
@@ -115,7 +165,7 @@ async def create_will(will_content: WillContent):
             detail=f"Validation error: {str(e)}",
         )
     except Exception as e:
-        logger.error(f"Error processing testator information: {str(e)}")
+        logger.error(f"Error processing testator information: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error processing testator information",

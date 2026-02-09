@@ -10,8 +10,8 @@ pydantic-settings==2.7.1
 python-dotenv==1.0.1
 
 # Database drivers (uncomment as needed)
-# sqlalchemy==2.0.36
-# psycopg2-binary==2.9.10  # PostgreSQL
+sqlalchemy==2.0.36
+psycopg2-binary==2.9.10  # PostgreSQL
 # pymongo==4.10.1  # MongoDB
 
 # HTTP client (for external API calls if needed)

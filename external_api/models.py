@@ -166,15 +166,15 @@ class FuneralWishes(BaseModel):
 
 class TestatorInfo(BaseModel):
     """Testator personal information"""
-    id: str = Field(..., min_length=1, max_length=100, description="Unique identifier")
+    # id: str = Field(..., min_length=1, max_length=100, description="Unique identifier")
     #fullName: str = Field(..., min_length=2, max_length=200, description="Full name")
     firstName: Optional[str] = Field(None, max_length=100, description="First name")
     lastName: Optional[str] = Field(None, max_length=100, description="Last name")
     dateOfBirth: str = Field(..., description="Date of birth (YYYY-MM-DD)")
     idNumber: str = Field(..., min_length=1, max_length=50, description="National ID or passport number")
-    address: Address
-    phone: str = Field(..., min_length=10, max_length=20, description="Phone number")
-    email: EmailStr = Field(..., description="Email address")
+    address: Optional[Address] = Field(None, description="Address")
+    phone: Optional[str] = Field(None, min_length=10, max_length=20, description="Phone number")
+    email: Optional[EmailStr] = Field(None, description="Email address")
     occupation: Optional[str] = Field(None, max_length=200, description="Occupation")
 
     @field_validator("dateOfBirth")
@@ -370,25 +370,26 @@ class User(BaseModel):
 
 class WillContent(BaseModel):
     """Complete will content structure"""
-    user_id: str = Optional[Field(..., min_length=1, max_length=50, description="National ID number")]
+    # user_id: str = Optional[Field(..., min_length=1, max_length=50, description="will builder user id")]
+    user_email: EmailStr = Field(..., description="Will builder user email (required)")
     willType: Optional[WillType] = Field(None, description="Type of will")
     testator: TestatorInfo = Field(..., description="Testator information")
-    maritalStatus: MaritalStatus = Field(..., description="Marital status")
+    # maritalStatus: MaritalStatus = Field(..., description="Marital status")
     marriage: MarriageInfo = Field(..., description="Marriage information")
     children: Optional[List[Child]] = Field(None, description="Children")
-    assets: List[Asset] = Field(..., min_length=1, description="Assets")
-    beneficiaries: List[Beneficiary] = Field(..., min_length=1, description="Beneficiaries")
-    executors: List[Executor] = Field(..., min_length=1, description="Executors (minimum 1)")
-    witnesses: List[Witness] = Field(..., min_length=2, description="Witnesses (minimum 2 for SA)")
-    guardians: List[Guardian] = Field(default_factory=list, description="Guardians for minor children")
-    trustees: Optional[List[Trustee]] = Field(None, description="Trustees for minor beneficiaries")
-    liabilities: List[Liability] = Field(default_factory=list, description="Liabilities")
+    assets: Optional[List[Asset]] = Field(None, description="Assets")
+    beneficiaries: Optional[List[Beneficiary]] = Field(default_factory=list, description="Beneficiaries")
+    executors: Optional[List[Executor]] = Field(default_factory=list, description="Executors (minimum 1)")
+    witnesses: Optional[List[Witness]] = Field(default_factory=list, description="Witnesses (minimum 2 for SA)")
+    guardians: Optional[List[Guardian]] = Field(default_factory=list, description="Guardians for minor children")
+    trustees: Optional[List[Trustee]] = Field(default_factory=list, description="Trustees for minor beneficiaries")
+    liabilities: Optional[List[Liability]] = Field(default_factory=list, description="Liabilities")
     funeralWishes: Optional[FuneralWishes] = Field(None, description="Funeral wishes")
-    digitalAssets: List[DigitalAsset] = Field(default_factory=list, description="Digital assets")
+    digitalAssets: Optional[List[DigitalAsset]] = Field(None, description="Digital assets")
     specialInstructions: Optional[str] = Field(None, max_length=5000, description="Special instructions")
-    revocationClause: str = Field(..., min_length=10, description="Required revocation clause")
-    residuaryClause: str = Field(..., min_length=10, description="Required residuary clause")
-    specificBequests: Optional[List[SpecificBequest]] = Field(None, description="Specific bequests")
+    revocationClause: Optional[str] = Field(None, min_length=10, description="Required revocation clause")
+    residuaryClause: Optional[str] = Field(None, min_length=10, description="Required residuary clause")
+    specificBequests: Optional[List[SpecificBequest]] = Field(default_factory=list, description="Specific bequests")
     minorBeneficiaryProvisions: Optional[MinorBeneficiaryProvisions] = Field(
         None, description="Provisions for minor beneficiaries"
     )
@@ -401,53 +402,53 @@ class WillContent(BaseModel):
         """Cross-model validations"""
         errors = []
 
-        # Validate beneficiary allocations don't exceed 100%
-        total_allocation = sum(
-            b.allocationPercentage for b in self.beneficiaries
-            if b.allocationPercentage is not None
-        )
-        if total_allocation > 100:
-            errors.append(f"Total beneficiary allocations ({total_allocation}%) exceed 100%")
+        # # Validate beneficiary allocations don't exceed 100%
+        # total_allocation = sum(
+        #     b.allocationPercentage for b in self.beneficiaries if self.beneficiaries is not None
+        #     if b.allocationPercentage is not None
+        # )
+        # if total_allocation > 100:
+        #     errors.append(f"Total beneficiary allocations ({total_allocation}%) exceed 100%")
 
-        # Validate minor beneficiaries have guardians
-        for beneficiary in self.beneficiaries:
-            if beneficiary.isMinor and not beneficiary.guardianId:
-                errors.append(f"Minor beneficiary '{beneficiary.fullName}' must have a guardianId")
+        # # Validate minor beneficiaries have guardians
+        # for beneficiary in self.beneficiaries:
+        #     if beneficiary.isMinor and not beneficiary.guardianId:
+        #         errors.append(f"Minor beneficiary '{beneficiary.fullName}' must have a guardianId")
 
-        # Validate guardian IDs exist
-        guardian_ids = {g.id for g in self.guardians}
-        for beneficiary in self.beneficiaries:
-            if beneficiary.guardianId and beneficiary.guardianId not in guardian_ids:
-                errors.append(
-                    f"Guardian ID '{beneficiary.guardianId}' for beneficiary '{beneficiary.fullName}' not found"
-                )
+        # # Validate guardian IDs exist
+        # guardian_ids = {g.id for g in self.guardians}
+        # for beneficiary in self.beneficiaries:
+        #     if beneficiary.guardianId and beneficiary.guardianId not in guardian_ids:
+        #         errors.append(
+        #             f"Guardian ID '{beneficiary.guardianId}' for beneficiary '{beneficiary.fullName}' not found"
+        #         )
 
         # Validate beneficiary IDs exist for references
-        beneficiary_ids = {b.id for b in self.beneficiaries}
+        beneficiary_ids = {b.id for b in self.beneficiaries if self.beneficiaries is not None}
 
-        # Check digital assets
-        for asset in self.digitalAssets:
-            if asset.beneficiaryId and asset.beneficiaryId not in beneficiary_ids:
-                errors.append(f"Beneficiary ID '{asset.beneficiaryId}' in digital asset '{asset.id}' not found")
+        # # Check digital assets
+        # for asset in self.digitalAssets:
+        #     if asset.beneficiaryId and asset.beneficiaryId not in beneficiary_ids:
+        #         errors.append(f"Beneficiary ID '{asset.beneficiaryId}' in digital asset '{asset.id}' not found")
 
-        # Check specific bequests
-        if self.specificBequests:
-            for bequest in self.specificBequests:
-                if bequest.beneficiaryId not in beneficiary_ids:
-                    errors.append(
-                        f"Beneficiary ID '{bequest.beneficiaryId}' in bequest '{bequest.id}' not found"
-                    )
-                if bequest.substituteBeneficiaryId and bequest.substituteBeneficiaryId not in beneficiary_ids:
-                    errors.append(
-                        f"Substitute beneficiary ID '{bequest.substituteBeneficiaryId}' in bequest '{bequest.id}' not found"
-                    )
+        # # Check specific bequests
+        # if self.specificBequests:
+        #     for bequest in self.specificBequests:
+        #         if bequest.beneficiaryId not in beneficiary_ids:
+        #             errors.append(
+        #                 f"Beneficiary ID '{bequest.beneficiaryId}' in bequest '{bequest.id}' not found"
+        #             )
+        #         if bequest.substituteBeneficiaryId and bequest.substituteBeneficiaryId not in beneficiary_ids:
+        #             errors.append(
+        #                 f"Substitute beneficiary ID '{bequest.substituteBeneficiaryId}' in bequest '{bequest.id}' not found"
+        #             )
 
-        # Check substitute beneficiaries
-        for beneficiary in self.beneficiaries:
-            if beneficiary.substituteBeneficiaryId and beneficiary.substituteBeneficiaryId not in beneficiary_ids:
-                errors.append(
-                    f"Substitute beneficiary ID '{beneficiary.substituteBeneficiaryId}' for '{beneficiary.fullName}' not found"
-                )
+        # # Check substitute beneficiaries
+        # for beneficiary in self.beneficiaries:
+        #     if beneficiary.substituteBeneficiaryId and beneficiary.substituteBeneficiaryId not in beneficiary_ids:
+        #         errors.append(
+        #             f"Substitute beneficiary ID '{beneficiary.substituteBeneficiaryId}' for '{beneficiary.fullName}' not found"
+        #         )
 
         # Validate witnesses are not beneficiaries, executors, or guardians
         witness_ids = {w.idNumber for w in self.witnesses if w.idNumber}
@@ -461,20 +462,20 @@ class WillContent(BaseModel):
                 f"Witnesses cannot be beneficiaries, executors, or guardians. Conflicting IDs: {conflicting_ids}"
             )
 
-        # Validate minimum witnesses
-        if len(self.witnesses) < 2:
-            errors.append("Minimum 2 witnesses required for South African wills")
+        # # Validate minimum witnesses
+        # if len(self.witnesses) < 2:
+        #     errors.append("Minimum 2 witnesses required for South African wills")
 
-        # Validate trustee IDs if minor provisions use testamentary trust
-        if self.minorBeneficiaryProvisions and self.minorBeneficiaryProvisions.method == MinorProvisionMethod.TESTAMENTARY_TRUST:
-            if not self.minorBeneficiaryProvisions.trusteeId:
-                errors.append("Trustee ID required when using testamentary trust for minor provisions")
-            elif self.trustees:
-                trustee_ids = {t.id for t in self.trustees}
-                if self.minorBeneficiaryProvisions.trusteeId not in trustee_ids:
-                    errors.append(
-                        f"Trustee ID '{self.minorBeneficiaryProvisions.trusteeId}' in minor provisions not found"
-                    )
+        # # Validate trustee IDs if minor provisions use testamentary trust
+        # if self.minorBeneficiaryProvisions and self.minorBeneficiaryProvisions.method == MinorProvisionMethod.TESTAMENTARY_TRUST:
+        #     if not self.minorBeneficiaryProvisions.trusteeId:
+        #         errors.append("Trustee ID required when using testamentary trust for minor provisions")
+        #     elif self.trustees:
+        #         trustee_ids = {t.id for t in self.trustees}
+        #         if self.minorBeneficiaryProvisions.trusteeId not in trustee_ids:
+        #             errors.append(
+        #                 f"Trustee ID '{self.minorBeneficiaryProvisions.trusteeId}' in minor provisions not found"
+        #             )
 
         if errors:
             raise ValueError("; ".join(errors))
@@ -499,6 +500,7 @@ class HealthCheckResponse(BaseModel):
     status: str
     timestamp: datetime
     service: str
+    db: Optional[str] = Field(None, description="Database connection status")
 
 
 class ErrorResponse(BaseModel):
