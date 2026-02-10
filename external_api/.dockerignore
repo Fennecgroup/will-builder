@@ -1,0 +1,85 @@
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+*.pyo
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# Environment variables (security - never copy into images)
+.env
+.env.*
+!.env.example
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker files (no need to copy into image)
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# Documentation
+README.md
+IMPLEMENTATION_SUMMARY.md
+commands.md
+prompts/
+*.md
+!requirements.txt
+
+# Tests (can be included if running tests in container)
+test_*.py
+tests/
+.pytest_cache/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Coverage reports
+.coverage
+htmlcov/
+.tox/
+coverage.xml
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/

@@ -1,0 +1,82 @@
+version: '3.8'
+
+# Docker Compose configuration for development
+#
+# DATABASE OPTIONS:
+# 1. Neon Cloud (Default) - Use this configuration as-is
+# 2. Local PostgreSQL - Uncomment the 'db' service and 'depends_on' below
+#
+# To use local PostgreSQL:
+#   1. Uncomment the 'db' service section below
+#   2. Uncomment 'depends_on: - db' in the api service
+#   3. Update DATABASE_URL in .env:
+#      DATABASE_URL=postgresql://postgres:postgres@db:5432/will_builder
+
+services:
+  # FastAPI application service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: will-builder-api
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount code directory for hot-reload
+      - .:/app
+      # Mount .env file as read-only for configuration
+      - ./.env:/app/.env:ro
+    env_file:
+      - .env
+    environment:
+      # Override settings for Docker environment if needed
+      - HOST=0.0.0.0
+      - PORT=8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - will-builder-network
+    # Uncomment the following line if using local PostgreSQL
+    # depends_on:
+    #   - db
+
+  # ========================================
+  # PostgreSQL database (OPTIONAL)
+  # Uncomment this entire service to use local PostgreSQL instead of Neon
+  # ========================================
+  # db:
+  #   image: postgres:16-alpine
+  #   container_name: will-builder-postgres
+  #   environment:
+  #     POSTGRES_DB: ${POSTGRES_DB:-will_builder}
+  #     POSTGRES_USER: ${POSTGRES_USER:-postgres}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   restart: unless-stopped
+  #   networks:
+  #     - will-builder-network
+
+# Networks
+networks:
+  will-builder-network:
+    driver: bridge
+    name: will-builder-network
+
+# Volumes (only needed if using local PostgreSQL)
+# Uncomment if you uncommented the 'db' service above
+# volumes:
+#   postgres_data:
+#     name: will-builder-postgres-data

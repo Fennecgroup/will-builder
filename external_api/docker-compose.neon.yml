@@ -1,0 +1,41 @@
+version: '3.8'
+
+# Docker Compose configuration for development with Neon cloud database
+# This configuration does NOT include a local PostgreSQL service
+# Use this when you want to connect to Neon cloud database only
+
+services:
+  # FastAPI application service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: will-builder-api
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount code directory for hot-reload
+      - .:/app
+      # Mount .env file as read-only for configuration
+      - ./.env:/app/.env:ro
+    env_file:
+      - .env
+    environment:
+      # Override settings for Docker environment if needed
+      - HOST=0.0.0.0
+      - PORT=8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - will-builder-network
+
+# Networks
+networks:
+  will-builder-network:
+    driver: bridge
+    name: will-builder-network

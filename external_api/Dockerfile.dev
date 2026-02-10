@@ -1,0 +1,47 @@
+# syntax=docker.io/docker/dockerfile:1
+
+# Development Dockerfile for FastAPI Will Builder API
+# Single-stage build with hot-reload support for fast iteration
+
+ARG PYTHON_VERSION=3.11
+
+FROM python:${PYTHON_VERSION}-slim
+
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user (matching production with UID 1001)
+RUN groupadd --system --gid 1001 fastapi && \
+    useradd --system --uid 1001 --gid fastapi --shell /bin/bash --create-home fastapi
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements file
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Note: Application code will be mounted as volume for hot-reload
+# No need to COPY . . here as it will be bind-mounted
+
+# Set proper permissions for the working directory
+RUN chown -R fastapi:fastapi /app
+
+# Switch to non-root user
+USER fastapi
+
+# Expose port
+EXPOSE 8000
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Run uvicorn server with reload enabled
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
