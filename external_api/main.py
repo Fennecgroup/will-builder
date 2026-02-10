@@ -137,20 +137,20 @@ async def create_will(will_content: WillContent, db: Session = Depends(get_db)):
         logger.info(f"User processed successfully: {user.id}")
 
         # Step 2: Create will for user
-        # will, will_error = create_will_for_user(db, user, will_content)
+        will, will_error = create_will_for_user(db, user, will_content)
 
-        # if will_error or not will:
-        #     logger.error(f"Failed to create will: {will_error}")
-        #     raise HTTPException(
-        #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        #         detail="Failed to create will record",
-        #     )
+        if will_error or not will:
+            logger.error(f"Failed to create will: {will_error}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to create will record",
+            )
 
-        # logger.info(f"Will created successfully: {will.id}")
+        logger.info(f"Will created successfully: {will.id}")
 
         return WillContentResponse(
             success=True,
-            will_id='1234567890',#will.id,
+            will_id=will.id,
             message="Will content received and validated successfully",
             timestamp=datetime.utcnow(),
         )
