@@ -9,9 +9,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 from datetime import datetime
 
-from db_models import User, Will, WillStatus
-from clerk_service import clerk_service
-from models import WillContent
+from models.db_models import User, Will, WillStatus
+from services.clerk_service import clerk_service
+from models.models import WillContent
 
 logger = logging.getLogger(__name__)
 

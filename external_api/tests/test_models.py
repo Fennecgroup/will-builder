@@ -4,7 +4,7 @@ Tests validation with complex-blended sample data
 """
 
 import json
-from models import WillContent
+from models.models import WillContent
 
 # Sample data based on TypeScript complex-blended sample
 # This is a simplified version for testing core structure

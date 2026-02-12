@@ -3,7 +3,7 @@ Test usufruct functionality in WillContent models
 """
 
 import json
-from models import WillContent, UsufructConfig
+from models.models import WillContent, UsufructConfig
 from fastapi.testclient import TestClient
 from main import app
 

@@ -4,6 +4,7 @@ source venv/bin/activate  # or venv\Scripts\activate on Windows
 pip install -r requirements.txt                                                                              
 cp .env.example .env                                                                                         
 python main.py 
+uvicorn main:app --host 0.0.0.0 --port 8000
 
 
 # 1. Stop and remove containers

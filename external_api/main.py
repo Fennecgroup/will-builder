@@ -11,14 +11,14 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
-from models import (
+from models.models import (
     WillContent,
     WillContentResponse,
     HealthCheckResponse,
 )
-from config import settings
-from database import get_db, test_db_connection
-from user_service import get_or_create_user, create_will_for_user
+from utils.config import settings
+from utils.database import get_db, test_db_connection
+from services.user_service import get_or_create_user, create_will_for_user
 
 # Configure logging
 logging.basicConfig(

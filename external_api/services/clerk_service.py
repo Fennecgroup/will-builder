@@ -5,7 +5,7 @@ Clerk Backend API integration service
 import httpx
 import logging
 from typing import Optional, Dict, Any
-from config import settings
+from utils.config import settings
 
 logger = logging.getLogger(__name__)
 

@@ -4,7 +4,7 @@ SQLAlchemy database models matching Prisma schema
 
 from sqlalchemy import Column, String, DateTime, Text, ForeignKey, Index, Enum as SQLEnum
 from sqlalchemy.sql import func
-from database import Base
+from utils.database import Base
 import enum
 
 
