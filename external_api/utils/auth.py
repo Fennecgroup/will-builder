@@ -51,7 +51,7 @@ def verify_token(token: str) -> str:
             settings.SECRET_KEY,
             algorithms=[settings.ALGORITHM]
         )
-
+        
         # Extract email from token payload
         email: str = payload.get("app:UserEmailKey")
         if email is None:

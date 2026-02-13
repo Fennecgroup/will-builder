@@ -41,3 +41,5 @@ run:
       value-from: "arn:aws:secretsmanager:eu-west-1:177418992867:secret:will-builder/qa/secrets-o3u77F:DATABASE_URL::"
     - name: CLERK_SECRET_KEY
       value-from: "arn:aws:secretsmanager:eu-west-1:177418992867:secret:will-builder/qa/secrets-o3u77F:CLERK_SECRET_KEY::"
+    - name: SECRET_KEY
+      value-from: "arn:aws:secretsmanager:eu-west-1:177418992867:secret:will-builder/qa/secrets-o3u77F:SECRET_KEY::"
