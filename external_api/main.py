@@ -18,6 +18,7 @@ from models.models import (
 )
 from utils.config import settings
 from utils.database import get_db, test_db_connection
+from utils.auth import require_auth, optional_auth
 from services.user_service import get_or_create_user, create_will_for_user
 
 # Configure logging
@@ -85,6 +86,31 @@ async def health_check(db: Session = Depends(get_db)):
         service="will-builder-api",
         db=db_status,
     )
+
+
+@app.get("/api/v1/profile", response_model=Dict[str, str])
+async def get_profile(email: str = Depends(require_auth)):
+    """
+    Get authenticated user profile.
+
+    Protected endpoint that requires JWT authentication.
+    Returns the authenticated user's email extracted from the token.
+
+    Args:
+        email: User email from JWT token (injected by require_auth dependency)
+
+    Returns:
+        Dictionary with authenticated user information
+
+    Raises:
+        HTTPException: 401 if token is missing or invalid
+    """
+    logger.info(f"Profile accessed by user: {email}")
+    return {
+        "authenticated_user": email,
+        "message": "Successfully authenticated",
+        "timestamp": datetime.utcnow().isoformat(),
+    }
 
 
 @app.post(
