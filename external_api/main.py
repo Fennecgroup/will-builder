@@ -61,7 +61,7 @@ async def startup_event():
 async def root():
     """Root endpoint - API information"""
     return {
-        "message": "Fennec Will Builder API",
+        "message": "Fennec Will Builder API External",
         "version": "1.0.0",
         "status": "active",
         "docs": "/docs",
