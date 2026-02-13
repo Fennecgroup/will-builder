@@ -39,7 +39,7 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins= ["*"], #settings.ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -50,11 +50,11 @@ app.add_middleware(
 async def startup_event():
     """Verify database connection on startup"""
     logger.info("Starting up - checking database connection...")
-    db_ok = await test_db_connection()
-    if not db_ok:
-        logger.error("Database connection failed on startup")
-    else:
-        logger.info("Database connection successful")
+    # db_ok = await test_db_connection()
+    # if not db_ok:
+    #     logger.error("Database connection failed on startup")
+    # else:
+    #     logger.info("Database connection successful")
 
 
 @app.get("/", response_model=Dict[str, str])

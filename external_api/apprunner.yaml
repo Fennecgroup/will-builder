@@ -3,13 +3,29 @@ runtime: python311
 build:
   commands:
     # We cd into the folder to install requirements correctly
-    pre_build:
-      - pip install --upgrade pip
+    # pre_build:
+    #   - pip install --upgrade pip
+    # pre-build:
+    #   - apt-get update && apt-get install -y libpq-dev gcc
+    #   - pip install --upgrade pip
     build:
-      - pip install -r requirements.txt
+      # - echo "=== Installing system dependencies ==="
+      # - apt-get update
+      # - apt-get install -y build-essential libffi-dev libssl-dev
+      # - echo "=== Starting build ==="
+      # - python --version
+      # - pip --version
+      - echo "=== Installing dependencies 2 ==="
+      - python3 -m pip install --upgrade pip
+      - pip3 install -r requirements.txt
+      - echo "=== Build completed successfully ==="
+
 run:
-  runtime-version: 3.11.x
-  command: uvicorn main:app --host 0.0.0.0 --port 8000
+  runtime-version: 3.11
+  pre-run:
+    - pip3 install -r requirements.txt
+  #command: uvicorn main:app --host 0.0.0.0 --port 8000
+  command: python3 main.py
   network:
     port: 8000
   # Optional: Define your environment variables here if not using the console
@@ -18,3 +34,10 @@ run:
       value: "0.0.0.0"
     - name: PORT
       value: "8000"
+    - name: PYTHONPATH
+      value: "/opt/app"
+  secrets:
+    - name: DATABASE_URL
+      value-from: "arn:aws:secretsmanager:eu-west-1:177418992867:secret:will-builder/qa/secrets-o3u77F:DATABASE_URL::"
+    - name: CLERK_SECRET_KEY
+      value-from: "arn:aws:secretsmanager:eu-west-1:177418992867:secret:will-builder/qa/secrets-o3u77F:CLERK_SECRET_KEY::"
