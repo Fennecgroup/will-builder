@@ -114,7 +114,7 @@ async def get_profile(email: str = Depends(require_auth)):
 
 
 @app.post(
-    "/api/v1/testator",
+    "/api/v1/create-will",
     response_model=WillContentResponse,
     status_code=status.HTTP_201_CREATED,
 )
