@@ -118,7 +118,10 @@ async def get_profile(email: str = Depends(require_auth)):
     response_model=WillContentResponse,
     status_code=status.HTTP_201_CREATED,
 )
-async def create_will(will_content: WillContent, db: Session = Depends(get_db)):
+async def create_will(
+    will_content: WillContent,
+    user_email: str = Depends(require_auth),
+    db: Session = Depends(get_db)):
     """
     Accept complete will content for will creation.
 
@@ -147,7 +150,7 @@ async def create_will(will_content: WillContent, db: Session = Depends(get_db)):
         logger.info(f"Received will content for testator: {testator_name}")
 
         # Extract user email (always provided)
-        user_email = will_content.user_email
+        #user_email = will_content.user_email
         logger.info(f"Processing will for user email: {user_email}")
 
         # Step 1: Get or create user (creates in Clerk and DB if needed)

@@ -371,7 +371,7 @@ class User(BaseModel):
 class WillContent(BaseModel):
     """Complete will content structure"""
     # user_id: str = Optional[Field(..., min_length=1, max_length=50, description="will builder user id")]
-    user_email: EmailStr = Field(..., description="Will builder user email (required)")
+    #user_email: EmailStr = Field(..., description="Will builder user email (required)")
     willType: Optional[WillType] = Field(None, description="Type of will")
     testator: TestatorInfo = Field(..., description="Testator information")
     # maritalStatus: MaritalStatus = Field(..., description="Marital status")
