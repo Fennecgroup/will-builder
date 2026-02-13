@@ -73,6 +73,12 @@ class LiabilityType(str, Enum):
     LOAN = "loan"
     CREDIT_CARD = "credit-card"
     TAX = "tax"
+    NORMAL = "normal"
+    COUNTER_CLAIM = "counter claim"
+    MASTER_FEE = "master's fee"
+    EXECUTOR_FEE = "executor's fee"
+    ESTATE_DUTY = "estate duty"
+    CAPITAL_GAINS_TAX = "capital's gains tax"
     OTHER = "other"
 
 
@@ -247,6 +253,8 @@ class Liability(BaseModel):
     currency: str = Field(default="ZAR", max_length=3, description="Currency code (ISO 4217)")
     accountNumber: Optional[str] = Field(None, max_length=100, description="Account number")
     notes: Optional[str] = Field(None, max_length=1000)
+    beneficiaryId: Optional[str] = Field(..., min_length=1, max_length=100, description="Beneficary ID")
+    assetId: Optional[str] = Field(..., min_length=1, max_length=100, description="Asset ID")
 
 
 class DigitalAsset(BaseModel):
