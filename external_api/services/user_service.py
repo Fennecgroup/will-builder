@@ -41,11 +41,11 @@ async def get_or_create_user(
     """
     Get existing user or create new user in both Clerk and database.
 
-    This function:
-    1. Checks if user exists in DB by email
-    2. If not found, creates Clerk user with email only
-    3. Creates DB user record with Clerk ID
-    4. Handles rollback: if DB fails, deletes Clerk user
+    This function implements the correct flow where Clerk is the source of truth:
+    1. Checks if user exists in Clerk by email, creates if not found
+    2. Extracts Clerk user ID from response
+    3. Checks if user exists in database by Clerk ID
+    4. Creates DB user record if not found (no rollback to Clerk on failure)
 
     Args:
         db: Database session
@@ -59,31 +59,39 @@ async def get_or_create_user(
     Note:
         Creates users with email only - no first/last name.
         User and testator are separate entities.
+        Clerk is the authentication authority; DB is synchronized to Clerk.
     """
     try:
-        # Step 1: Check if user exists in database
-        logger.info(f"Checking if user exists: {email}")
-        stmt = select(User).where(User.email == email)
-        existing_user = db.execute(stmt).scalar_one_or_none()
+        # Step 1: Get or create user in Clerk (Clerk is source of truth)
+        logger.info(f"Checking if user exists in Clerk: {email}")
+        clerk_user, clerk_error = await clerk_service.get_user_by_email(email)
 
-        if existing_user:
-            logger.info(f"User found in database: {existing_user.id}")
-            return existing_user, None
-
-        # Step 2: User doesn't exist - create in Clerk first
-        logger.info(f"User not found, creating Clerk user: {email}")
-        clerk_user, clerk_error = await clerk_service.create_user(email)
+        if clerk_error and "not found" in clerk_error.lower():
+            # User doesn't exist in Clerk, create them
+            logger.info(f"User not found in Clerk, creating: {email}")
+            clerk_user, clerk_error = await clerk_service.create_user(email)
 
         if clerk_error or not clerk_user:
-            error_msg = f"Failed to create Clerk user: {clerk_error}"
+            error_msg = f"Failed to get/create Clerk user: {clerk_error}"
             logger.error(error_msg)
             return None, error_msg
 
         clerk_user_id = clerk_user.get("id")
         if not clerk_user_id:
-            error_msg = "Clerk user created but no ID returned"
+            error_msg = "Clerk user exists but no ID returned"
             logger.error(error_msg)
             return None, error_msg
+
+        logger.info(f"Clerk user found/created: {clerk_user_id}")
+
+        # Step 2: Check if user exists in database by Clerk ID
+        logger.info(f"Checking database for Clerk ID: {clerk_user_id}")
+        stmt = select(User).where(User.clerkId == clerk_user_id)
+        existing_user = db.execute(stmt).scalar_one_or_none()
+
+        if existing_user:
+            logger.info(f"User found in database: {existing_user.id}")
+            return existing_user, None
 
         # Step 3: Create database user record
         logger.info(f"Creating database user with Clerk ID: {clerk_user_id}")
@@ -110,10 +118,8 @@ async def get_or_create_user(
             db.rollback()
             logger.error(f"Database user creation failed: {str(db_error)}")
 
-            # Cleanup: Delete Clerk user since DB creation failed
-            logger.info(f"Rolling back: deleting Clerk user {clerk_user_id}")
-            await clerk_service.delete_user(clerk_user_id)
-
+            # Note: Do NOT delete Clerk user - they are valid in Clerk
+            # The database should eventually be synchronized with Clerk
             error_msg = f"Database user creation failed: {str(db_error)}"
             return None, error_msg
 
